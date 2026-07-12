@@ -1,0 +1,68 @@
+{
+  "jobs": [
+    {
+      "id": 5691911004,
+      "title": "Software Engineer, Full Stack",
+      "updated_at": "2026-07-09T11:41:47-04:00",
+      "location": {
+        "name": "San Francisco, CA \u2022 New York, NY \u2022 United States"
+      },
+      "absolute_url": "https://boards.greenhouse.io/figma/jobs/5691911004?gh_jid=5691911004",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma\u2019s platform helps teams bring ideas to life\u2014whether you&#39;re brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you&#39;re excited to shape the future of design and collaboration, join us!&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;section page-center"
+    },
+    {
+      "id": 5552530004,
+      "title": "Software Engineer, C++",
+      "updated_at": "2026-04-15T15:32:40-04:00",
+      "location": {
+        "name": "San Francisco, CA \u2022 New York, NY \u2022 United States"
+      },
+      "absolute_url": "https://boards.greenhouse.io/figma/jobs/5552530004?gh_jid=5552530004",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma\u2019s platform helps teams bring ideas to life\u2014whether you&#39;re brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you&#39;re excited to shape the future of design and collaboration, join us!&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;section page-center"
+    },
+    {
+      "id": 5426468004,
+      "title": "Account Executive, Enterprise",
+      "updated_at": "2026-04-15T15:32:40-04:00",
+      "location": {
+        "name": "San Francisco, CA \u2022 New York, NY \u2022 United States"
+      },
+      "absolute_url": "https://boards.greenhouse.io/figma/jobs/5426468004?gh_jid=5426468004",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma\u2019s platform helps teams bring ideas to life\u2014whether you&#39;re brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you&#39;re excited to shape the future of design and collaboration, join us!&lt;/p&gt;&lt;/div&gt;&lt;p&gt;We are looking for an Enterpri"
+    },
+    {
+      "id": 5220003004,
+      "title": "Data Engineer",
+      "updated_at": "2026-04-15T15:32:40-04:00",
+      "location": {
+        "name": "San Francisco, CA \u2022 New York, NY \u2022 United States"
+      },
+      "absolute_url": "https://boards.greenhouse.io/figma/jobs/5220003004?gh_jid=5220003004",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma\u2019s platform helps teams bring ideas to life\u2014whether you&#39;re brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you&#39;re excited to shape the future of design and collaboration, join us!&lt;/p&gt;&lt;/div&gt;&lt;div&gt;\n&lt;div&gt;&lt;span class=&"
+    },
+    {
+      "id": 5722244004,
+      "title": "Manager, Software Engineering - Billing",
+      "updated_at": "2026-04-15T15:32:40-04:00",
+      "location": {
+        "name": "San Francisco, CA \u2022 New York, NY \u2022 United States"
+      },
+      "absolute_url": "https://boards.greenhouse.io/figma/jobs/5722244004?gh_jid=5722244004",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma\u2019s platform helps teams bring ideas to life\u2014whether you&#39;re brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you&#39;re excited to shape the future of design and collaboration, join us!&lt;/p&gt;&lt;/div&gt;&lt;p&gt;Billing is a full stack engine"
+    },
+    {
+      "id": 5969647004,
+      "title": "Developer Advocate (Tokyo, Japan)",
+      "updated_at": "2026-04-15T15:32:40-04:00",
+      "location": {
+        "name": "Tokyo, Japan"
+      },
+      "absolute_url": "https://boards.greenhouse.io/figma/jobs/5969647004?gh_jid=5969647004",
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma\u2019s platform helps teams bring ideas to life\u2014whether you&#39;re brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you&#39;re excited to shape the future of design and collaboration, join us!&lt;/p&gt;&lt;/div&gt;&lt;p&gt;We&#39;re looking for a Develo"
+    }
+  ],
+  "meta": {
+    "total": 6,
+    "_note": "Trimmed subset of a real Figma Greenhouse board response for normalizer tests."
+  }
+}

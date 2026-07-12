@@ -26,7 +26,8 @@ function prettySkill(canonical: string): string {
 
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, matchCount, selectJob } = useAppFlow()
+  const { candidateName, candidateRole, jobs, matchCount, loading, selectJob } =
+    useAppFlow()
 
   const checkFit = (job: RankedJob) => {
     selectJob(job.id)
@@ -58,6 +59,15 @@ export function Discovery() {
         </div>
 
         {/* Match list */}
+        {loading && jobs.length === 0 && (
+          <div className="disc-state">Finding real openings for you…</div>
+        )}
+        {!loading && jobs.length === 0 && (
+          <div className="disc-state">
+            No live openings matched your résumé yet. Try again shortly — boards
+            update through the day.
+          </div>
+        )}
         <div className="disc-list">
           {jobs.map((job, i) => {
             const top = i === 0

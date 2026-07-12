@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { buildHiringInsight, buildResearch, runPipeline } from './pipeline'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { buildHiringInsight, buildResearch, runPipeline, type PipelineResult } from './pipeline'
 import { fixtureProviders } from './providers/fixtures'
 import { groundableRefs } from './reasoning'
 
@@ -7,7 +7,10 @@ import { groundableRefs } from './reasoning'
 const AS_OF = 2026
 
 describe('pipeline — discover → audit → score → rank (fixtures)', () => {
-  const result = runPipeline(fixtureProviders, { asOfYear: AS_OF })
+  let result: PipelineResult
+  beforeAll(async () => {
+    result = await runPipeline(fixtureProviders, { asOfYear: AS_OF })
+  })
 
   it('collapses the duplicate posting and drops the confirmed-dead one', () => {
     // 6 raw postings → 1 duplicate collapsed, 1 dead dropped → 4 survivors.

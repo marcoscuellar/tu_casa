@@ -36,6 +36,15 @@
   margin-top: 4px;
 }
 
+.disc-state {
+  margin-top: 14px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 30px;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
 .disc-list {
   display: flex;
   flex-direction: column;

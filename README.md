@@ -68,6 +68,47 @@ job crawl, live liveness re-check, résumé/company research, and the verdict
 *prose* — sits behind `providers/`. Today those are fixtures; swapping in live
 LLM/web implementations touches only that seam, never the engines or the UI.
 
+## Live job discovery (real ATS jobs)
+
+Discovery can pull **real, live postings** from companies' public ATS boards —
+no API key, no scraping, no paid feed. These are the same unauthenticated
+endpoints a company's own careers page calls:
+
+- Greenhouse — `boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true`
+- Lever — `api.lever.co/v0/postings/{slug}?mode=json`
+- Ashby — `api.ashbyhq.com/posting-api/job-board/{slug}?includeCompensation=true`
+
+```
+src/engines/live/
+  ats/{greenhouse,lever,ashby}.ts   # fetch + normalize each board
+  companies.seed.ts                 # ~40 seed companies (slugs)
+  companySource.ts                  # CompanySourceProvider seam
+  jdKeywordParser.ts                # posting text → ParsedJD (deterministic)
+  filter.ts                         # résumé-driven relevance (family + location)
+  liveDiscovery.ts                  # compose into a DiscoveryProvider
+```
+
+The **résumé drives the search** — the candidate's role family and location, never
+a typed query. Pipeline order is unchanged: fetch → filter → Engine 4 → Engine 3
+→ rubric → rank. Which companies to pull sits behind `CompanySourceProvider`
+(seed list now; a "who's hiring for X in Y" reasoning step later).
+
+**Turn it on:**
+
+```bash
+# In the app — real jobs instead of the fixture pipeline:
+VITE_LIVE_JOBS=1 npm run dev
+
+# From the CLI — pull the seed and print ranked real jobs:
+npx vite-node scripts/run-live.ts
+```
+
+Live mode needs outbound access to the three ATS hosts. Where a proxy is in the
+way (Node ≥ 22.21): `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=$CURL_CA_BUNDLE npx
+vite-node scripts/run-live.ts`. Boards that fail (renamed slug, network) are
+skipped, never fatal. Résumé parse + the cheat-sheet research/reasoning stay
+fixtures this round; live JD parsing uses the deterministic keyword parser.
+
 ## Where real services plug in
 
 The UI only ever touches `src/flow/AppFlowContext.tsx`, which runs the pipeline

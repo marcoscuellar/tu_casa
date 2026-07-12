@@ -72,3 +72,24 @@ export function toCanonical(raw: string): string {
 export function skillsMatch(a: string, b: string): boolean {
   return toCanonical(a) === toCanonical(b)
 }
+
+/**
+ * Scan free text (a job description) for known skills from the vocabulary,
+ * matched on word boundaries after cleaning. Returns canonical ids. This is the
+ * deterministic keyword extraction the live JD parser builds on — a heuristic
+ * seam an LLM improves later, never a raw-string match.
+ */
+export function scanSkills(text: string): string[] {
+  const hay = ` ${clean(text)} `
+  const found = new Set<string>()
+  for (const [canonical, aliases] of Object.entries(SYNONYMS)) {
+    const phrases = [clean(canonical.replace(/-/g, ' ')), ...aliases.map(clean)]
+    for (const ph of phrases) {
+      if (ph && hay.includes(` ${ph} `)) {
+        found.add(canonical)
+        break
+      }
+    }
+  }
+  return [...found]
+}

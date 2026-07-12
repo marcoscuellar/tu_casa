@@ -39,14 +39,14 @@ export interface PipelineResult {
 }
 
 /** Run discover → audit → score → rank on a résumé. */
-export function runPipeline(
+export async function runPipeline(
   providers: Providers,
   opts: { asOfYear?: number } = {},
-): PipelineResult {
+): Promise<PipelineResult> {
   const asOfYear = opts.asOfYear ?? new Date().getFullYear()
 
   const resume = providers.resume.parseResume()
-  const raw = providers.discovery.findPostings(resume)
+  const raw = await providers.discovery.findPostings(resume)
   const discovered = runDiscovery(raw)
   const signals = providers.audit.recheck(raw)
   const { survivors, dropped, duplicates } = runAudit(discovered, signals)

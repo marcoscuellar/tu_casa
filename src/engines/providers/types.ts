@@ -25,8 +25,8 @@ export interface ResumeProvider {
 }
 
 export interface DiscoveryProvider {
-  /** Find real, live postings implied by the résumé. (Live web crawl) */
-  findPostings(resume: ParsedResume): RawPosting[]
+  /** Find real, live postings implied by the résumé. (Live ATS fetch) */
+  findPostings(resume: ParsedResume): Promise<RawPosting[]>
 }
 
 export interface AuditProvider {

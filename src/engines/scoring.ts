@@ -19,42 +19,7 @@ import type {
   Verdict,
 } from './types'
 import { toCanonical } from './synonymMap'
-
-/* ---------- Title taxonomy (deterministic families + levels) ---------- */
-
-const LEVEL_RANK: Record<string, number> = {
-  intern: 0,
-  junior: 1,
-  associate: 1,
-  mid: 2,
-  senior: 3,
-  lead: 4,
-  staff: 4,
-  manager: 4,
-  principal: 5,
-  director: 5,
-}
-
-/** Undirected adjacency between job families (transferable neighbours). */
-const FAMILY_ADJACENCY: Record<string, string[]> = {
-  frontend: ['fullstack', 'mobile'],
-  backend: ['fullstack', 'data', 'devops'],
-  fullstack: ['frontend', 'backend', 'mobile'],
-  mobile: ['frontend', 'fullstack'],
-  data: ['backend', 'ml'],
-  ml: ['data'],
-  devops: ['backend'],
-}
-
-function levelRank(level: string): number {
-  return LEVEL_RANK[level.trim().toLowerCase()] ?? 2 // default to mid
-}
-
-function familiesAdjacent(a: string, b: string): boolean {
-  const fa = a.trim().toLowerCase()
-  const fb = b.trim().toLowerCase()
-  return (FAMILY_ADJACENCY[fa] ?? []).includes(fb)
-}
+import { familiesAdjacent, levelRank } from './taxonomy'
 
 /* ---------- Skill matching ---------- */
 

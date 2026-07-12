@@ -309,7 +309,9 @@ const CANNED_JD: ParsedJD = {
 /* ---------- The fixture provider bundle ---------- */
 
 const resume: ResumeProvider = { parseResume: () => SAMPLE_RESUME }
-const discovery: DiscoveryProvider = { findPostings: () => SAMPLE_POSTINGS }
+const discovery: DiscoveryProvider = {
+  findPostings: async () => SAMPLE_POSTINGS,
+}
 const audit: AuditProvider = { recheck: () => SAMPLE_RECHECK }
 const research: ResearchProvider = {
   research: (company, role) => RESEARCH[company] ?? THIN_BRIEF(company, role),

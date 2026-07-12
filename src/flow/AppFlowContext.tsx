@@ -1,5 +1,13 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
 import { fixtureProviders } from '../engines/providers/fixtures'
+import { liveProviders } from '../engines/providers/live'
 import {
   buildHiringInsight,
   buildResearch,
@@ -9,6 +17,11 @@ import {
 } from '../engines/pipeline'
 import type { GatedResearch } from '../engines/research'
 import type { HiringInsight, RankedJob } from '../engines/types'
+
+// Real ATS jobs when VITE_LIVE_JOBS=1 (needs open egress to the ATS hosts);
+// otherwise the fixture pipeline, so the demo works offline and tests are hermetic.
+const USE_LIVE = import.meta.env?.VITE_LIVE_JOBS === '1'
+const PROVIDERS = USE_LIVE ? liveProviders : fixtureProviders
 
 /**
  * Shared state for the résumé-in → jobs-out flow.
@@ -34,6 +47,8 @@ export interface AppFlowContextValue {
   matchCount: number
   droppedCount: number
   duplicateCount: number
+  /** True while the (possibly live) pipeline is still resolving. */
+  loading: boolean
 
   /* Selection carried into fit + cheat sheet */
   selectedJob?: RankedJob
@@ -65,30 +80,38 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   const [credits, setCredits] = useState(0)
   const [firstSheetUsed, setFirstSheetUsed] = useState(false)
 
-  // Run the deterministic pipeline once on the fixture résumé.
-  const pipeline: PipelineResult = useMemo(
-    () => runPipeline(fixtureProviders, { asOfYear: AS_OF_YEAR }),
-    [],
-  )
+  // Run the pipeline once (async — live discovery fetches real boards).
+  const [pipeline, setPipeline] = useState<PipelineResult | null>(null)
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    let alive = true
+    runPipeline(PROVIDERS, { asOfYear: AS_OF_YEAR })
+      .then((r) => alive && (setPipeline(r), setLoading(false)))
+      .catch(() => alive && setLoading(false))
+    return () => {
+      alive = false
+    }
+  }, [])
 
+  const jobs = pipeline?.jobs ?? []
   const selectedJob = useMemo(
-    () => pipeline.jobs.find((j) => j.id === selectedId),
-    [pipeline.jobs, selectedId],
+    () => jobs.find((j) => j.id === selectedId),
+    [jobs, selectedId],
   )
 
   // Research is fetched + QA-gated per selected job.
   const research = useMemo<GatedResearch | undefined>(() => {
     if (!selectedJob) return undefined
-    return buildResearch(fixtureProviders, selectedJob.company, selectedJob.role)
+    return buildResearch(PROVIDERS, selectedJob.company, selectedJob.role)
   }, [selectedJob])
 
   // "Why this role exists" — reasoned from verified signals, or null when thin.
   const insight = useMemo<HiringInsight | null>(() => {
     if (!selectedJob || !research) return null
-    return buildHiringInsight(fixtureProviders, research, selectedJob.role)
+    return buildHiringInsight(PROVIDERS, research, selectedJob.role)
   }, [selectedJob, research])
 
-  const candidateRole = pipeline.resume.titles[0]?.raw ?? 'your field'
+  const candidateRole = pipeline?.resume.titles[0]?.raw ?? 'your field'
 
   const value = useMemo<AppFlowContextValue>(
     () => ({
@@ -102,10 +125,11 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       candidateName: name.trim() || 'there',
       candidateRole,
 
-      jobs: pipeline.jobs,
-      matchCount: pipeline.jobs.length,
-      droppedCount: pipeline.droppedCount,
-      duplicateCount: pipeline.duplicateCount,
+      jobs,
+      matchCount: jobs.length,
+      droppedCount: pipeline?.droppedCount ?? 0,
+      duplicateCount: pipeline?.duplicateCount ?? 0,
+      loading,
 
       selectedJob,
       selectJob: (id) => setSelectedId(id),
@@ -114,8 +138,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       cheatRole: selectedJob?.role ?? '',
       research,
       insight,
-      narrate: (job) =>
-        narrateFit(fixtureProviders, job.fit, job.company, job.role),
+      narrate: (job) => narrateFit(PROVIDERS, job.fit, job.company, job.role),
 
       credits,
       addCredits: (n) => setCredits((c) => c + n),
@@ -132,7 +155,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, candidateRole, pipeline, selectedJob, research, insight, credits, firstSheetUsed],
+    [name, email, candidateRole, pipeline, jobs, loading, selectedJob, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

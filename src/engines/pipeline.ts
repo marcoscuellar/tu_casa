@@ -12,6 +12,7 @@
 
 import { runAudit } from './audit'
 import { runDiscovery } from './discovery'
+import { locationFit } from './location'
 import { deriveHiringInsight } from './reasoning'
 import { gateResearch, type GatedResearch } from './research'
 import { scoreResume } from './scoring'
@@ -51,15 +52,22 @@ export async function runPipeline(
   const signals = providers.audit.recheck(raw)
   const { survivors, dropped, duplicates } = runAudit(discovered, signals)
 
-  const jobs: RankedJob[] = survivors
-    .map((job) => ({ ...job, fit: scoreResume(resume, job.jd, { asOfYear }) }))
-    .sort((a, b) => {
-      // Ranked by earned score; ties broken by confidence, then id.
-      if (b.fit.score !== a.fit.score) return b.fit.score - a.fit.score
-      const c = CONFIDENCE_RANK[a.confidence] - CONFIDENCE_RANK[b.confidence]
-      if (c !== 0) return c
-      return a.id.localeCompare(b.id)
-    })
+  // Score each survivor, then rank by (earned fit − location penalty). The
+  // displayed fit score stays pure; an onsite role for a remote-preferrer is
+  // downgraded in rank, never dropped, and carries a plain note.
+  const scored = survivors.map((job) => {
+    const fit = scoreResume(resume, job.jd, { asOfYear })
+    const loc = locationFit(resume, job)
+    const ranked: RankedJob = { ...job, fit, locationNote: loc.note }
+    return { ranked, effective: fit.score - loc.penalty }
+  })
+  scored.sort((a, b) => {
+    if (b.effective !== a.effective) return b.effective - a.effective
+    const c = CONFIDENCE_RANK[a.ranked.confidence] - CONFIDENCE_RANK[b.ranked.confidence]
+    if (c !== 0) return c
+    return a.ranked.id.localeCompare(b.ranked.id)
+  })
+  const jobs: RankedJob[] = scored.map((s) => s.ranked)
 
   return {
     resume,

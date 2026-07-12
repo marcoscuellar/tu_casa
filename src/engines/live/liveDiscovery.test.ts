@@ -100,12 +100,13 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
       result.jobs.map((j) => `${j.fit.score} ${j.role} · ${j.company} [${j.confidence}]`),
     )
 
-    // 3 relevant remote engineering roles; Sales (family) + onsite Fullstack (location) filtered.
-    expect(result.jobs).toHaveLength(3)
-    const companies = result.jobs.map((j) => j.company).sort()
-    expect(companies).toEqual(['Acme', 'Beta', 'Gamma'])
+    // Sales dropped (wrong family). The onsite Fullstack role is now KEPT but
+    // downgraded (Maya is onsite_ok) → 4 jobs, not 3.
+    expect(result.jobs).toHaveLength(4)
     expect(result.jobs.some((j) => j.role === 'Sales Manager')).toBe(false)
-    expect(result.jobs.some((j) => j.role === 'Fullstack Engineer')).toBe(false)
+    const fullstack = result.jobs.find((j) => j.role === 'Fullstack Engineer')
+    expect(fullstack).toBeDefined() // onsite role surfaced…
+    expect(fullstack?.locationNote).toBeTruthy() // …with the "ranked lower" note
   })
 
   it('scores each with the real rubric and ranks strongest first', async () => {
@@ -117,8 +118,51 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
     expect(result.jobs[0].role).toBe('Senior Frontend Engineer')
     expect(result.jobs[0].fit.verdict).toMatch(/STRONG|PARTIAL/)
     // ids are ATS-prefixed and unique
-    expect(new Set(result.jobs.map((j) => j.id)).size).toBe(3)
+    expect(new Set(result.jobs.map((j) => j.id)).size).toBe(4)
     expect(result.jobs[0].id.startsWith('greenhouse:')).toBe(true)
+  })
+
+  it('downgrades an onsite role below an equal-scoring remote one (not dropped)', async () => {
+    // Same role at two companies — one remote, one onsite Austin (distinct so
+    // Engine 3 doesn't dedupe them). Maya is remote-preferred but onsite_ok, so
+    // both surface; the remote one wins on rank despite an identical fit score.
+    const desc = 'Requirements: 5+ years React, TypeScript, design systems.'
+    const board = (id: string, remote: boolean, location: string) => ({
+      jobs: [
+        {
+          id,
+          title: 'Senior Frontend Engineer',
+          location,
+          isRemote: remote,
+          descriptionPlain: desc,
+          jobUrl: `https://jobs.ashbyhq.com/${id}/1`,
+          publishedAt: '2026-04-01T00:00:00Z',
+        },
+      ],
+    })
+    const src: CompanySourceProvider = {
+      companiesFor: () => [
+        { name: 'Delta', ats: 'ashby', slug: 'delta' },
+        { name: 'Echo', ats: 'ashby', slug: 'echo' },
+      ],
+    }
+    const fetch2: JsonFetcher = async (url) => {
+      if (url === ashbyUrl('delta')) return board('delta', true, 'Remote, US')
+      if (url === ashbyUrl('echo')) return board('echo', false, 'Austin, TX')
+      throw new Error('404')
+    }
+    const result = await runPipeline(
+      createLiveProviders({ companySource: src, fetchJson: fetch2 }),
+      { asOfYear: 2026 },
+    )
+
+    expect(result.jobs).toHaveLength(2) // both kept — onsite NOT dropped
+    const remote = result.jobs.find((j) => j.remote)!
+    const onsite = result.jobs.find((j) => !j.remote)!
+    expect(result.jobs[0].id).toBe(remote.id) // remote ranks first
+    expect(remote.fit.score).toBe(onsite.fit.score) // same pure fit score
+    expect(onsite.locationNote).toBeTruthy() // onsite carries the plain note
+    expect(remote.locationNote).toBeUndefined()
   })
 
   it('skips boards that fail without aborting the run', async () => {

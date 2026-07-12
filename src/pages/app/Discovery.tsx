@@ -114,6 +114,9 @@ export function Discovery() {
                     {flagged && job.audit.note && (
                       <div className="disc-flag-note">{job.audit.note}</div>
                     )}
+                    {job.locationNote && (
+                      <div className="disc-flag-note">{job.locationNote}</div>
+                    )}
                     <div className="disc-tags">
                       {tags.map((tag) => (
                         <span

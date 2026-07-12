@@ -162,6 +162,8 @@ export interface AuditedJob extends DiscoveredJob {
 
 export interface RankedJob extends AuditedJob {
   fit: ScoreResult
+  /** Set when an onsite role was downgraded (not dropped) for a remote-preferrer. */
+  locationNote?: string
 }
 
 /* ============================================================

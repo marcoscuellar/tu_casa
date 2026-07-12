@@ -55,18 +55,26 @@ describe('Greenhouse normalizer — real Figma board', () => {
     expect(fullStack?.remote).toBe(false) // Figma roles are onsite
   })
 
-  it('filter keeps SF engineering roles, drops non-eng + wrong-location', async () => {
+  it('filter keeps engineering roles, drops non-engineering (family is a hard gate)', async () => {
     const out = await fetchGreenhouse('Figma', 'figma', fetchJson)
     const sf = resume({})
     const relevant = out.filter((p) => isRelevant(sf, p)).map((p) => p.role)
     expect(relevant).toContain('Software Engineer, Full Stack')
     expect(relevant).not.toContain('Account Executive, Enterprise') // wrong family
-    expect(relevant).not.toContain('Developer Advocate (Tokyo, Japan)') // wrong location
+    expect(relevant).not.toContain('Data Engineer') // data family ≠ fullstack
   })
 
-  it('a remote candidate matches nothing (Figma has no remote roles) — honest', async () => {
+  it('an onsite-willing remote candidate now SEES Figma roles (downgraded, not dropped)', async () => {
     const out = await fetchGreenhouse('Figma', 'figma', fetchJson)
-    const remoteCandidate = resume({ location: 'Remote' })
-    expect(out.filter((p) => isRelevant(remoteCandidate, p))).toHaveLength(0)
+    // Remote-preferred but open to onsite → onsite engineering roles surface.
+    const onsiteWilling = resume({ location: 'Remote', onsite_ok: true })
+    const relevant = out.filter((p) => isRelevant(onsiteWilling, p)).map((p) => p.role)
+    expect(relevant).toContain('Software Engineer, Full Stack')
+  })
+
+  it('a remote-ONLY candidate still matches nothing onsite (exclusion stays)', async () => {
+    const out = await fetchGreenhouse('Figma', 'figma', fetchJson)
+    const remoteOnly = resume({ location: 'Remote', onsite_ok: false })
+    expect(out.filter((p) => isRelevant(remoteOnly, p))).toHaveLength(0)
   })
 })

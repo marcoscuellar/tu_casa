@@ -5,6 +5,7 @@
  * candidate. This is the "approved role types + US-usable" gate from Engine 4.
  */
 
+import { locationFit } from '../location'
 import { familyRelated } from '../taxonomy'
 import type { ParsedResume } from '../types'
 import type { NormalizedPosting } from './ats/types'
@@ -22,19 +23,17 @@ export function searchTermsFrom(resume: ParsedResume): {
   return { families: families.length ? families : ['other'], location, wantsRemote }
 }
 
-function locationWorks(resume: ParsedResume, posting: NormalizedPosting): boolean {
-  if (posting.remote) return true // remote works for everyone
-  // Onsite posting: only if the candidate can be onsite AND the city matches.
-  if (!resume.onsite_ok) return false
-  const city = resume.location.trim().toLowerCase()
-  if (!city || city === 'remote') return false
-  return posting.location.toLowerCase().includes(city)
-}
-
-/** Does this posting match the résumé's role family + location? */
+/**
+ * Does this posting match the résumé's role family + location?
+ *
+ * Role family is a hard gate (approved role types). Location follows the
+ * "downgrade, don't drop" rule — an onsite role is still *relevant* to an
+ * onsite-willing candidate (it's ranked lower downstream, not hidden); only a
+ * remote-only candidate excludes a non-local onsite role.
+ */
 export function isRelevant(resume: ParsedResume, posting: NormalizedPosting): boolean {
   const { families } = searchTermsFrom(resume)
   const postingFamily = parseJDText(posting.role, posting.descriptionText).title.family
   const familyOk = families.some((f) => familyRelated(f, postingFamily))
-  return familyOk && locationWorks(resume, posting)
+  return familyOk && locationFit(resume, posting).include
 }

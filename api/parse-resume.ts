@@ -25,6 +25,10 @@ import type { ResumeUpload } from '../src/engines/types'
 // Résumé extraction is a simple task; swap to 'claude-haiku-4-5' to cut cost ~5×.
 const MODEL = 'claude-opus-4-8'
 
+// Give the model call room to finish — a large PDF parse can exceed the default
+// 10s function limit. 60s is the Hobby-plan ceiling; Pro allows more.
+export const config = { maxDuration: 60 }
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })

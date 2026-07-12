@@ -119,7 +119,7 @@ export function Landing() {
             the ones built for you, and preps you to win the interview.
           </p>
           <div className="lp-desc-cta">
-            <Link to="/signup" className="lp-pill">
+            <Link to="/upload" className="lp-pill">
               Upload your résumé — free
             </Link>
             <div className="lp-desc-note">Every match verified. No inflated scores.</div>
@@ -275,7 +275,7 @@ export function Landing() {
             Real matches, honest fit, and a cheat sheet for the interview — all
             free.
           </p>
-          <Link to="/signup" className="lp-pill lp-pill-lg">
+          <Link to="/upload" className="lp-pill lp-pill-lg">
             Upload your résumé — free
           </Link>
           <div className="lp-final-note">

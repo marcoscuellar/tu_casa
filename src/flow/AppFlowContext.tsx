@@ -37,6 +37,8 @@ export interface AppFlowContextValue {
   /* Account (from signup) */
   name: string
   email: string
+  /** True once a (fake, in-memory) account exists — the cheat-sheet gate. */
+  hasAccount: boolean
   setAccount: (name: string, email: string) => void
 
   /* Parsed profile (name from signup, role from the résumé) */
@@ -143,6 +145,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
     () => ({
       name,
       email,
+      hasAccount: email.trim().length > 0,
       setAccount: (n, e) => {
         setName(n)
         setEmail(e)

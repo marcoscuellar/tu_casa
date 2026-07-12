@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
 import './flow.css'
@@ -9,17 +9,29 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
 export function SignUp() {
   const navigate = useNavigate()
-  const { setAccount } = useAppFlow()
+  const location = useLocation()
+  const { setAccount, consumeSheet } = useAppFlow()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [err, setErr] = useState('')
+
+  // Where to go after signup. The cheat-sheet gate sends users here with a
+  // `next`; a direct visit has none, so we fall back to the upload step.
+  const next = (location.state as { next?: string } | null)?.next
 
   const submit = () => {
     if (!name.trim()) return setErr('Add your name to continue.')
     if (!EMAIL_RE.test(email.trim())) return setErr('Enter a valid email.')
     setErr('')
     setAccount(name.trim(), email.trim())
-    navigate('/upload')
+    if (next) {
+      // They signed up specifically to get the cheat sheet — claim it and go
+      // straight there, no round-trip back to Fit Check.
+      consumeSheet()
+      navigate(next)
+    } else {
+      navigate('/upload')
+    }
   }
 
   return (

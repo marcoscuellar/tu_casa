@@ -13,7 +13,7 @@ import './FitCheck.css'
  */
 export function FitCheck() {
   const navigate = useNavigate()
-  const { selectedJob, narrate, needsCredits, consumeSheet } = useAppFlow()
+  const { selectedJob, narrate, needsCredits, consumeSheet, hasAccount } = useAppFlow()
 
   // Reached without a selection (e.g. a refresh) → back to the shortlist.
   useEffect(() => {
@@ -25,6 +25,12 @@ export function FitCheck() {
   const body = narrate(selectedJob)
 
   const prepMe = () => {
+    // The cheat sheet is where we ask for an account — everything up to here
+    // (upload, discovery, fit) is free and anonymous.
+    if (!hasAccount) {
+      navigate('/signup', { state: { next: '/cheat-generating' } })
+      return
+    }
     if (needsCredits()) {
       navigate('/paywall')
       return

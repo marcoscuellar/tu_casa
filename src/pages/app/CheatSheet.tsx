@@ -20,6 +20,7 @@ export function CheatSheet() {
     insight,
     needsCredits,
     consumeSheet,
+    hasAccount,
   } = useAppFlow()
   const [active, setActive] = useState('company')
   const [checked, setChecked] = useState<Record<number, boolean>>({})
@@ -75,6 +76,10 @@ export function CheatSheet() {
   const thin = research.readiness === 'THIN'
 
   const tryNewSheet = () => {
+    if (!hasAccount) {
+      navigate('/signup', { state: { next: '/cheat-generating' } })
+      return
+    }
     if (needsCredits()) {
       navigate('/paywall')
       return

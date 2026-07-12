@@ -1,0 +1,17 @@
+.tc-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 11px 18px;
+  text-transform: uppercase;
+  z-index: 400;
+  border-radius: 8px;
+  box-shadow: 0 12px 34px rgba(15, 15, 15, 0.32);
+  animation: tcModalPop 0.2s ease;
+}

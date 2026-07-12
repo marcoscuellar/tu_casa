@@ -1,0 +1,280 @@
+/* ============================================================
+   Auth surfaces — reconciled to the canonical black/red/white
+   TuCasa tokens (the honey/navy iteration remnants are dropped).
+   ============================================================ */
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--paper);
+}
+
+@keyframes authPop {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- Sign in card ---- */
+.signin-card {
+  max-width: 410px;
+  width: 100%;
+  text-align: center;
+  background: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.06), 0 14px 40px rgba(17, 17, 17, 0.28);
+  padding: 46px 38px;
+  position: relative;
+  animation: authPop 0.25s ease;
+}
+.signin-logo {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+.signin-logo .accent {
+  color: var(--red);
+}
+.signin-rule {
+  width: 44px;
+  height: 3px;
+  margin: 18px auto 12px;
+  background: var(--red);
+}
+.signin-tagline {
+  font-family: var(--font);
+  font-size: 17px;
+  color: #fff;
+  font-weight: 500;
+}
+.signin-lead {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 26px 0 18px;
+  text-align: left;
+}
+.signin-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+.auth-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 15px;
+  padding: 13px;
+  color: #fff;
+}
+.signin-submit {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border: 1px solid #fff;
+  border-radius: 10px;
+  padding: 14px 20px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 700;
+  margin-top: 4px;
+  background: #fff;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.signin-submit:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+.signin-swap {
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.signin-swap-link {
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.signin-forgot {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.signin-forgot a {
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.auth-err {
+  color: var(--red);
+  font-size: 13px;
+  margin-top: 14px;
+  min-height: 16px;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* ---- Onboarding wizard ---- */
+.onb-card {
+  max-width: 460px;
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.06), 0 14px 40px rgba(17, 17, 17, 0.14);
+  padding: 38px 34px;
+  text-align: left;
+  animation: authPop 0.25s ease;
+}
+.onb-dots {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 22px;
+}
+.onb-dot {
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+.onb-h2 {
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  color: #fff;
+}
+.onb-p {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+.onb-field {
+  margin-bottom: 14px;
+}
+.onb-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 6px;
+}
+.onb-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 15px;
+  padding: 13px;
+  color: #fff;
+}
+.onb-input:disabled {
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+textarea.onb-input {
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 60px;
+  font-size: 14px;
+}
+.onb-optional {
+  color: rgba(255, 255, 255, 0.4);
+}
+.onb-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+}
+.onb-primary {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--red);
+  color: #fff;
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  padding: 14px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.onb-primary:hover {
+  background: #fff;
+  color: var(--ink);
+  border-color: #fff;
+}
+.onb-back {
+  background: none;
+  border: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  padding: 0 6px;
+  transition: color 0.15s;
+}
+.onb-back:hover {
+  color: #fff;
+}
+.onb-free-center {
+  text-align: center;
+  padding: 10px 0 2px;
+}
+.onb-free-num {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 56px;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--red);
+}
+.onb-free-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 10px 0 24px;
+}
+.onb-free-body {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: #fff;
+}
+.onb-free-note {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 12px;
+  line-height: 1.5;
+}

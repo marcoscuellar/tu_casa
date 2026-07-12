@@ -1,0 +1,158 @@
+.disc-header {
+  padding: 40px 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.disc-eyebrow {
+  margin-bottom: 14px;
+}
+.disc-head {
+  font-size: 52px;
+}
+.disc-sub {
+  font-size: 15px;
+  color: var(--on-dark-66);
+  line-height: 1.55;
+  margin-top: 14px;
+  max-width: 52ch;
+}
+.disc-count-wrap {
+  text-align: right;
+}
+.disc-count {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 60px;
+  line-height: 1;
+  color: var(--red);
+}
+.disc-count-label {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--on-dark-50);
+  margin-top: 4px;
+}
+
+.disc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+.disc-card {
+  border-radius: 22px;
+  padding: 26px 30px;
+}
+.disc-card-top {
+  background: var(--ink);
+  color: #fff;
+}
+.disc-card-plain {
+  background: #fff;
+  color: var(--ink);
+}
+.disc-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.disc-score-wrap {
+  text-align: center;
+  min-width: 76px;
+}
+.disc-score {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--red);
+}
+.disc-score-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  margin-top: 3px;
+}
+.muted-dark {
+  color: var(--on-dark-50);
+}
+.muted-light {
+  color: var(--grey);
+}
+.disc-mid {
+  flex: 1;
+  min-width: 220px;
+}
+.disc-title {
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+.disc-meta {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  margin-top: 5px;
+}
+.disc-tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.disc-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 5px 11px;
+}
+.disc-tag-dark {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+.disc-tag-light {
+  background: var(--field);
+  color: var(--muted);
+}
+.disc-btn {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 11px;
+  padding: 14px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.disc-btn-top {
+  background: #fff;
+  color: var(--ink);
+}
+.disc-btn-plain {
+  background: var(--ink);
+  color: #fff;
+}
+.disc-btn:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .disc-header {
+    padding: 30px 28px;
+  }
+  .disc-head {
+    font-size: 40px;
+  }
+  .disc-btn {
+    width: 100%;
+  }
+}

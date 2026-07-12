@@ -1,0 +1,146 @@
+/* ============================================================
+   TuCasa design tokens — the black / red / white bento system.
+   Canonical values from the design handoff (App Flow palette).
+   ============================================================ */
+:root {
+  /* Colors */
+  --paper: #edebe4;
+  --ink: #0f0f0f;
+  --red: #f01c0c;
+  --white: #ffffff;
+  --field: #f4f2ec; /* field fill on light */
+  --muted: #6b6b6b; /* muted text on light */
+  --grey: #9a968c; /* secondary / label grey */
+
+  /* Muted text on dark */
+  --on-dark-62: rgba(255, 255, 255, 0.62);
+  --on-dark-66: rgba(255, 255, 255, 0.66);
+  --on-dark-50: rgba(255, 255, 255, 0.5);
+  --on-dark-40: rgba(255, 255, 255, 0.4);
+
+  /* Borders */
+  --hairline: rgba(15, 15, 15, 0.1);
+  --hairline-14: rgba(15, 15, 15, 0.14);
+  --border-light: rgba(15, 15, 15, 0.2);
+  --border-dark: rgba(255, 255, 255, 0.16);
+  --field-dark: rgba(255, 255, 255, 0.06);
+
+  /* Type */
+  --font: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Layout */
+  --page-max: 1200px;
+  --page-pad: 28px;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--red);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--ink);
+}
+
+button {
+  font-family: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--red) !important;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--grey);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 15, 15, 0.2);
+  border-radius: 8px;
+  border: 3px solid var(--paper);
+}
+
+/* Animations */
+@keyframes tcPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes tcSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes tcPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes tcBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tcModalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -11,7 +11,13 @@
 
 import type { RawPosting } from '../discovery'
 import type { RecheckSignal } from '../audit'
-import type { ParsedJD, ParsedResume, ResearchBrief, ScoreResult } from '../types'
+import type {
+  HiringInsight,
+  ParsedJD,
+  ParsedResume,
+  ResearchBrief,
+  ScoreResult,
+} from '../types'
 
 export interface ResumeProvider {
   /** Extract the rubric's résumé schema from an uploaded résumé. (LLM) */
@@ -41,6 +47,20 @@ export interface NarrateProvider {
   narrateVerdict(score: ScoreResult, company: string, role: string): string
 }
 
+export interface ReasoningProvider {
+  /**
+   * The "why does this role exist?" reasoning step (LLM). Given the company's
+   * verified signals + stated priorities, reason to why the role is open and
+   * derive the talking points + likely questions from that situation.
+   *
+   * CONTRACT: every returned item's `sources` MUST cite real signal/priority
+   * texts from the brief. The deterministic layer (reasoning.ts) re-validates
+   * this and drops anything ungrounded, so a hallucinated motive can never
+   * reach the candidate. Return null when no honest inference is possible.
+   */
+  whyHiring(brief: ResearchBrief, role: string): HiringInsight | null
+}
+
 export interface JDParseProvider {
   /**
    * Parked capability: parse a pasted job description into the rubric's JD
@@ -55,6 +75,7 @@ export interface Providers {
   discovery: DiscoveryProvider
   audit: AuditProvider
   research: ResearchProvider
+  reasoning: ReasoningProvider
   narrate: NarrateProvider
   jd: JDParseProvider
 }

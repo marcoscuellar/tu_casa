@@ -196,3 +196,33 @@ export interface ResearchBrief {
   /** QA/handoff outcome. THIN is a valid, honest result. */
   readiness: 'GO' | 'THIN'
 }
+
+/* ============================================================
+   Hiring-need reasoning ("why does this role exist?")
+   ============================================================ */
+
+/** A talking point reasoned from the company's real situation. */
+export interface GroundedPoint {
+  point: string
+  because: string
+  /** The exact signal/priority texts this is built on. Must be real. */
+  sources: string[]
+}
+
+/** A likely interview question reasoned from the company's real situation. */
+export interface GroundedQuestion {
+  question: string
+  why: string
+  sources: string[]
+}
+
+/**
+ * The reasoned thesis: no company hires just to hire. Given verified signals,
+ * why this role exists — and the talking points + likely questions that follow.
+ * Only ever built on sourced, verified signals; null when intelligence is thin.
+ */
+export interface HiringInsight {
+  why: string
+  talkingPoints: GroundedPoint[]
+  likelyQuestions: GroundedQuestion[]
+}

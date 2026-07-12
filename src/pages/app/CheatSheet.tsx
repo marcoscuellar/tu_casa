@@ -17,6 +17,7 @@ export function CheatSheet() {
   const {
     selectedJob,
     research,
+    insight,
     needsCredits,
     consumeSheet,
   } = useAppFlow()
@@ -93,8 +94,11 @@ export function CheatSheet() {
   if (brief.signals[0]) tiles.push({ label: 'Signal', val: brief.signals[0].signal })
   if (brief.mainProduct) tiles.push({ label: 'Focus', val: brief.mainProduct })
 
-  // Section 02 — company's stated priorities, else role-prep from themes.
-  const talkingPoints =
+  // Section 02/03 are driven by the reasoned "why this role exists" when we have
+  // one (real, grounded signals). Otherwise they fall back to role-based prep.
+  const hasInsight = !!insight && insight.talkingPoints.length > 0
+
+  const fallbackTalkingPoints =
     brief.statedPriorities.length > 0
       ? brief.statedPriorities.map((p) => ({ title: p.priority, body: p.howToUse }))
       : brief.likelyThemes.map((t) => ({
@@ -173,41 +177,91 @@ export function CheatSheet() {
 
           <div className="cheat-hairline" />
 
-          {/* 02 Talking points */}
+          {/* 02 Talking points — reasoned from why the role exists */}
           <div data-sec="talking" ref={setSectionRef('talking')} className="cheat-sec">
             <div className="cheat-sec-eyebrow mono-label">02 · Talking points</div>
             <h2 className="cheat-sec-head">Lead with these.</h2>
+
+            {hasInsight && insight && (
+              <div className="cheat-why">
+                <div className="cheat-why-label mono-label">Why this role exists</div>
+                <div className="cheat-why-text">{insight.why}</div>
+              </div>
+            )}
+
             <div className="cheat-talk-list">
-              {talkingPoints.map((tp) => (
-                <div key={tp.title} className="cheat-talk">
-                  <div className="cheat-talk-title">{tp.title}</div>
-                  <p className="cheat-talk-body">{tp.body}</p>
-                </div>
-              ))}
+              {hasInsight && insight
+                ? insight.talkingPoints.map((tp) => (
+                    <div key={tp.point} className="cheat-talk">
+                      <div className="cheat-talk-title">{tp.point}</div>
+                      <p className="cheat-talk-body">{tp.because}</p>
+                      <div className="cheat-src mono-label">
+                        Based on: {tp.sources.join(' · ')}
+                      </div>
+                    </div>
+                  ))
+                : fallbackTalkingPoints.map((tp) => (
+                    <div key={tp.title} className="cheat-talk">
+                      <div className="cheat-talk-title">{tp.title}</div>
+                      <p className="cheat-talk-body">{tp.body}</p>
+                    </div>
+                  ))}
             </div>
           </div>
 
           <div className="cheat-hairline" />
 
-          {/* 03 Likely questions — themes to prep (answers come from you) */}
+          {/* 03 Likely questions — generated FROM the company's situation */}
           <div data-sec="questions" ref={setSectionRef('questions')} className="cheat-sec">
             <div className="cheat-sec-eyebrow mono-label">03 · Likely questions</div>
-            <h2 className="cheat-sec-head">
-              What this role
-              <br />
-              tends to draw.
-            </h2>
-            <div className="cheat-qa-list">
-              {brief.likelyThemes.map((theme) => (
-                <div key={theme} className="cheat-qa">
-                  <div className="cheat-qa-q">Expect questions on {theme.toLowerCase()}.</div>
-                  <p className="cheat-qa-a">
-                    <b className="cheat-you">Prep:</b> pull your answer from your own
-                    background — a specific example lands better than a general claim.
-                  </p>
+            {hasInsight && insight && insight.likelyQuestions.length > 0 ? (
+              <>
+                <h2 className="cheat-sec-head">
+                  What they&rsquo;ll dig
+                  <br />
+                  into — and why.
+                </h2>
+                <div className="cheat-qa-list">
+                  {insight.likelyQuestions.map((q) => (
+                    <div key={q.question} className="cheat-qa">
+                      <div className="cheat-qa-q">{q.question}</div>
+                      <p className="cheat-qa-a">
+                        <b className="cheat-you">Why:</b> {q.why}
+                      </p>
+                      <div className="cheat-src mono-label">
+                        Based on: {q.sources.join(' · ')}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              <>
+                <h2 className="cheat-sec-head">
+                  What this role
+                  <br />
+                  tends to draw.
+                </h2>
+                <div className="cheat-qa-note">
+                  Not enough public signal to infer why they&rsquo;re hiring —
+                  preparing for the role itself.
+                </div>
+                <div className="cheat-qa-list">
+                  {brief.likelyThemes.map((theme) => (
+                    <div key={theme} className="cheat-qa">
+                      <div className="cheat-qa-q">
+                        Expect questions on {theme.toLowerCase()}.
+                      </div>
+                      <p className="cheat-qa-a">
+                        <b className="cheat-you">Prep:</b> pull your answer from your
+                        own background — a specific example lands better than a
+                        general claim.
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="cheat-hairline" />

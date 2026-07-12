@@ -1,13 +1,14 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 import { fixtureProviders } from '../engines/providers/fixtures'
 import {
+  buildHiringInsight,
   buildResearch,
   narrateFit,
   runPipeline,
   type PipelineResult,
 } from '../engines/pipeline'
 import type { GatedResearch } from '../engines/research'
-import type { RankedJob } from '../engines/types'
+import type { HiringInsight, RankedJob } from '../engines/types'
 
 /**
  * Shared state for the résumé-in → jobs-out flow.
@@ -42,6 +43,8 @@ export interface AppFlowContextValue {
   cheatCompany: string
   cheatRole: string
   research?: GatedResearch
+  /** Reasoned "why this role exists" + derived points/questions; null when thin. */
+  insight?: HiringInsight | null
   narrate: (job: RankedJob) => string
 
   /* Credits — first cheat sheet free, then gated */
@@ -79,6 +82,12 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
     return buildResearch(fixtureProviders, selectedJob.company, selectedJob.role)
   }, [selectedJob])
 
+  // "Why this role exists" — reasoned from verified signals, or null when thin.
+  const insight = useMemo<HiringInsight | null>(() => {
+    if (!selectedJob || !research) return null
+    return buildHiringInsight(fixtureProviders, research, selectedJob.role)
+  }, [selectedJob, research])
+
   const candidateRole = pipeline.resume.titles[0]?.raw ?? 'your field'
 
   const value = useMemo<AppFlowContextValue>(
@@ -104,6 +113,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       cheatCompany: selectedJob?.company ?? '',
       cheatRole: selectedJob?.role ?? '',
       research,
+      insight,
       narrate: (job) =>
         narrateFit(fixtureProviders, job.fit, job.company, job.role),
 
@@ -122,7 +132,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, candidateRole, pipeline, selectedJob, research, credits, firstSheetUsed],
+    [name, email, candidateRole, pipeline, selectedJob, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

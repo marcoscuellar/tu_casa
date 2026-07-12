@@ -10,13 +10,20 @@
 
 import type { RawPosting } from '../discovery'
 import type { RecheckSignal } from '../audit'
-import type { ParsedJD, ParsedResume, ResearchBrief, ScoreResult } from '../types'
+import type {
+  HiringInsight,
+  ParsedJD,
+  ParsedResume,
+  ResearchBrief,
+  ScoreResult,
+} from '../types'
 import type {
   AuditProvider,
   DiscoveryProvider,
   JDParseProvider,
   NarrateProvider,
   Providers,
+  ReasoningProvider,
   ResearchProvider,
   ResumeProvider,
 } from './types'
@@ -222,6 +229,58 @@ const RESEARCH: Record<string, ResearchBrief> = {
   },
 }
 
+/* ---------- Hiring-need reasoning (grounded in the brief's real signals) ---------- */
+
+// Signal / priority texts, referenced verbatim so grounding validation passes.
+const NW_S1 = 'New DTC mobile app launching this quarter'
+const NW_S2 = 'Series C raised to fund the e-commerce replatform'
+const NW_P1 = 'Performance and conversion on the storefront'
+
+const REASONING: Record<string, HiringInsight> = {
+  'Northwind Apparel': {
+    why: 'Northwind just raised a Series C to replatform its e-commerce and is launching a new DTC app this quarter. This role exists to carry that replatform and app work while keeping storefront performance and conversion moving — you’re being hired to solve that, not to fill a seat.',
+    talkingPoints: [
+      {
+        point: 'You’ve already led the replatform they just raised to do.',
+        because:
+          'Their Series C is explicitly funding the e-commerce replatform — your Hydrogen migration is that exact work, with numbers.',
+        sources: [NW_S2],
+      },
+      {
+        point: 'You can help land the DTC app that ships this quarter.',
+        because:
+          'The mobile app launch is imminent — your React/React Native experience de-risks the timeline.',
+        sources: [NW_S1],
+      },
+      {
+        point: 'You move the storefront metrics they openly care about.',
+        because:
+          'They state performance and conversion as a priority — bring your LCP and conversion wins.',
+        sources: [NW_P1],
+      },
+    ],
+    likelyQuestions: [
+      {
+        question: 'Walk us through a replatform you owned end to end.',
+        why: 'They just raised to replatform — expect them to probe whether you’ve truly led one, not just touched it.',
+        sources: [NW_S2],
+      },
+      {
+        question:
+          'How would you keep storefront performance steady while a new app ships in parallel?',
+        why: 'They’re doing both at once this quarter — they need someone who holds quality under that split focus.',
+        sources: [NW_S1, NW_P1],
+      },
+      {
+        question:
+          'Where does conversion break down first on a DTC storefront, and how do you catch it?',
+        why: 'Performance and conversion are a stated priority for this team.',
+        sources: [NW_P1],
+      },
+    ],
+  },
+}
+
 const THIN_BRIEF = (company: string, role: string): ResearchBrief => ({
   companyOneLiner: `${company} is hiring for a ${role}. Public details were limited.`,
   signals: [],
@@ -255,6 +314,16 @@ const audit: AuditProvider = { recheck: () => SAMPLE_RECHECK }
 const research: ResearchProvider = {
   research: (company, role) => RESEARCH[company] ?? THIN_BRIEF(company, role),
 }
+const reasoning: ReasoningProvider = {
+  // The fixture "LLM": returns a grounded insight where we have real signals,
+  // and declines (null) otherwise. The deterministic layer still re-validates.
+  whyHiring: (brief) => {
+    const key = Object.keys(REASONING).find((k) =>
+      brief.companyOneLiner.startsWith(k),
+    )
+    return key ? REASONING[key] : null
+  },
+}
 const narrate: NarrateProvider = {
   narrateVerdict: (score: ScoreResult, company: string) => {
     // Deterministic honest template standing in for the LLM write-up. The
@@ -280,6 +349,7 @@ export const fixtureProviders: Providers = {
   discovery,
   audit,
   research,
+  reasoning,
   narrate,
   jd,
 }

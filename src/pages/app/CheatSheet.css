@@ -168,6 +168,43 @@
   margin-top: 4px;
 }
 
+/* "Why this role exists" callout */
+.cheat-why {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+.cheat-why-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+.cheat-why-text {
+  font-size: 15.5px;
+  line-height: 1.55;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* Grounding hint — traces a point/question back to the real signal */
+.cheat-src {
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--grey);
+  margin-top: 8px;
+}
+
+/* Honest note when there's no verified signal to reason from */
+.cheat-qa-note {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
 /* Talking points */
 .cheat-talk-list {
   display: flex;

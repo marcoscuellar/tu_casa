@@ -12,9 +12,16 @@
 
 import { runAudit } from './audit'
 import { runDiscovery } from './discovery'
+import { deriveHiringInsight } from './reasoning'
 import { gateResearch, type GatedResearch } from './research'
 import { scoreResume } from './scoring'
-import type { Confidence, ParsedResume, RankedJob, ScoreResult } from './types'
+import type {
+  Confidence,
+  HiringInsight,
+  ParsedResume,
+  RankedJob,
+  ScoreResult,
+} from './types'
 import type { Providers } from './providers/types'
 
 const CONFIDENCE_RANK: Record<Confidence, number> = {
@@ -79,4 +86,16 @@ export function buildResearch(
   role: string,
 ): GatedResearch {
   return gateResearch(providers.research.research(company, role))
+}
+
+/**
+ * Reason "why does this role exist?" from the gated research, grounded in real
+ * signals. Returns null when intelligence is thin (no honest motive to infer).
+ */
+export function buildHiringInsight(
+  providers: Providers,
+  gated: GatedResearch,
+  role: string,
+): HiringInsight | null {
+  return deriveHiringInsight(gated, role, providers.reasoning)
 }

@@ -21,6 +21,7 @@ import type {
   HiringInsight,
   ParsedResume,
   RankedJob,
+  ResumeUpload,
   ScoreResult,
 } from './types'
 import type { Providers } from './providers/types'
@@ -42,11 +43,11 @@ export interface PipelineResult {
 /** Run discover → audit → score → rank on a résumé. */
 export async function runPipeline(
   providers: Providers,
-  opts: { asOfYear?: number } = {},
+  opts: { asOfYear?: number; upload?: ResumeUpload } = {},
 ): Promise<PipelineResult> {
   const asOfYear = opts.asOfYear ?? new Date().getFullYear()
 
-  const resume = providers.resume.parseResume()
+  const resume = await providers.resume.parseResume(opts.upload)
   const raw = await providers.discovery.findPostings(resume)
   const discovered = runDiscovery(raw)
   const signals = providers.audit.recheck(raw)

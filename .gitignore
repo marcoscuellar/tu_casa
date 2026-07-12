@@ -12,6 +12,12 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
+# Secrets — never commit the Anthropic API key
+.env
+.env.*
+!.env.example
+.vercel
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

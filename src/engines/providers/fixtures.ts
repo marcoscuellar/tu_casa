@@ -308,7 +308,7 @@ const CANNED_JD: ParsedJD = {
 
 /* ---------- The fixture provider bundle ---------- */
 
-const resume: ResumeProvider = { parseResume: () => SAMPLE_RESUME }
+const resume: ResumeProvider = { parseResume: async () => SAMPLE_RESUME }
 const discovery: DiscoveryProvider = {
   findPostings: async () => SAMPLE_POSTINGS,
 }

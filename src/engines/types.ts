@@ -38,6 +38,16 @@ export interface ParsedResume {
   onsite_ok: boolean
 }
 
+/** An uploaded résumé, ready to hand to the parser (PDF sent natively, or text). */
+export interface ResumeUpload {
+  kind: 'text' | 'pdf'
+  /** Present when kind === 'text'. */
+  text?: string
+  /** Base64 (no data: prefix) when kind === 'pdf'. */
+  base64?: string
+  filename?: string
+}
+
 export type DealbreakerType = 'cert' | 'clearance' | 'license' | 'location'
 
 export interface Dealbreaker {

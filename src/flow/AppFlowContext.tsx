@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -16,7 +17,7 @@ import {
   type PipelineResult,
 } from '../engines/pipeline'
 import type { GatedResearch } from '../engines/research'
-import type { HiringInsight, RankedJob } from '../engines/types'
+import type { HiringInsight, RankedJob, ResumeUpload } from '../engines/types'
 
 // Real ATS jobs when VITE_LIVE_JOBS=1 (needs open egress to the ATS hosts);
 // otherwise the fixture pipeline, so the demo works offline and tests are hermetic.
@@ -49,6 +50,12 @@ export interface AppFlowContextValue {
   duplicateCount: number
   /** True while the (possibly live) pipeline is still resolving. */
   loading: boolean
+  /** Whether real ATS jobs / real résumé parsing are active (VITE_LIVE_JOBS). */
+  live: boolean
+  /** A résumé-parse or pipeline error to surface on Upload, if any. */
+  pipelineError?: string
+  /** Submit an uploaded résumé to run the pipeline (live mode). Resolves true on success. */
+  submitResume: (upload: ResumeUpload) => Promise<boolean>
 
   /* Selection carried into fit + cheat sheet */
   selectedJob?: RankedJob
@@ -80,18 +87,37 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   const [credits, setCredits] = useState(0)
   const [firstSheetUsed, setFirstSheetUsed] = useState(false)
 
-  // Run the pipeline once (async — live discovery fetches real boards).
+  // Run the pipeline (async — live discovery fetches real boards, and live
+  // mode parses the uploaded résumé with Claude). In fixtures mode it runs
+  // eagerly on the sample résumé; in live mode it runs when a résumé is
+  // submitted. submitResume returns whether the run succeeded, so the Upload
+  // screen can navigate on success without racing a loading flag.
   const [pipeline, setPipeline] = useState<PipelineResult | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!USE_LIVE)
+  const [pipelineError, setPipelineError] = useState<string | undefined>(undefined)
+
+  const runPipelineNow = useCallback(
+    async (upload?: ResumeUpload): Promise<boolean> => {
+      setLoading(true)
+      setPipelineError(undefined)
+      try {
+        const result = await runPipeline(PROVIDERS, { asOfYear: AS_OF_YEAR, upload })
+        setPipeline(result)
+        setLoading(false)
+        return true
+      } catch (e) {
+        setLoading(false)
+        setPipelineError(e instanceof Error ? e.message : 'Something went wrong.')
+        return false
+      }
+    },
+    [],
+  )
+
+  // Fixtures mode: run eagerly on the sample résumé. Live mode waits for upload.
   useEffect(() => {
-    let alive = true
-    runPipeline(PROVIDERS, { asOfYear: AS_OF_YEAR })
-      .then((r) => alive && (setPipeline(r), setLoading(false)))
-      .catch(() => alive && setLoading(false))
-    return () => {
-      alive = false
-    }
-  }, [])
+    if (!USE_LIVE) void runPipelineNow()
+  }, [runPipelineNow])
 
   const jobs = pipeline?.jobs ?? []
   const selectedJob = useMemo(
@@ -130,6 +156,9 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       droppedCount: pipeline?.droppedCount ?? 0,
       duplicateCount: pipeline?.duplicateCount ?? 0,
       loading,
+      live: USE_LIVE,
+      pipelineError,
+      submitResume: runPipelineNow,
 
       selectedJob,
       selectJob: (id) => setSelectedId(id),
@@ -155,7 +184,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, candidateRole, pipeline, jobs, loading, selectedJob, research, insight, credits, firstSheetUsed],
+    [name, email, candidateRole, pipeline, jobs, loading, pipelineError, selectedJob, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

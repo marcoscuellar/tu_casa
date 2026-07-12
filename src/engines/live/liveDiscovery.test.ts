@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { runPipeline } from '../pipeline'
 import { createLiveProviders } from '../providers/live'
+import { SAMPLE_RESUME } from '../providers/fixtures'
+import type { LiveDiscoveryOptions } from './liveDiscovery'
 import type { CompanySourceProvider } from './companySource'
 import { greenhouseUrl } from './ats/greenhouse'
 import { leverUrl } from './ats/lever'
@@ -89,9 +91,16 @@ const fetchJson: JsonFetcher = async (url) => {
   throw new Error(`HTTP 404 ${url}`)
 }
 
+// These tests exercise discovery, so use the fixture résumé (Maya) rather than
+// the live Claude parser.
+const liveProviders = (opts: LiveDiscoveryOptions) => ({
+  ...createLiveProviders(opts),
+  resume: { parseResume: async () => SAMPLE_RESUME },
+})
+
 describe('live discovery — full pipeline on recorded ATS payloads', () => {
   it('returns real, filtered, scored, ranked jobs', async () => {
-    const providers = createLiveProviders({ companySource, fetchJson })
+    const providers = liveProviders({ companySource, fetchJson })
     const result = await runPipeline(providers, { asOfYear: 2026 })
 
     // Evidence: print the actual jobs that came back.
@@ -110,7 +119,7 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
   })
 
   it('scores each with the real rubric and ranks strongest first', async () => {
-    const providers = createLiveProviders({ companySource, fetchJson })
+    const providers = liveProviders({ companySource, fetchJson })
     const result = await runPipeline(providers, { asOfYear: 2026 })
     const scores = result.jobs.map((j) => j.fit.score)
     expect([...scores]).toEqual([...scores].sort((a, b) => b - a))
@@ -152,7 +161,7 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
       throw new Error('404')
     }
     const result = await runPipeline(
-      createLiveProviders({ companySource: src, fetchJson: fetch2 }),
+      liveProviders({ companySource: src, fetchJson: fetch2 }),
       { asOfYear: 2026 },
     )
 
@@ -173,7 +182,7 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
       ],
     }
     const skipped: string[] = []
-    const providers = createLiveProviders({
+    const providers = liveProviders({
       companySource: flaky,
       fetchJson,
       onSkip: (c) => skipped.push(c.name),

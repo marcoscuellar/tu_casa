@@ -16,12 +16,16 @@ import type {
   ParsedJD,
   ParsedResume,
   ResearchBrief,
+  ResumeUpload,
   ScoreResult,
 } from '../types'
 
 export interface ResumeProvider {
-  /** Extract the rubric's résumé schema from an uploaded résumé. (LLM) */
-  parseResume(fileRef?: unknown): ParsedResume
+  /**
+   * Parse an uploaded résumé into the rubric's schema. (LLM extraction +
+   * deterministic validation.) Fixtures ignore the upload and return a sample.
+   */
+  parseResume(upload?: ResumeUpload): Promise<ParsedResume>
 }
 
 export interface DiscoveryProvider {

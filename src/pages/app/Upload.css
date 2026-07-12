@@ -96,6 +96,12 @@
   cursor: pointer;
   color: var(--red);
 }
+.upload-error {
+  font-size: 13px;
+  color: var(--red);
+  margin-top: 14px;
+  line-height: 1.5;
+}
 
 /* Parsing state */
 .upload-parsing {

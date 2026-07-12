@@ -6,18 +6,31 @@ import { CHEAT_NAV, PREFLIGHT } from '../../flow/data'
 import './flow.css'
 import './CheatSheet.css'
 
+const GENERIC_ASKS = [
+  'How will you know the person in this role is succeeding in the first 90 days?',
+  'What does the team most need help with right now?',
+  'How does the team make decisions when priorities conflict?',
+]
+
 export function CheatSheet() {
   const navigate = useNavigate()
-  const { cheatCompany, cheatRole, needsCredits, consumeSheet } = useAppFlow()
+  const {
+    selectedJob,
+    research,
+    needsCredits,
+    consumeSheet,
+  } = useAppFlow()
   const [active, setActive] = useState('company')
   const [checked, setChecked] = useState<Record<number, boolean>>({})
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
-  // While an explicit jump is settling, the click wins over the scroll-spy —
-  // otherwise a short trailing section (e.g. pre-flight) can't reach the top of
-  // the panel and the observer would re-mark the previous section active.
   const jumpingUntil = useRef(0)
+
+  // Reached without a selection/research → back to the shortlist.
+  useEffect(() => {
+    if (!selectedJob) navigate('/discovery', { replace: true })
+  }, [selectedJob, navigate])
 
   // Section jump: smooth-scroll the content panel to the chosen section.
   const jumpTo = (id: string) => {
@@ -53,7 +66,12 @@ export function CheatSheet() {
     )
     Object.values(sectionRefs.current).forEach((el) => el && observer.observe(el))
     return () => observer.disconnect()
-  }, [])
+  }, [selectedJob])
+
+  if (!selectedJob || !research) return null
+
+  const brief = research.brief
+  const thin = research.readiness === 'THIN'
 
   const tryNewSheet = () => {
     if (needsCredits()) {
@@ -64,12 +82,31 @@ export function CheatSheet() {
     navigate('/cheat-generating')
   }
 
-  const toggleCheck = (i: number) =>
-    setChecked((c) => ({ ...c, [i]: !c[i] }))
-
+  const toggleCheck = (i: number) => setChecked((c) => ({ ...c, [i]: !c[i] }))
   const setSectionRef = (id: string) => (el: HTMLDivElement | null) => {
     sectionRefs.current[id] = el
   }
+
+  // Section 01 tiles — only from confirmable facts.
+  const tiles: { label: string; val: string }[] = []
+  if (brief.stageSize) tiles.push({ label: 'Stage', val: brief.stageSize })
+  if (brief.signals[0]) tiles.push({ label: 'Signal', val: brief.signals[0].signal })
+  if (brief.mainProduct) tiles.push({ label: 'Focus', val: brief.mainProduct })
+
+  // Section 02 — company's stated priorities, else role-prep from themes.
+  const talkingPoints =
+    brief.statedPriorities.length > 0
+      ? brief.statedPriorities.map((p) => ({ title: p.priority, body: p.howToUse }))
+      : brief.likelyThemes.map((t) => ({
+          title: `Have a story ready: ${t}`,
+          body: 'Draw it from your own experience — a concrete example beats a general claim.',
+        }))
+
+  // Section 04 — sourced questions to ask, topped up with safe generics.
+  const asks = [
+    ...brief.signals.map((s) => s.youCouldSay),
+    ...GENERIC_ASKS,
+  ].slice(0, 4)
 
   return (
     <AppShell>
@@ -77,8 +114,8 @@ export function CheatSheet() {
         {/* Side nav */}
         <div className="blk blk-black cheat-nav">
           <div className="eyebrow cheat-nav-eyebrow">Interview cheat sheet</div>
-          <div className="cheat-nav-role">{cheatRole}</div>
-          <div className="cheat-nav-company mono-label">{cheatCompany}</div>
+          <div className="cheat-nav-role">{selectedJob.role}</div>
+          <div className="cheat-nav-company mono-label">{selectedJob.company}</div>
           <div className="cheat-divider" />
           <div className="cheat-nav-list">
             {CHEAT_NAV.map((n) => (
@@ -103,6 +140,13 @@ export function CheatSheet() {
 
         {/* Content */}
         <div className="blk-white cheat-content" ref={scrollRef}>
+          {thin && (
+            <div className="cheat-thin">
+              Public info on {selectedJob.company} was limited — this sheet leans
+              on role-based prep. That&rsquo;s honest and still works.
+            </div>
+          )}
+
           {/* 01 Company snapshot */}
           <div data-sec="company" ref={setSectionRef('company')} className="cheat-sec">
             <div className="cheat-sec-eyebrow mono-label">01 · Company snapshot</div>
@@ -112,25 +156,19 @@ export function CheatSheet() {
               walking in to.
             </h2>
             <p className="cheat-para">
-              Northwind Apparel is a mid-market DTC retailer (~450 people, Series
-              C) pushing hard into direct e-commerce after years of wholesale.
-              Their web team owns the storefront, checkout, and a new mobile app
-              launching this quarter.
+              {brief.companyOneLiner}
+              {brief.mainProduct ? ` ${brief.mainProduct}` : ''}
             </p>
-            <div className="cheat-tiles">
-              <div className="cheat-tile">
-                <div className="cheat-tile-label mono-label">Stage</div>
-                <div className="cheat-tile-val">Series C · scaling</div>
+            {tiles.length > 0 && (
+              <div className="cheat-tiles">
+                {tiles.map((tile) => (
+                  <div key={tile.label} className="cheat-tile">
+                    <div className="cheat-tile-label mono-label">{tile.label}</div>
+                    <div className="cheat-tile-val">{tile.val}</div>
+                  </div>
+                ))}
               </div>
-              <div className="cheat-tile">
-                <div className="cheat-tile-label mono-label">Signal</div>
-                <div className="cheat-tile-val">DTC app launch</div>
-              </div>
-              <div className="cheat-tile">
-                <div className="cheat-tile-label mono-label">Your edge</div>
-                <div className="cheat-tile-val">DTC replatforms</div>
-              </div>
-            </div>
+            )}
           </div>
 
           <div className="cheat-hairline" />
@@ -140,78 +178,35 @@ export function CheatSheet() {
             <div className="cheat-sec-eyebrow mono-label">02 · Talking points</div>
             <h2 className="cheat-sec-head">Lead with these.</h2>
             <div className="cheat-talk-list">
-              <div className="cheat-talk">
-                <div className="cheat-talk-title">
-                  You&rsquo;ve shipped the exact thing they&rsquo;re building.
+              {talkingPoints.map((tp) => (
+                <div key={tp.title} className="cheat-talk">
+                  <div className="cheat-talk-title">{tp.title}</div>
+                  <p className="cheat-talk-body">{tp.body}</p>
                 </div>
-                <p className="cheat-talk-body">
-                  Your Shopify Hydrogen storefront replatform at Loomly maps
-                  directly to their DTC push. Bring the load-time and conversion
-                  numbers.
-                </p>
-              </div>
-              <div className="cheat-talk">
-                <div className="cheat-talk-title">
-                  You bridge design and engineering.
-                </div>
-                <p className="cheat-talk-body">
-                  Seven years pairing with design systems teams — useful for a
-                  small web team that can&rsquo;t silo roles.
-                </p>
-              </div>
-              <div className="cheat-talk">
-                <div className="cheat-talk-title">
-                  You&rsquo;ve done the mobile-web handoff.
-                </div>
-                <p className="cheat-talk-body">
-                  Their app is launching now — your React Native side project is
-                  a credible, honest anchor.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
 
           <div className="cheat-hairline" />
 
-          {/* 03 Likely questions */}
+          {/* 03 Likely questions — themes to prep (answers come from you) */}
           <div data-sec="questions" ref={setSectionRef('questions')} className="cheat-sec">
             <div className="cheat-sec-eyebrow mono-label">03 · Likely questions</div>
             <h2 className="cheat-sec-head">
-              What they&rsquo;ll ask —
+              What this role
               <br />
-              and your answer.
+              tends to draw.
             </h2>
             <div className="cheat-qa-list">
-              <div className="cheat-qa">
-                <div className="cheat-qa-q">
-                  &ldquo;Walk me through a replatform you led.&rdquo;
+              {brief.likelyThemes.map((theme) => (
+                <div key={theme} className="cheat-qa">
+                  <div className="cheat-qa-q">Expect questions on {theme.toLowerCase()}.</div>
+                  <p className="cheat-qa-a">
+                    <b className="cheat-you">Prep:</b> pull your answer from your own
+                    background — a specific example lands better than a general claim.
+                  </p>
                 </div>
-                <p className="cheat-qa-a">
-                  <b className="cheat-you">You:</b> Loomly, 2023 — migrated a
-                  legacy storefront to Hydrogen. Frame it as problem → your call
-                  → measured result (LCP 4.1s → 1.6s, +12% mobile conversion).
-                </p>
-              </div>
-              <div className="cheat-qa">
-                <div className="cheat-qa-q">
-                  &ldquo;How do you work with designers?&rdquo;
-                </div>
-                <p className="cheat-qa-a">
-                  <b className="cheat-you">You:</b> Tokens and a shared component
-                  library. Give the concrete example of the design-system
-                  rebuild you co-owned.
-                </p>
-              </div>
-              <div className="cheat-qa">
-                <div className="cheat-qa-q">
-                  &ldquo;Where are you weaker?&rdquo;
-                </div>
-                <p className="cheat-qa-a">
-                  <b className="cheat-you">You:</b> Native mobile depth. Be
-                  honest, then pivot to your RN side project and how fast you
-                  ramp.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -226,22 +221,11 @@ export function CheatSheet() {
               a conversation.
             </h2>
             <ul className="cheat-ask-list">
-              <li className="cheat-ask">
-                <span className="cheat-arrow">→</span> How&rsquo;s the web team
-                split between the storefront and the new app?
-              </li>
-              <li className="cheat-ask">
-                <span className="cheat-arrow">→</span> What does &ldquo;done&rdquo;
-                look like for the app launch this quarter?
-              </li>
-              <li className="cheat-ask">
-                <span className="cheat-arrow">→</span> Where does the current
-                storefront hurt most on performance?
-              </li>
-              <li className="cheat-ask">
-                <span className="cheat-arrow">→</span> Who would I pair with most
-                in the first 90 days?
-              </li>
+              {asks.map((q) => (
+                <li key={q} className="cheat-ask">
+                  <span className="cheat-arrow">→</span> {q}
+                </li>
+              ))}
             </ul>
           </div>
 

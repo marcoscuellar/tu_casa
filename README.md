@@ -42,22 +42,48 @@ npm run preview    # serve the production build
 | `/paywall`         | App: cheat-sheet credit packs                             |
 
 Flow: `signup → upload → discovery → fit → cheat-generating → cheatsheet`, with the
-paywall gating **additional** cheat sheets once the free first one is used.
+paywall gating **additional** cheat sheets once the free first one is used. The
+candidate provides only a résumé — no job description is ever asked for.
+
+## The engine layer (`src/engines/`)
+
+The résumé-in → jobs-out pipeline is implemented as deterministic, unit-tested
+modules from the four specs. `npm test` runs 50 tests.
+
+```
+engines/
+  types.ts        # all four specs' schemas
+  synonymMap.ts   # deterministic skill normalization (MySQL ≠ SQL Server)
+  scoring.ts      # rubric — layers 1–4, dealbreaker gate, verdicts (no LLM)
+  discovery.ts    # Engine 4 — confidence mapping, liveness>freshness, never drop
+  audit.ts        # Engine 3 — dedupe, flag-not-drop, only-confirmed-dead removed
+  research.ts     # interview-research THIN/GO gate
+  pipeline.ts     # discover → audit → score → rank
+  providers/      # the LLM/web seams (fixtures now, live later)
+```
+
+**Determinism boundary:** scoring, discovery classification, audit, dedupe, and
+the THIN/GO gate are pure and deterministic. The non-deterministic work — the
+job crawl, live liveness re-check, résumé/company research, and the verdict
+*prose* — sits behind `providers/`. Today those are fixtures; swapping in live
+LLM/web implementations touches only that seam, never the engines or the UI.
 
 ## Where real services plug in
 
-The flow carries state through `src/flow/AppFlowContext.tsx`, and sample content
-lives in `src/flow/data.ts`. In production, replace:
+The UI only ever touches `src/flow/AppFlowContext.tsx`, which runs the pipeline
+on the fixture providers. To go live, implement the provider interfaces in
+`src/engines/providers/types.ts`:
 
-- **Upload/parse** (`Upload.tsx`) — the simulated ~2s parse with the real
-  résumé parse/extract job; the parsed name/role feed every later screen.
-- **Job search & ranking** (`data.ts` `MATCHES`) — from the parsed profile.
-- **Fit scoring** (`FitCheck.tsx`, `data.ts`) — grade the pasted JD against the
-  résumé.
-- **Cheat-sheet generation** (`CheatGen.tsx`) — drive off the real
-  company/role research + drafting job's completion.
-- **Credits** (`AppFlowContext.tsx`) — first sheet free, then decrement a real
-  credit balance; finding & fit are never gated.
+- **`ResumeProvider`** — parse an uploaded résumé into the rubric schema (LLM).
+- **`DiscoveryProvider`** — find real, live postings (job crawl).
+- **`AuditProvider`** — independent liveness re-check per posting.
+- **`ResearchProvider`** — sourced, dated company research (LLM + web).
+- **`NarrateProvider`** — the one LLM seam in scoring: the verdict write-up.
+- **`JDParseProvider`** — parked capability for an optional "check a specific
+  job" feature (JD paste), off the main résumé-in flow.
+
+Credits (`AppFlowContext.tsx`) stay first-sheet-free then gated; finding & fit
+are never gated.
 
 ## Structure
 

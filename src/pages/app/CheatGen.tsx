@@ -7,17 +7,21 @@ import './CheatGen.css'
 
 export function CheatGen() {
   const navigate = useNavigate()
-  const { cheatCompany } = useAppFlow()
+  const { cheatCompany, selectedJob } = useAppFlow()
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // In production this is driven off the real research/generation job's
   // completion. Here we simulate the ~2.2s build, then reveal the sheet.
   useEffect(() => {
+    if (!selectedJob) {
+      navigate('/discovery', { replace: true })
+      return
+    }
     timer.current = setTimeout(() => navigate('/cheatsheet'), 2200)
     return () => {
       if (timer.current) clearTimeout(timer.current)
     }
-  }, [navigate])
+  }, [navigate, selectedJob])
 
   return (
     <AppShell>

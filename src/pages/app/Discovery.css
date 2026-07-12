@@ -86,11 +86,42 @@
   flex: 1;
   min-width: 220px;
 }
+.disc-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 .disc-title {
   font-family: var(--font);
   font-weight: 800;
   font-size: 20px;
   letter-spacing: -0.01em;
+}
+.disc-flag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.disc-flag-dark {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.disc-flag-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+  margin-top: 6px;
+  max-width: 62ch;
+}
+.disc-card-top .disc-flag-note {
+  color: rgba(255, 255, 255, 0.6);
 }
 .disc-meta {
   font-size: 11px;

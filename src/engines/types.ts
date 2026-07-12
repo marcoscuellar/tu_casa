@@ -122,6 +122,8 @@ export interface DiscoveredJob {
   link: string
   /** Real posted/last-seen date, or "Unknown" — never a guess. */
   postedDate: string
+  /** Salary range as posted, if the posting states one. */
+  salary?: string
   sourceType: SourceType
   confidence: Confidence
   status: OpenStatus

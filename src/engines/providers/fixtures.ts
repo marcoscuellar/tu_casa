@@ -100,6 +100,7 @@ export const SAMPLE_POSTINGS: RawPosting[] = [
     remote: true,
     link: 'https://boards.greenhouse.io/northwind/jobs/sfe',
     postedDate: 'May 2026',
+    salary: '$150–175k',
     sourceType: 'company-ats',
     livenessEvidence: 'confirmed-open',
     jd: jdNorthwind,
@@ -125,6 +126,7 @@ export const SAMPLE_POSTINGS: RawPosting[] = [
     remote: false,
     link: 'https://jobs.lever.co/loomly/staff-web',
     postedDate: 'Mar 2026',
+    salary: '$165–190k',
     sourceType: 'aggregator-corroborated',
     livenessEvidence: 'confirmed-open',
     jd: jdLoomly,
@@ -138,6 +140,7 @@ export const SAMPLE_POSTINGS: RawPosting[] = [
     link: 'https://ziprecruiter.com/jobs/cedar-oak-frontend-lead',
     // An older but potentially still-open req — age must NOT downgrade it.
     postedDate: 'Nov 2025',
+    salary: '$145–170k',
     sourceType: 'aggregator-only',
     livenessEvidence: 'none',
     jd: jdCedar,
@@ -150,6 +153,7 @@ export const SAMPLE_POSTINGS: RawPosting[] = [
     remote: true,
     link: 'https://boards.greenhouse.io/brightline/jobs/sse',
     postedDate: 'Apr 2026',
+    salary: '$140–160k',
     sourceType: 'company-ats',
     livenessEvidence: 'confirmed-open',
     jd: jdBrightline,
@@ -253,17 +257,20 @@ const research: ResearchProvider = {
 }
 const narrate: NarrateProvider = {
   narrateVerdict: (score: ScoreResult, company: string) => {
-    // Deterministic honest template standing in for the LLM write-up.
-    const gap = score.gaps[0]
-    const base =
-      score.verdict === 'STRONG'
-        ? `Strong match on the core work at ${company}.`
-        : score.verdict === 'PARTIAL'
-          ? `A real shot at ${company}, with a couple of things to address.`
-          : score.verdict === 'WEAK'
-            ? `This one’s a stretch — the core requirements aren’t there yet.`
-            : `Not a fit right now — a hard requirement isn’t met.`
-    return gap ? `${base} ${gap.t}: ${gap.d}` : base
+    // Deterministic honest template standing in for the LLM write-up. The
+    // specifics live in the covered/gaps columns, so this stays a summary line.
+    const n = score.gaps.length
+    const things = `${n} thing${n === 1 ? '' : 's'} to tighten`
+    switch (score.verdict) {
+      case 'STRONG':
+        return `Strong match on the core work at ${company}. You clear the bar — go for it.`
+      case 'PARTIAL':
+        return `A real shot at ${company} — ${things} before you apply, noted on the right.`
+      case 'WEAK':
+        return `This one’s a stretch: the core requirements aren’t there yet.`
+      default:
+        return `Not a fit right now — a hard requirement isn’t met.`
+    }
   },
 }
 const jd: JDParseProvider = { parseJobDescription: () => CANNED_JD }

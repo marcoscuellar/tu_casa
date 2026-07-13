@@ -25,9 +25,9 @@ export function SignUp() {
     setErr('')
     setAccount(name.trim(), email.trim())
     if (next) {
-      // They signed up specifically to get the cheat sheet — claim it and go
-      // straight there, no round-trip back to Fit Check.
-      consumeSheet()
+      // If they came from the cheat-sheet gate, claim the sheet and go straight
+      // there. Other gates (e.g. application tracking) just return to `next`.
+      if (next === '/cheat-generating') consumeSheet()
       navigate(next)
     } else {
       navigate('/upload')

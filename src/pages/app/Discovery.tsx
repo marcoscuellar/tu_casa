@@ -51,12 +51,17 @@ function snippet(text: string, max = 320): string {
 
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, loading, selectJob } = useAppFlow()
+  const { candidateName, candidateRole, jobs, loading, selectJob, hasAccount } = useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
   const [openId, setOpenId] = useState<string | null>(null)
   const [applied, setApplied] = useState<Set<string>>(loadApplied)
 
   const toggleApplied = (id: string) => {
+    // Tracking applications is an account feature — send them to sign in first.
+    if (!hasAccount) {
+      navigate('/signup', { state: { next: '/discovery' } })
+      return
+    }
     setApplied((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)

@@ -134,7 +134,9 @@
   font-weight: 800;
   font-size: clamp(120px, 20vw, 280px);
   letter-spacing: -0.04em;
-  color: rgba(255, 255, 255, 0.1);
+  /* Slightly stronger than a pure watermark so the "…sa" still reads once the
+     red wash (40%) sits over it. */
+  color: rgba(255, 255, 255, 0.16);
   line-height: 1;
   white-space: nowrap;
   user-select: none;
@@ -145,42 +147,10 @@
   top: 0;
   bottom: 0;
   width: 38%;
-  background: var(--red);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 18px;
-  padding: 36px;
+  /* 40% red so the "…sa" of the wordmark reads through the wash. */
+  background: rgba(255, 0, 0, 0.4);
+  pointer-events: none;
 }
-.lp-rail-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.55);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 4px;
-}
-.lp-rail-title {
-  font-weight: 800;
-  font-size: 22px;
-  letter-spacing: -0.02em;
-  color: #fff;
-  line-height: 1;
-  text-transform: uppercase;
-}
-.lp-rail-title-gap {
-  margin-bottom: 14px;
-}
-.lp-rail-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Statement bands */
 .lp-band {
   border-radius: 20px;
@@ -512,12 +482,8 @@
     left: 24px;
   }
   .lp-hero-rail {
-    position: static;
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 24px;
-    margin-top: 24px;
+    /* Empty now (just a red wash) — no need for it as a stacked block on mobile. */
+    display: none;
   }
   .lp-tiles,
   .lp-stats-grid {

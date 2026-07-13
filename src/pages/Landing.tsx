@@ -79,26 +79,9 @@ export function Landing() {
           <div className="lp-hero-ghost" aria-hidden>
             TuCasa
           </div>
-          <div className="lp-hero-rail">
-            <div>
-              <div className="lp-rail-label">01 / In</div>
-              <div className="lp-rail-title">Your résumé</div>
-            </div>
-            <div className="lp-rail-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M5 12l7 7 7-7" />
-              </svg>
-            </div>
-            <div>
-              <div className="lp-rail-label">02 / Out</div>
-              <div className="lp-rail-title lp-rail-title-gap">Ranked shortlist</div>
-              <div className="lp-rail-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" />
-                </svg>
-              </div>
-            </div>
-          </div>
+          {/* A 40%-opacity red wash over the right end of the "TuCasa"
+              wordmark — reveals the "…sa" behind it. No text on top, by design. */}
+          <div className="lp-hero-rail" aria-hidden />
         </div>
 
         {/* Statement — why we exist */}

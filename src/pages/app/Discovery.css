@@ -196,3 +196,32 @@
     width: 100%;
   }
 }
+
+/* Show-more control under the shortlist */
+.disc-more-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 4px 8px;
+}
+.disc-more-count {
+  color: var(--muted);
+}
+.disc-more-btn {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 13px 24px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.disc-more-btn:hover {
+  filter: brightness(1.25);
+}

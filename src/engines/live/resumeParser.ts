@@ -62,19 +62,19 @@ export const RESUME_JSON_SCHEMA = {
   ],
 } as const
 
-/** Instruction sent alongside the résumé. Extraction only — no scoring, no invention. */
-export const RESUME_PARSE_PROMPT = `You are extracting structured data from a job seeker's résumé. Return ONLY the fields in the schema — do not infer, embellish, or invent anything that isn't supported by the résumé text.
+/** Instruction sent alongside the résumé. Extraction only — thorough, objective, no invention. */
+export const RESUME_PARSE_PROMPT = `You are extracting a complete, faithful profile from a job seeker's résumé. Read the ENTIRE document — the summary, EVERY role and its bullet points, any skills/tools sections, projects, and education. Extract from ALL of it, not just section headers or the top job title. Be thorough and objective: capture the full picture, and never bias the result toward the title alone. Missing real information the résumé clearly states is the main failure to avoid — but do not invent, embellish, or inflate anything that isn't there.
 
-Guidelines:
-- titles: the person's job titles, most recent first, each as its raw text (e.g. "Senior Frontend Engineer"). Do not classify or rename them.
-- skills: concrete technical skills, tools, and languages the résumé shows. For each, give name (as written), years of experience with it, and last_used_year (the most recent year they used it; use the résumé's dates). If a year isn't stated, estimate conservatively from context.
-- years_total: total years of professional experience.
-- industries: industries/domains they've worked in.
-- certs_clearances: any certifications, licenses, or security clearances (e.g. "AWS Solutions Architect", "RN license", "TS/SCI"). Empty array if none.
-- location: their location as stated, or "Remote" if they indicate remote preference, or "" if unknown.
-- onsite_ok: true if they indicate willingness to work onsite/relocate; false if remote-only or unstated.
+Extract these fields, grounded strictly in what the résumé states:
+- titles: every job title held, most recent first, each as its raw text (e.g. "Senior Frontend Engineer"). Do not rename or classify them.
+- skills: EVERY concrete technical skill, tool, language, framework, library, platform, database, cloud service, or methodology named ANYWHERE — including ones mentioned only inside experience bullet points, not just a dedicated "Skills" section. Be exhaustive. For each: name (as written), years (estimate from how long and across how many roles it appears), and last_used_year (the most recent year a role using it was active — a "present"/current role means this year; otherwise use the role's end date).
+- years_total: total years of professional experience. If it isn't stated outright, INFER it from the span of employment dates (earliest start year → latest end year or present).
+- industries: industries/domains worked in, drawn from the companies and the work described.
+- certs_clearances: certifications, licenses, or security clearances (e.g. "AWS Solutions Architect", "RN license", "PMP", "TS/SCI"). Empty array if none.
+- location: their location as stated, or "Remote" if they indicate a remote preference, or "" if unknown.
+- onsite_ok: true if they indicate willingness to work onsite/hybrid/relocate; false if remote-only or unstated.
 
-If the document is not a résumé or is unreadable, return empty titles and skills arrays.
+If the document is genuinely not a résumé or is unreadable, return empty titles and skills arrays.
 
 Return ONLY a JSON object — no markdown, no code fences, no prose — in exactly this shape:
 {"titles":[{"raw":"..."}],"skills":[{"name":"...","years":0,"last_used_year":2026}],"years_total":0,"industries":["..."],"certs_clearances":["..."],"location":"...","onsite_ok":false}`

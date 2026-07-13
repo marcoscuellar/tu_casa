@@ -76,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const message = await client.messages.create({
         model: MODEL,
-        max_tokens: 2000,
+        max_tokens: 8000, // room for a thorough, skill-heavy extraction
         messages: [{ role: 'user', content }],
       })
 

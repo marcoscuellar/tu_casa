@@ -4606,18 +4606,18 @@ function inferLevel(title) {
 }
 
 // src/engines/live/resumeParser.ts
-var RESUME_PARSE_PROMPT = `You are extracting structured data from a job seeker's r\xE9sum\xE9. Return ONLY the fields in the schema \u2014 do not infer, embellish, or invent anything that isn't supported by the r\xE9sum\xE9 text.
+var RESUME_PARSE_PROMPT = `You are extracting a complete, faithful profile from a job seeker's r\xE9sum\xE9. Read the ENTIRE document \u2014 the summary, EVERY role and its bullet points, any skills/tools sections, projects, and education. Extract from ALL of it, not just section headers or the top job title. Be thorough and objective: capture the full picture, and never bias the result toward the title alone. Missing real information the r\xE9sum\xE9 clearly states is the main failure to avoid \u2014 but do not invent, embellish, or inflate anything that isn't there.
 
-Guidelines:
-- titles: the person's job titles, most recent first, each as its raw text (e.g. "Senior Frontend Engineer"). Do not classify or rename them.
-- skills: concrete technical skills, tools, and languages the r\xE9sum\xE9 shows. For each, give name (as written), years of experience with it, and last_used_year (the most recent year they used it; use the r\xE9sum\xE9's dates). If a year isn't stated, estimate conservatively from context.
-- years_total: total years of professional experience.
-- industries: industries/domains they've worked in.
-- certs_clearances: any certifications, licenses, or security clearances (e.g. "AWS Solutions Architect", "RN license", "TS/SCI"). Empty array if none.
-- location: their location as stated, or "Remote" if they indicate remote preference, or "" if unknown.
-- onsite_ok: true if they indicate willingness to work onsite/relocate; false if remote-only or unstated.
+Extract these fields, grounded strictly in what the r\xE9sum\xE9 states:
+- titles: every job title held, most recent first, each as its raw text (e.g. "Senior Frontend Engineer"). Do not rename or classify them.
+- skills: EVERY concrete technical skill, tool, language, framework, library, platform, database, cloud service, or methodology named ANYWHERE \u2014 including ones mentioned only inside experience bullet points, not just a dedicated "Skills" section. Be exhaustive. For each: name (as written), years (estimate from how long and across how many roles it appears), and last_used_year (the most recent year a role using it was active \u2014 a "present"/current role means this year; otherwise use the role's end date).
+- years_total: total years of professional experience. If it isn't stated outright, INFER it from the span of employment dates (earliest start year \u2192 latest end year or present).
+- industries: industries/domains worked in, drawn from the companies and the work described.
+- certs_clearances: certifications, licenses, or security clearances (e.g. "AWS Solutions Architect", "RN license", "PMP", "TS/SCI"). Empty array if none.
+- location: their location as stated, or "Remote" if they indicate a remote preference, or "" if unknown.
+- onsite_ok: true if they indicate willingness to work onsite/hybrid/relocate; false if remote-only or unstated.
 
-If the document is not a r\xE9sum\xE9 or is unreadable, return empty titles and skills arrays.
+If the document is genuinely not a r\xE9sum\xE9 or is unreadable, return empty titles and skills arrays.
 
 Return ONLY a JSON object \u2014 no markdown, no code fences, no prose \u2014 in exactly this shape:
 {"titles":[{"raw":"..."}],"skills":[{"name":"...","years":0,"last_used_year":2026}],"years_total":0,"industries":["..."],"certs_clearances":["..."],"location":"...","onsite_ok":false}`;
@@ -4741,7 +4741,8 @@ R\xC9SUM\xC9:
 ${input.text}` }];
       const message = await client.messages.create({
         model: MODEL,
-        max_tokens: 2e3,
+        max_tokens: 8e3,
+        // room for a thorough, skill-heavy extraction
         messages: [{ role: "user", content }]
       });
       const textBlock = message.content.find((b) => b.type === "text");

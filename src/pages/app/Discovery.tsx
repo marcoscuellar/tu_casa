@@ -1,9 +1,17 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
 import type { RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
+
+// Show the strongest handful first; reveal more on demand (10 at a time) up to
+// a hard cap so a big shortlist stays focused. The cap is a display limit today;
+// it becomes a real per-user quota once accounts + the credits model land.
+const INITIAL_SHOWN = 7
+const SHOW_MORE_STEP = 10
+const MAX_SHOWN = 30
 
 /** Prettify a canonical skill id for a tag chip. */
 function prettySkill(canonical: string): string {
@@ -28,11 +36,17 @@ export function Discovery() {
   const navigate = useNavigate()
   const { candidateName, candidateRole, jobs, matchCount, loading, selectJob } =
     useAppFlow()
+  const [visible, setVisible] = useState(INITIAL_SHOWN)
 
   const checkFit = (job: RankedJob) => {
     selectJob(job.id)
     navigate('/fit')
   }
+
+  const cap = Math.min(jobs.length, MAX_SHOWN)
+  const shown = jobs.slice(0, Math.min(visible, cap))
+  const remaining = cap - shown.length
+  const cappedOut = shown.length >= MAX_SHOWN && jobs.length > MAX_SHOWN
 
   return (
     <AppShell>
@@ -69,7 +83,7 @@ export function Discovery() {
           </div>
         )}
         <div className="disc-list">
-          {jobs.map((job, i) => {
+          {shown.map((job, i) => {
             const top = i === 0
             const flagged = job.audit.recheck === 'flagged'
             // Tags = the required skills this résumé actually matched (why it ranks).
@@ -139,6 +153,28 @@ export function Discovery() {
             )
           })}
         </div>
+
+        {remaining > 0 && (
+          <div className="disc-more-row">
+            <span className="disc-more-count mono-label">
+              Showing {shown.length} of {jobs.length}
+            </span>
+            <button
+              className="disc-more-btn"
+              onClick={() => setVisible((v) => Math.min(v + SHOW_MORE_STEP, cap))}
+            >
+              Show {Math.min(SHOW_MORE_STEP, remaining)} more →
+            </button>
+          </div>
+        )}
+        {cappedOut && (
+          <div className="disc-more-row">
+            <span className="disc-more-count mono-label">
+              Showing your top {MAX_SHOWN} of {jobs.length} — refine your résumé
+              to sharpen the list.
+            </span>
+          </div>
+        )}
       </div>
     </AppShell>
   )

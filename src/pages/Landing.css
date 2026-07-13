@@ -134,9 +134,7 @@
   font-weight: 800;
   font-size: clamp(120px, 20vw, 280px);
   letter-spacing: -0.04em;
-  /* Slightly stronger than a pure watermark so the "…sa" still reads once the
-     red wash (40%) sits over it. */
-  color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.1);
   line-height: 1;
   white-space: nowrap;
   user-select: none;
@@ -147,9 +145,17 @@
   top: 0;
   bottom: 0;
   width: 38%;
-  /* 40% red so the "…sa" of the wordmark reads through the wash. */
-  background: rgba(255, 0, 0, 0.4);
-  pointer-events: none;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lp-hero-arrows {
+  display: flex;
+  gap: 10px;
+}
+.lp-hero-arrows svg {
+  display: block;
 }
 /* Statement bands */
 .lp-band {
@@ -482,8 +488,10 @@
     left: 24px;
   }
   .lp-hero-rail {
-    /* Empty now (just a red wash) — no need for it as a stacked block on mobile. */
-    display: none;
+    position: static;
+    width: 100%;
+    min-height: 96px;
+    margin-top: 24px;
   }
   .lp-tiles,
   .lp-stats-grid {

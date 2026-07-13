@@ -24,6 +24,9 @@ export function ConfirmInfo() {
   const [onsiteOk, setOnsiteOk] = useState(false)
   const [years, setYears] = useState('')
   const [titleErr, setTitleErr] = useState('')
+  // Default to a clean read-only review; open editing automatically if a
+  // required field (the title) came back empty so it can't be missed.
+  const [editing, setEditing] = useState(false)
 
   // Reached without a parsed draft (e.g. a refresh) → back to upload.
   useEffect(() => {
@@ -31,10 +34,12 @@ export function ConfirmInfo() {
       navigate('/upload', { replace: true })
       return
     }
-    setTitle(draftResume.titles[0]?.raw ?? '')
+    const t = draftResume.titles[0]?.raw ?? ''
+    setTitle(t)
     setLocation(draftResume.location ?? '')
     setOnsiteOk(draftResume.onsite_ok)
     setYears(draftResume.years_total ? String(draftResume.years_total) : '')
+    setEditing(!t.trim())
   }, [draftResume, navigate])
 
   if (!draftResume) return null
@@ -44,6 +49,7 @@ export function ConfirmInfo() {
     const t = title.trim()
     if (!t) {
       setTitleErr('Add your role so we can match jobs to it.')
+      setEditing(true)
       return
     }
     setTitleErr('')
@@ -80,60 +86,92 @@ export function ConfirmInfo() {
           </p>
         </div>
 
+        <div className="confirm-editbar">
+          <button
+            type="button"
+            className="confirm-edit-btn"
+            onClick={() => setEditing((v) => !v)}
+          >
+            {editing ? 'Done' : '✎ Edit'}
+          </button>
+        </div>
+
         <div className="confirm-fields">
-          <label className="confirm-field">
+          <div className="confirm-field">
             <span className="confirm-flabel mono-label">Your title / role</span>
-            <input
-              className="confirm-input"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Senior Frontend Engineer"
-            />
-            {titleErr && <span className="confirm-ferr">{titleErr}</span>}
-          </label>
+            {editing ? (
+              <>
+                <input
+                  className="confirm-input"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Senior Frontend Engineer"
+                />
+                {titleErr && <span className="confirm-ferr">{titleErr}</span>}
+              </>
+            ) : (
+              <span className={`confirm-value ${!title.trim() ? 'is-missing' : ''}`}>
+                {title.trim() || 'Not detected — tap Edit to add it'}
+              </span>
+            )}
+          </div>
 
           <div className="confirm-row">
-            <label className="confirm-field">
+            <div className="confirm-field">
               <span className="confirm-flabel mono-label">Location</span>
-              <input
-                className="confirm-input"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Remote (US) or Austin, TX"
-              />
-            </label>
-            <label className="confirm-field confirm-field-sm">
+              {editing ? (
+                <input
+                  className="confirm-input"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Remote (US) or Austin, TX"
+                />
+              ) : (
+                <span className="confirm-value">{location.trim() || 'Not specified'}</span>
+              )}
+            </div>
+            <div className="confirm-field confirm-field-sm">
               <span className="confirm-flabel mono-label">Years of experience</span>
-              <input
-                className="confirm-input"
-                type="number"
-                min={0}
-                max={60}
-                value={years}
-                onChange={(e) => setYears(e.target.value)}
-                placeholder="0"
-              />
-            </label>
+              {editing ? (
+                <input
+                  className="confirm-input"
+                  type="number"
+                  min={0}
+                  max={60}
+                  value={years}
+                  onChange={(e) => setYears(e.target.value)}
+                  placeholder="0"
+                />
+              ) : (
+                <span className="confirm-value">{years ? `${years} yrs` : '—'}</span>
+              )}
+            </div>
           </div>
 
           <div className="confirm-field">
             <span className="confirm-flabel mono-label">Work preference</span>
-            <div className="confirm-toggle">
-              <button
-                type="button"
-                className={`confirm-toggle-btn ${!onsiteOk ? 'is-on' : ''}`}
-                onClick={() => setOnsiteOk(false)}
-              >
-                Remote only
-              </button>
-              <button
-                type="button"
-                className={`confirm-toggle-btn ${onsiteOk ? 'is-on' : ''}`}
-                onClick={() => setOnsiteOk(true)}
-              >
-                Open to onsite
-              </button>
-            </div>
+            {editing ? (
+              <div className="confirm-toggle">
+                <button
+                  type="button"
+                  className={`confirm-toggle-btn ${!onsiteOk ? 'is-on' : ''}`}
+                  onClick={() => setOnsiteOk(false)}
+                >
+                  Remote only
+                </button>
+                <button
+                  type="button"
+                  className={`confirm-toggle-btn ${onsiteOk ? 'is-on' : ''}`}
+                  onClick={() => setOnsiteOk(true)}
+                >
+                  Open to onsite
+                </button>
+              </div>
+            ) : (
+              <span className="confirm-value">
+                {onsiteOk ? 'Open to onsite' : 'Remote only'}
+              </span>
+            )}
           </div>
 
           <div className="confirm-field">

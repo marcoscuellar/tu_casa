@@ -10,7 +10,7 @@ import './Discovery.css'
 // a hard cap so a big shortlist stays focused. The cap is a display limit today;
 // it becomes a real per-user quota once accounts + the credits model land.
 const INITIAL_SHOWN = 7
-const SHOW_MORE_STEP = 10
+const SHOW_MORE_STEP = 7
 const MAX_SHOWN = 30
 
 /** Prettify a canonical skill id for a tag chip. */
@@ -34,8 +34,7 @@ function prettySkill(canonical: string): string {
 
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, matchCount, loading, selectJob } =
-    useAppFlow()
+  const { candidateName, candidateRole, jobs, loading, selectJob } = useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
 
   const checkFit = (job: RankedJob) => {
@@ -65,10 +64,6 @@ export function Discovery() {
               first — every score earned against the role&rsquo;s real
               requirements. Finding &amp; ranking is always free.
             </p>
-          </div>
-          <div className="disc-count-wrap">
-            <div className="disc-count">{matchCount}</div>
-            <div className="disc-count-label mono-label">Genuine matches</div>
           </div>
         </div>
 
@@ -155,23 +150,19 @@ export function Discovery() {
         </div>
 
         {remaining > 0 && (
-          <div className="disc-more-row">
-            <span className="disc-more-count mono-label">
-              Showing {shown.length} of {jobs.length}
-            </span>
+          <div className="disc-more-row disc-more-center">
             <button
               className="disc-more-btn"
               onClick={() => setVisible((v) => Math.min(v + SHOW_MORE_STEP, cap))}
             >
-              Show {Math.min(SHOW_MORE_STEP, remaining)} more →
+              Show me the next {SHOW_MORE_STEP} →
             </button>
           </div>
         )}
         {cappedOut && (
-          <div className="disc-more-row">
+          <div className="disc-more-row disc-more-center">
             <span className="disc-more-count mono-label">
-              Showing your top {MAX_SHOWN} of {jobs.length} — refine your résumé
-              to sharpen the list.
+              That&rsquo;s your top {MAX_SHOWN} — refine your résumé to sharpen the list.
             </span>
           </div>
         )}

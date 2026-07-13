@@ -23,11 +23,45 @@
   max-width: 46ch;
 }
 
+.confirm-editbar {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+.confirm-edit-btn {
+  background: transparent;
+  border: 1px solid var(--border-dark);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.confirm-edit-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
 .confirm-fields {
-  margin-top: 32px;
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+.confirm-value {
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 17px;
+  color: #fff;
+  padding: 2px 0;
+}
+.confirm-value.is-missing {
+  color: var(--red);
+  font-weight: 500;
+  font-size: 15px;
 }
 .confirm-row {
   display: flex;

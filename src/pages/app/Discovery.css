@@ -225,3 +225,7 @@
 .disc-more-btn:hover {
   filter: brightness(1.25);
 }
+
+.disc-more-center {
+  justify-content: center;
+}

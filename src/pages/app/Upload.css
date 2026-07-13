@@ -16,9 +16,66 @@
   letter-spacing: 0.14em;
   color: var(--on-dark-40);
 }
-.upload-intro {
+.upload-intro-row {
   margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 56px;
+}
+.upload-intro {
   max-width: 16ch;
+  flex-shrink: 0;
+}
+
+/* "What happens next" stepper */
+.upload-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 340px;
+  padding-top: 8px;
+}
+.upload-step-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.upload-step-item.is-now {
+  opacity: 1;
+}
+.upload-step-n {
+  color: var(--red);
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.upload-step-title {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+}
+.upload-step-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--on-dark-66);
+  margin-top: 3px;
+}
+
+@media (max-width: 860px) {
+  .upload-intro-row {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .upload-intro {
+    max-width: none;
+  }
+  .upload-steps {
+    max-width: none;
+  }
 }
 .upload-head {
   font-size: 56px;

@@ -2,7 +2,6 @@
   "name": "tucasa",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
   "description": "TuCasa — AI-powered job search, free for job seekers.",
   "scripts": {
     "dev": "vite",

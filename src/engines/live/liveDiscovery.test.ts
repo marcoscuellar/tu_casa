@@ -75,9 +75,9 @@ const ASHBY = {
 
 const companySource: CompanySourceProvider = {
   companiesFor: () => [
-    { name: 'Acme', ats: 'greenhouse', slug: 'acme' },
-    { name: 'Beta', ats: 'lever', slug: 'beta' },
-    { name: 'Gamma', ats: 'ashby', slug: 'gamma' },
+    { name: 'Acme', ats: 'greenhouse', slug: 'acme', industry: 'devtools' },
+    { name: 'Beta', ats: 'lever', slug: 'beta', industry: 'fintech' },
+    { name: 'Gamma', ats: 'ashby', slug: 'gamma', industry: 'healthtech' },
   ],
 }
 
@@ -151,8 +151,8 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
     })
     const src: CompanySourceProvider = {
       companiesFor: () => [
-        { name: 'Delta', ats: 'ashby', slug: 'delta' },
-        { name: 'Echo', ats: 'ashby', slug: 'echo' },
+        { name: 'Delta', ats: 'ashby', slug: 'delta', industry: 'devtools' },
+        { name: 'Echo', ats: 'ashby', slug: 'echo', industry: 'devtools' },
       ],
     }
     const fetch2: JsonFetcher = async (url) => {
@@ -177,8 +177,8 @@ describe('live discovery — full pipeline on recorded ATS payloads', () => {
   it('skips boards that fail without aborting the run', async () => {
     const flaky: CompanySourceProvider = {
       companiesFor: () => [
-        { name: 'Acme', ats: 'greenhouse', slug: 'acme' },
-        { name: 'Dead', ats: 'greenhouse', slug: 'does-not-exist' },
+        { name: 'Acme', ats: 'greenhouse', slug: 'acme', industry: 'devtools' },
+        { name: 'Dead', ats: 'greenhouse', slug: 'does-not-exist', industry: 'devtools' },
       ],
     }
     const skipped: string[] = []

@@ -136,6 +136,8 @@ export interface DiscoveredJob {
   salary?: string
   /** Plain-text posting description (for the quick preview on the card). */
   description?: string
+  /** The company's domain (canonical IndustryTag), when known. */
+  industry?: string
   sourceType: SourceType
   confidence: Confidence
   status: OpenStatus
@@ -176,6 +178,12 @@ export interface RankedJob extends AuditedJob {
   fit: ScoreResult
   /** Set when an onsite role was downgraded (not dropped) for a remote-preferrer. */
   locationNote?: string
+  /** How this job's field compares to the candidate's (drives the card signal). */
+  industryMatch?: 'same' | 'different' | 'unknown'
+  /** Human-readable field label (e.g. "Fintech"), when the company's is known. */
+  industryLabel?: string
+  /** Plain-language same-field / different-field note, when there's one to show. */
+  industryNote?: string
 }
 
 /* ============================================================

@@ -105,9 +105,9 @@
 }
 .disc-title {
   font-family: var(--font);
-  font-weight: 800;
+  font-weight: 900;
   font-size: 20px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 .disc-applied-badge {
   font-family: var(--mono);
@@ -352,9 +352,9 @@
 }
 .disc-fact-val {
   font-family: var(--font);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 15px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .disc-card-top .disc-fact-val {
@@ -363,6 +363,38 @@
 .disc-section {
   display: flex;
   flex-direction: column;
+}
+
+/* Industry same-field / new-field signal */
+.disc-field-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.disc-field-tag.is-same {
+  color: #128a3e;
+}
+.disc-card-top .disc-field-tag.is-same {
+  color: #59e08a;
+}
+.disc-field-tag.is-diff {
+  color: var(--red);
+}
+.disc-card-top .disc-field-tag.is-diff {
+  color: #ff6b5e;
+}
+.disc-field-note {
+  padding-left: 12px;
+  border-left: 2px solid transparent;
+}
+.disc-field-note.is-same {
+  border-left-color: #128a3e;
+}
+.disc-field-note.is-diff {
+  border-left-color: var(--red);
 }
 
 /* "How you measure up" — covered vs gaps */
@@ -392,9 +424,9 @@
 }
 .disc-measure-t {
   font-family: var(--font);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 14.5px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .disc-card-top .disc-measure-t {

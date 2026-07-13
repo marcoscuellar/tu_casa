@@ -19,6 +19,7 @@ import { seedCompanySource, type CompanySourceProvider } from './companySource'
 import type { CompanyRef } from './companies.seed'
 import { isRelevant } from './filter'
 import { parseJDText } from './jdKeywordParser'
+import { inferIndustryFromText } from '../industry'
 
 export interface LiveDiscoveryOptions {
   companySource?: CompanySourceProvider
@@ -48,6 +49,9 @@ function toRawPosting(c: CompanyRef, p: NormalizedPosting): RawPosting {
     postedDate: p.postedDate,
     salary: p.salary,
     description: p.descriptionText,
+    // The company's own domain is the authoritative industry signal; only fall
+    // back to sniffing the posting text if a company somehow carries no tag.
+    industry: c.industry ?? inferIndustryFromText(`${p.role} ${p.descriptionText}`) ?? undefined,
     // It's currently listed on the company's own ATS → that IS the liveness
     // confirmation. One authoritative source is enough (Engine 4 spec).
     sourceType: 'company-ats',

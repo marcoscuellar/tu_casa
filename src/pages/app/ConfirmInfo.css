@@ -53,8 +53,9 @@
 }
 .confirm-value {
   font-family: var(--font);
-  font-weight: 600;
+  font-weight: 800;
   font-size: 17px;
+  letter-spacing: -0.02em;
   color: #fff;
   padding: 2px 0;
 }

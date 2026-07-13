@@ -148,7 +148,9 @@ export function Discovery() {
             const isApplied = applied.has(job.id)
             const flagged = job.audit.recheck === 'flagged'
             const matched = skillsInPosting(resume, job)
-            const meta = [job.company, job.location].filter(Boolean).join(' · ')
+            const meta = [job.company, job.location, job.industryLabel]
+              .filter(Boolean)
+              .join(' · ')
 
             return (
               <div
@@ -209,6 +211,20 @@ export function Discovery() {
                         <div className="disc-fact-label mono-label">Work type</div>
                         <div className="disc-fact-val">{workType(job)}</div>
                       </div>
+                      {job.industryLabel && (
+                        <div className="disc-fact">
+                          <div className="disc-fact-label mono-label">Industry</div>
+                          <div className="disc-fact-val">
+                            {job.industryLabel}
+                            {job.industryMatch === 'same' && (
+                              <span className="disc-field-tag is-same"> ✓ your field</span>
+                            )}
+                            {job.industryMatch === 'different' && (
+                              <span className="disc-field-tag is-diff"> ✕ new field</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                       <div className="disc-fact">
                         <div className="disc-fact-label mono-label">Seniority</div>
                         <div className="disc-fact-val">
@@ -223,6 +239,15 @@ export function Discovery() {
 
                     {job.locationNote && (
                       <div className="disc-body-note">{job.locationNote}</div>
+                    )}
+                    {job.industryNote && (
+                      <div
+                        className={`disc-body-note disc-field-note ${
+                          job.industryMatch === 'same' ? 'is-same' : 'is-diff'
+                        }`}
+                      >
+                        {job.industryNote}
+                      </div>
                     )}
 
                     {/* How you measure up — the real answer, straight from the rubric */}

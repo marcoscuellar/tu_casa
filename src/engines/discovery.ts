@@ -26,6 +26,8 @@ export interface RawPosting {
   postedDate: string // real date or "Unknown"
   salary?: string
   description?: string
+  /** The company's domain (canonical IndustryTag), when known. */
+  industry?: string
   sourceType: SourceType
   livenessEvidence: 'confirmed-open' | 'none' | 'confirmed-closed'
   jd: ParsedJD
@@ -74,6 +76,7 @@ export function runDiscovery(raw: RawPosting[]): DiscoveredJob[] {
       postedDate: p.postedDate,
       salary: p.salary,
       description: p.description,
+      industry: p.industry,
       sourceType: p.sourceType,
       confidence,
       status: statusFor(p.livenessEvidence),

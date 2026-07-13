@@ -12,6 +12,7 @@
 
 import { runAudit } from './audit'
 import { runDiscovery } from './discovery'
+import { industryFit, resumeIndustryTags, type IndustryTag } from './industry'
 import { locationFit } from './location'
 import { deriveHiringInsight } from './reasoning'
 import { gateResearch, type GatedResearch } from './research'
@@ -66,14 +67,26 @@ export async function runPipelineFromResume(
   const signals = providers.audit.recheck(raw)
   const { survivors, dropped, duplicates } = runAudit(discovered, signals)
 
-  // Score each survivor, then rank by (earned fit − location penalty). The
-  // displayed fit score stays pure; an onsite role for a remote-preferrer is
-  // downgraded in rank, never dropped, and carries a plain note.
+  // The candidate's own fields, resolved once (empty when the résumé names no
+  // concrete domain — industry then stays neutral for every job).
+  const resumeTags = resumeIndustryTags(resume.industries)
+
+  // Score each survivor, then rank by (earned fit − location penalty − field
+  // penalty). The displayed fit score stays pure; location and industry are
+  // rank adjustments, never dropped and always surfaced with a plain note.
   const scored = survivors.map((job) => {
     const fit = scoreResume(resume, job.jd, { asOfYear })
     const loc = locationFit(resume, job)
-    const ranked: RankedJob = { ...job, fit, locationNote: loc.note }
-    return { ranked, effective: fit.score - loc.penalty }
+    const ind = industryFit(resumeTags, job.industry as IndustryTag | undefined)
+    const ranked: RankedJob = {
+      ...job,
+      fit,
+      locationNote: loc.note,
+      industryMatch: ind.match,
+      industryLabel: ind.jobLabel,
+      industryNote: ind.note,
+    }
+    return { ranked, effective: fit.score - loc.penalty - ind.penalty }
   })
   scored.sort((a, b) => {
     if (b.effective !== a.effective) return b.effective - a.effective

@@ -13,57 +13,60 @@
  */
 
 import type { AtsKind } from './ats/types'
+import type { IndustryTag } from '../industry'
 
 export interface CompanyRef {
   name: string
   ats: AtsKind
   slug: string
+  /** The company's domain — the authoritative industry signal for its jobs. */
+  industry: IndustryTag
 }
 
 export const SEED_COMPANIES: CompanyRef[] = [
   // ---- Greenhouse ----
-  { name: 'Stripe', ats: 'greenhouse', slug: 'stripe' },
-  { name: 'Airbnb', ats: 'greenhouse', slug: 'airbnb' },
-  { name: 'GitLab', ats: 'greenhouse', slug: 'gitlab' },
-  { name: 'Figma', ats: 'greenhouse', slug: 'figma' },
-  { name: 'Databricks', ats: 'greenhouse', slug: 'databricks' },
-  { name: 'Coinbase', ats: 'greenhouse', slug: 'coinbase' },
-  { name: 'Robinhood', ats: 'greenhouse', slug: 'robinhood' },
-  { name: 'Dropbox', ats: 'greenhouse', slug: 'dropbox' },
-  { name: 'Reddit', ats: 'greenhouse', slug: 'reddit' },
-  { name: 'Brex', ats: 'greenhouse', slug: 'brex' },
-  { name: 'Instacart', ats: 'greenhouse', slug: 'instacart' },
-  { name: 'DoorDash', ats: 'greenhouse', slug: 'doordash' },
-  { name: 'Pinterest', ats: 'greenhouse', slug: 'pinterest' },
-  { name: 'Cloudflare', ats: 'greenhouse', slug: 'cloudflare' },
-  { name: 'Samsara', ats: 'greenhouse', slug: 'samsara' },
-  { name: 'Benchling', ats: 'greenhouse', slug: 'benchling' },
-  { name: 'Gusto', ats: 'greenhouse', slug: 'gusto' },
-  { name: 'Airtable', ats: 'greenhouse', slug: 'airtable' },
+  { name: 'Stripe', ats: 'greenhouse', slug: 'stripe', industry: 'fintech' },
+  { name: 'Airbnb', ats: 'greenhouse', slug: 'airbnb', industry: 'travel' },
+  { name: 'GitLab', ats: 'greenhouse', slug: 'gitlab', industry: 'devtools' },
+  { name: 'Figma', ats: 'greenhouse', slug: 'figma', industry: 'productivity' },
+  { name: 'Databricks', ats: 'greenhouse', slug: 'databricks', industry: 'data-ai' },
+  { name: 'Coinbase', ats: 'greenhouse', slug: 'coinbase', industry: 'crypto' },
+  { name: 'Robinhood', ats: 'greenhouse', slug: 'robinhood', industry: 'fintech' },
+  { name: 'Dropbox', ats: 'greenhouse', slug: 'dropbox', industry: 'productivity' },
+  { name: 'Reddit', ats: 'greenhouse', slug: 'reddit', industry: 'social' },
+  { name: 'Brex', ats: 'greenhouse', slug: 'brex', industry: 'fintech' },
+  { name: 'Instacart', ats: 'greenhouse', slug: 'instacart', industry: 'ecommerce' },
+  { name: 'DoorDash', ats: 'greenhouse', slug: 'doordash', industry: 'ecommerce' },
+  { name: 'Pinterest', ats: 'greenhouse', slug: 'pinterest', industry: 'social' },
+  { name: 'Cloudflare', ats: 'greenhouse', slug: 'cloudflare', industry: 'security' },
+  { name: 'Samsara', ats: 'greenhouse', slug: 'samsara', industry: 'iot' },
+  { name: 'Benchling', ats: 'greenhouse', slug: 'benchling', industry: 'healthtech' },
+  { name: 'Gusto', ats: 'greenhouse', slug: 'gusto', industry: 'hr-tech' },
+  { name: 'Airtable', ats: 'greenhouse', slug: 'airtable', industry: 'productivity' },
 
   // ---- Lever ----
-  { name: 'Netflix', ats: 'lever', slug: 'netflix' },
-  { name: 'Plaid', ats: 'lever', slug: 'plaid' },
-  { name: 'Attentive', ats: 'lever', slug: 'attentive' },
-  { name: 'KeepTruckin', ats: 'lever', slug: 'motive' },
-  { name: 'Sourcegraph', ats: 'lever', slug: 'sourcegraph' },
-  { name: 'Lattice', ats: 'lever', slug: 'lattice' },
-  { name: 'Ramp', ats: 'lever', slug: 'ramp' },
-  { name: 'Whatnot', ats: 'lever', slug: 'whatnot' },
-  { name: 'Fivetran', ats: 'lever', slug: 'fivetran' },
-  { name: 'Included Health', ats: 'lever', slug: 'includedhealth' },
+  { name: 'Netflix', ats: 'lever', slug: 'netflix', industry: 'media' },
+  { name: 'Plaid', ats: 'lever', slug: 'plaid', industry: 'fintech' },
+  { name: 'Attentive', ats: 'lever', slug: 'attentive', industry: 'martech' },
+  { name: 'KeepTruckin', ats: 'lever', slug: 'motive', industry: 'logistics' },
+  { name: 'Sourcegraph', ats: 'lever', slug: 'sourcegraph', industry: 'devtools' },
+  { name: 'Lattice', ats: 'lever', slug: 'lattice', industry: 'hr-tech' },
+  { name: 'Ramp', ats: 'lever', slug: 'ramp', industry: 'fintech' },
+  { name: 'Whatnot', ats: 'lever', slug: 'whatnot', industry: 'ecommerce' },
+  { name: 'Fivetran', ats: 'lever', slug: 'fivetran', industry: 'data-ai' },
+  { name: 'Included Health', ats: 'lever', slug: 'includedhealth', industry: 'healthtech' },
 
   // ---- Ashby ----
-  { name: 'Linear', ats: 'ashby', slug: 'linear' },
-  { name: 'Vercel', ats: 'ashby', slug: 'vercel' },
-  { name: 'Replit', ats: 'ashby', slug: 'replit' },
-  { name: 'Mercury', ats: 'ashby', slug: 'mercury' },
-  { name: 'PostHog', ats: 'ashby', slug: 'posthog' },
-  { name: 'Hex', ats: 'ashby', slug: 'hex' },
-  { name: 'Baseten', ats: 'ashby', slug: 'baseten' },
-  { name: 'Watershed', ats: 'ashby', slug: 'watershed' },
-  { name: 'Modal', ats: 'ashby', slug: 'modal' },
-  { name: 'Clerk', ats: 'ashby', slug: 'clerk' },
-  { name: 'Resend', ats: 'ashby', slug: 'resend' },
-  { name: 'Cursor', ats: 'ashby', slug: 'anysphere' },
+  { name: 'Linear', ats: 'ashby', slug: 'linear', industry: 'devtools' },
+  { name: 'Vercel', ats: 'ashby', slug: 'vercel', industry: 'devtools' },
+  { name: 'Replit', ats: 'ashby', slug: 'replit', industry: 'devtools' },
+  { name: 'Mercury', ats: 'ashby', slug: 'mercury', industry: 'fintech' },
+  { name: 'PostHog', ats: 'ashby', slug: 'posthog', industry: 'devtools' },
+  { name: 'Hex', ats: 'ashby', slug: 'hex', industry: 'data-ai' },
+  { name: 'Baseten', ats: 'ashby', slug: 'baseten', industry: 'data-ai' },
+  { name: 'Watershed', ats: 'ashby', slug: 'watershed', industry: 'climate' },
+  { name: 'Modal', ats: 'ashby', slug: 'modal', industry: 'data-ai' },
+  { name: 'Clerk', ats: 'ashby', slug: 'clerk', industry: 'devtools' },
+  { name: 'Resend', ats: 'ashby', slug: 'resend', industry: 'devtools' },
+  { name: 'Cursor', ats: 'ashby', slug: 'anysphere', industry: 'devtools' },
 ]

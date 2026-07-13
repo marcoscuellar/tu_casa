@@ -30,10 +30,15 @@
   line-height: 1.55;
 }
 .disc-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  align-items: start;
   margin-top: 14px;
+}
+/* The #1 match is featured full-width; the rest sit in a 2-up grid. */
+.disc-card-top {
+  grid-column: 1 / -1;
 }
 
 /* Card — collapsed head + expandable body */
@@ -169,16 +174,13 @@
 }
 .disc-desc {
   margin: 0;
-  padding-top: 16px;
-  border-top: 1px solid var(--hairline);
   font-size: 14px;
   line-height: 1.6;
   color: var(--muted);
-  max-width: 76ch;
+  max-width: 78ch;
 }
 .disc-card-top .disc-desc {
   color: rgba(255, 255, 255, 0.72);
-  border-top-color: rgba(255, 255, 255, 0.14);
 }
 .disc-body-label {
   font-size: 10px;
@@ -325,4 +327,40 @@
   .disc-applied-btn {
     margin-left: 0;
   }
+}
+
+/* Structured facts row inside the expanded card */
+.disc-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 36px;
+  padding: 18px 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.disc-card-top .disc-facts {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.disc-fact-label {
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.disc-card-top .disc-fact-label {
+  color: var(--on-dark-50);
+}
+.disc-fact-val {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.disc-card-top .disc-fact-val {
+  color: #fff;
+}
+.disc-section {
+  display: flex;
+  flex-direction: column;
 }

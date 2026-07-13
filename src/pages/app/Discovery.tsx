@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
-import type { RankedJob } from '../../engines/types'
+import type { ParsedResume, RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
 
@@ -44,14 +44,40 @@ function prettySkill(canonical: string): string {
 }
 
 /** A short, clean preview of the posting text. */
-function snippet(text: string, max = 320): string {
+function snippet(text: string, max = 360): string {
   const clean = text.replace(/\s+/g, ' ').trim()
   return clean.length > max ? `${clean.slice(0, max).trimEnd()}…` : clean
 }
 
+/** Remote / Hybrid / Onsite, read from the posting. */
+function workType(job: RankedJob): string {
+  if (/\bhybrid\b/i.test(job.location)) return 'Hybrid'
+  if (job.remote) return 'Remote'
+  return 'Onsite'
+}
+
+/**
+ * The candidate's own skills that this posting actually names — cross-referenced
+ * against the description, so "why it fits you" is concrete, not generic.
+ */
+function skillsInPosting(resume: ParsedResume | undefined, job: RankedJob): string[] {
+  const desc = (job.description ?? '').toLowerCase()
+  const hits: string[] = []
+  if (resume && desc) {
+    for (const s of resume.skills) {
+      const words = s.canonical.replace(/-/g, ' ')
+      if (desc.includes(s.canonical) || desc.includes(words)) hits.push(prettySkill(s.canonical))
+    }
+  }
+  // Fall back to the rubric's matched hard requirements if the text match is thin.
+  if (hits.length === 0) return job.fit.hardRequiredMatched.map(prettySkill).slice(0, 8)
+  return hits.slice(0, 10)
+}
+
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, loading, selectJob, hasAccount } = useAppFlow()
+  const { candidateName, candidateRole, jobs, loading, selectJob, hasAccount, resume } =
+    useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
   const [openId, setOpenId] = useState<string | null>(null)
   const [applied, setApplied] = useState<Set<string>>(loadApplied)
@@ -121,12 +147,8 @@ export function Discovery() {
             const isOpen = openId === job.id
             const isApplied = applied.has(job.id)
             const flagged = job.audit.recheck === 'flagged'
-            const matched = (
-              job.fit.hardRequiredMatched.length
-                ? job.fit.hardRequiredMatched.map(prettySkill)
-                : job.fit.covered.map((c) => c.t)
-            ).slice(0, 8)
-            const meta = [job.company, job.location, job.salary].filter(Boolean).join(' · ')
+            const matched = skillsInPosting(resume, job)
+            const meta = [job.company, job.location].filter(Boolean).join(' · ')
 
             return (
               <div
@@ -171,16 +193,36 @@ export function Discovery() {
 
                 {isOpen && (
                   <div className="disc-card-body">
+                    {/* Structured facts row */}
+                    <div className="disc-facts">
+                      <div className="disc-fact">
+                        <div className="disc-fact-label mono-label">Verdict</div>
+                        <div className="disc-fact-val">{job.fit.verdictHead}</div>
+                      </div>
+                      {job.salary && (
+                        <div className="disc-fact">
+                          <div className="disc-fact-label mono-label">Pay</div>
+                          <div className="disc-fact-val">{job.salary}</div>
+                        </div>
+                      )}
+                      <div className="disc-fact">
+                        <div className="disc-fact-label mono-label">Work type</div>
+                        <div className="disc-fact-val">{workType(job)}</div>
+                      </div>
+                      <div className="disc-fact">
+                        <div className="disc-fact-label mono-label">Posted</div>
+                        <div className="disc-fact-val">{job.postedDate}</div>
+                      </div>
+                    </div>
+
                     {job.locationNote && (
                       <div className="disc-body-note">{job.locationNote}</div>
                     )}
-                    {job.description && (
-                      <p className="disc-desc">{snippet(job.description)}</p>
-                    )}
+
                     {matched.length > 0 && (
-                      <div className="disc-match">
+                      <div className="disc-section">
                         <div className="disc-body-label mono-label">
-                          Matching skills · why it fits you
+                          Your skills this role asks for
                         </div>
                         <div className="disc-match-chips">
                           {matched.map((s) => (
@@ -191,6 +233,14 @@ export function Discovery() {
                         </div>
                       </div>
                     )}
+
+                    {job.description && (
+                      <div className="disc-section">
+                        <div className="disc-body-label mono-label">The role</div>
+                        <p className="disc-desc">{snippet(job.description)}</p>
+                      </div>
+                    )}
+
                     <div className="disc-card-actions">
                       <a
                         className="disc-apply-btn"

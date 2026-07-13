@@ -44,6 +44,9 @@ export interface AppFlowContextValue {
   candidateName: string
   candidateRole: string
 
+  /* The confirmed résumé driving the search (skills etc.). */
+  resume?: ParsedResume
+
   /* Ranked openings */
   jobs: RankedJob[]
   matchCount: number
@@ -174,6 +177,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       candidateName: name.trim() || 'there',
       candidateRole,
 
+      resume: pipeline?.resume,
       jobs,
       matchCount: jobs.length,
       droppedCount: pipeline?.droppedCount ?? 0,

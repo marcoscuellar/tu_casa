@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
 import { inferFamily, inferLevel } from '../../engines/taxonomy'
-import type { ParsedResume } from '../../engines/types'
+import { toCanonical } from '../../engines/synonymMap'
+import type { ParsedResume, ResumeSkill } from '../../engines/types'
 import './flow.css'
 import './ConfirmInfo.css'
+
+const NOW_YEAR = new Date().getFullYear()
 
 /**
  * "Confirm your info" — the review step between parsing and searching.
@@ -24,6 +27,8 @@ export function ConfirmInfo() {
   const [onsiteOk, setOnsiteOk] = useState(false)
   const [years, setYears] = useState('')
   const [titleErr, setTitleErr] = useState('')
+  const [skillsList, setSkillsList] = useState<ResumeSkill[]>([])
+  const [newSkill, setNewSkill] = useState('')
   // Default to a clean read-only review; open editing automatically if a
   // required field (the title) came back empty so it can't be missed.
   const [editing, setEditing] = useState(false)
@@ -39,11 +44,22 @@ export function ConfirmInfo() {
     setLocation(draftResume.location ?? '')
     setOnsiteOk(draftResume.onsite_ok)
     setYears(draftResume.years_total ? String(draftResume.years_total) : '')
+    setSkillsList(draftResume.skills)
     setEditing(!t.trim())
   }, [draftResume, navigate])
 
   if (!draftResume) return null
-  const skills = draftResume.skills
+
+  const addSkill = () => {
+    const canonical = toCanonical(newSkill.trim())
+    if (!canonical) return
+    if (!skillsList.some((s) => s.canonical === canonical)) {
+      setSkillsList((list) => [...list, { canonical, years: 0, last_used_year: NOW_YEAR }])
+    }
+    setNewSkill('')
+  }
+  const removeSkill = (canonical: string) =>
+    setSkillsList((list) => list.filter((s) => s.canonical !== canonical))
 
   const submit = async () => {
     const t = title.trim()
@@ -57,7 +73,7 @@ export function ConfirmInfo() {
     const confirmed: ParsedResume = {
       // family/level are re-derived from the (possibly edited) title.
       titles: [{ raw: t, family: inferFamily(t), level: inferLevel(t) }],
-      skills, // as parsed — already canonicalized
+      skills: skillsList, // parsed + user-edited, canonicalized
       years_total: Number.isFinite(yrs) ? Math.min(60, Math.max(0, Math.round(yrs))) : 0,
       industries: draftResume.industries,
       certs_clearances: draftResume.certs_clearances,
@@ -70,7 +86,8 @@ export function ConfirmInfo() {
 
   return (
     <AppShell>
-      <div className="blk blk-black confirm-block pop">
+      <div className="confirm-bento pop">
+        <div className="blk blk-black confirm-block">
         <div className="confirm-header">
           <div className="eyebrow">Confirm your info</div>
           <div className="upload-step mono-label">Setup · 2 of 2</div>
@@ -176,20 +193,54 @@ export function ConfirmInfo() {
 
           <div className="confirm-field">
             <span className="confirm-flabel mono-label">
-              Skills we found · {skills.length}
+              Skills we found · {skillsList.length}
             </span>
-            {skills.length > 0 ? (
+            {skillsList.length > 0 ? (
               <div className="confirm-chips">
-                {skills.map((s) => (
-                  <span key={s.canonical} className="confirm-chip">
+                {skillsList.map((s) => (
+                  <span
+                    key={s.canonical}
+                    className={`confirm-chip ${editing ? 'is-editable' : ''}`}
+                  >
                     {s.canonical}
+                    {editing && (
+                      <button
+                        type="button"
+                        className="confirm-chip-x"
+                        onClick={() => removeSkill(s.canonical)}
+                        aria-label={`Remove ${s.canonical}`}
+                      >
+                        ×
+                      </button>
+                    )}
                   </span>
                 ))}
               </div>
             ) : (
               <span className="confirm-chip-empty">
-                None detected — we&rsquo;ll still match on your title.
+                {editing
+                  ? 'None yet — add your key skills below.'
+                  : 'None detected — tap Edit to add your skills.'}
               </span>
+            )}
+            {editing && (
+              <div className="confirm-add-skill">
+                <input
+                  className="confirm-input confirm-add-input"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addSkill()
+                    }
+                  }}
+                  placeholder="Add a skill, press Enter"
+                />
+                <button type="button" className="confirm-add-btn" onClick={addSkill}>
+                  + Add
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -203,6 +254,20 @@ export function ConfirmInfo() {
           </button>
         </div>
         {pipelineError && <p className="confirm-error">{pipelineError}</p>}
+        </div>
+
+        <aside className="confirm-aside">
+          <div className="confirm-aside-title mono-label">Why this step</div>
+          <ul className="confirm-aside-list">
+            <li>
+              We match jobs against <b>exactly this</b> — so a minute here sharpens
+              every result.
+            </li>
+            <li>Add or trim skills to steer what surfaces.</li>
+            <li>Private to you. Nothing here is shared.</li>
+          </ul>
+          <div className="confirm-aside-foot mono-label">Next → your top 7</div>
+        </aside>
       </div>
     </AppShell>
   )

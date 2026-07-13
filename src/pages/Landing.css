@@ -1,6 +1,7 @@
 /* ============================================================
-   Marketing / landing page. Uses the landing prototype's own
-   palette values (#f4f1ea paper, #0a0a0a ink, #ff0000 red).
+   Marketing / landing page. Paper/ink use the landing prototype's
+   own values (#f4f1ea paper, #0a0a0a ink); red comes from the shared
+   --red token so landing and app never drift.
    ============================================================ */
 .lp {
   background: #f4f1ea;
@@ -13,7 +14,7 @@
   padding: 60px;
 }
 .lp-red {
-  color: #ff0000;
+  color: var(--red);
 }
 
 /* shared block shadow */
@@ -45,13 +46,13 @@
   font-weight: 700;
   font-size: 15px;
   letter-spacing: -0.01em;
-  color: #ff0000;
+  color: var(--red);
 }
 .lp-brand-square {
   width: 10px;
   height: 10px;
   border-radius: 3px;
-  background: #ff0000;
+  background: var(--red);
 }
 .lp-tag {
   font-family: var(--mono);
@@ -90,9 +91,9 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 .lp-adhd.is-on {
-  background: #ff0000;
+  background: var(--red);
   color: #fff;
-  border-color: #ff0000;
+  border-color: var(--red);
 }
 
 /* Hero */
@@ -110,7 +111,7 @@
   top: 32px;
   font-family: var(--mono);
   font-size: 12px;
-  color: #ff0000;
+  color: var(--red);
   line-height: 1.6;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -144,7 +145,7 @@
   top: 0;
   bottom: 0;
   width: 38%;
-  background: #ff0000;
+  background: var(--red);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -195,7 +196,7 @@
   background: #0a0a0a;
 }
 .lp-band-red {
-  background: #ff0000;
+  background: var(--red);
 }
 .lp-band-eyebrow {
   font-family: var(--mono);
@@ -205,7 +206,7 @@
   margin-bottom: 18px;
 }
 .lp-eyebrow-red {
-  color: #ff0000;
+  color: var(--red);
 }
 .lp-eyebrow-onred {
   color: rgba(0, 0, 0, 0.7);
@@ -255,7 +256,7 @@
   gap: 8px;
 }
 .lp-pill {
-  background: #ff0000;
+  background: var(--red);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -302,7 +303,7 @@
   background: #0a0a0a;
 }
 .lp-tile-red {
-  background: #ff0000;
+  background: var(--red);
 }
 .lp-tile-title {
   font-weight: 800;
@@ -419,7 +420,7 @@
   gap: 14px;
 }
 .lp-stat {
-  border-top: 2px solid #ff0000;
+  border-top: 2px solid var(--red);
   padding-top: 20px;
 }
 .lp-stat-num {

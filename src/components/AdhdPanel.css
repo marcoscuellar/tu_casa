@@ -120,7 +120,7 @@
   filter: brightness(0.92);
 }
 .adhd-btn-red {
-  background: #ff0000;
+  background: var(--red);
   color: #fff;
   border: none;
 }
@@ -138,7 +138,7 @@
   margin-top: 14px;
   padding: 12px 14px;
   background: rgba(255, 0, 0, 0.08);
-  border: 1.5px dashed #ff0000;
+  border: 1.5px dashed var(--red);
   font-size: 13.5px;
   line-height: 1.4;
 }

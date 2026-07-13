@@ -168,7 +168,7 @@ export function AdhdPanel({ onClose }: { onClose: () => void }) {
               <div
                 className="adhd-ring"
                 style={{
-                  background: `conic-gradient(#ff0000 ${sweep}deg, rgba(236,232,222,.14) 0deg)`,
+                  background: `conic-gradient(var(--red) ${sweep}deg, rgba(236,232,222,.14) 0deg)`,
                 }}
               >
                 <div className="adhd-ring-inner">{timerDisplay}</div>
@@ -210,7 +210,7 @@ export function AdhdPanel({ onClose }: { onClose: () => void }) {
 
           <div className="adhd-offload-input-row">
             <span
-              style={{ fontFamily: 'var(--mono)', fontSize: 13, color: '#ff0000' }}
+              style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)' }}
             >
               +
             </span>

@@ -194,19 +194,49 @@ var seedCompanySource = {
 };
 
 // src/engines/location.ts
-var ONSITE_PENALTY = 12;
+var LOCAL_BOOST = 4;
+var NEARBY_PENALTY = 8;
+var FAR_ONSITE_PENALTY = 14;
+var FAR_HYBRID_PENALTY = 24;
+var MODE_WORDS = /\b(remote|hybrid|onsite|on-site|in-office|in office)\b/gi;
+function isHybrid(location) {
+  return /\bhybrid\b/i.test(location);
+}
+function segments(loc) {
+  return loc.toLowerCase().replace(MODE_WORDS, " ").split(/[,•|;/]/).map((s) => s.trim()).filter(Boolean);
+}
 function locationFit(resume, job) {
-  if (job.remote) return { include: true, penalty: 0 };
+  const hybrid = isHybrid(job.location);
+  if (job.remote && !hybrid) return { include: true, penalty: 0 };
   const resumeLoc = resume.location.trim().toLowerCase();
-  const remotePreferred = resumeLoc === "" || resumeLoc.includes("remote");
-  const city = remotePreferred ? "" : resumeLoc;
-  const cityMatch = !!city && job.location.toLowerCase().includes(city);
-  if (cityMatch) return { include: true, penalty: 0 };
+  const remotePreferred = resumeLoc === "" || /\bremote\b/.test(resumeLoc);
+  const candSegs = remotePreferred ? [] : segments(resume.location);
+  const candCity = candSegs[0] ?? "";
+  const candRegion = candSegs[1] ?? "";
+  const jobSegs = segments(job.location);
+  const jobLoc = jobSegs.join(" , ");
+  const local = candCity.length >= 3 && jobLoc.includes(candCity);
+  const nearby = !local && candRegion.length >= 2 && jobSegs.includes(candRegion);
+  const label = hybrid ? "Hybrid" : "Onsite";
+  if (local) {
+    return {
+      include: true,
+      penalty: -LOCAL_BOOST,
+      note: hybrid ? "Hybrid, in your area \u2014 close to home." : void 0
+    };
+  }
+  if (nearby) {
+    return {
+      include: true,
+      penalty: NEARBY_PENALTY,
+      note: `${label} near you (${job.location}) \u2014 a doable commute.`
+    };
+  }
   if (resume.onsite_ok) {
     return {
       include: true,
-      penalty: ONSITE_PENALTY,
-      note: remotePreferred ? "Onsite role \u2014 shown because you\u2019re open to onsite, ranked below remote fits." : `Onsite in ${job.location} \u2014 outside your area, so it\u2019s ranked lower.`
+      penalty: hybrid ? FAR_HYBRID_PENALTY : FAR_ONSITE_PENALTY,
+      note: hybrid ? `Hybrid in ${job.location} \u2014 far from you; you'd need to be onsite there regularly.` : remotePreferred ? "Onsite role \u2014 shown because you\u2019re open to onsite, ranked below remote fits." : `Onsite in ${job.location} \u2014 outside your area, so it\u2019s ranked lower.`
     };
   }
   return { include: false, penalty: 0 };

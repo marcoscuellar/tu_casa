@@ -44,11 +44,15 @@ describe('pipeline — discover → audit → score → rank (fixtures)', () => 
     }
   })
 
-  it('ranks by earned score, strongest first', () => {
-    const scores = result.jobs.map((j) => j.fit.score)
-    expect([...scores]).toEqual([...scores].sort((a, b) => b - a))
-    // Northwind is the cleanest match → it tops the list.
+  it('ranks by earned fit, with location factored into the order', () => {
+    // Northwind (remote, cleanest match) tops the list.
     expect(result.jobs[0].company).toBe('Northwind Apparel')
+    // Ranking is by effective score (fit − location penalty), so a far HYBRID
+    // role is downgraded even with a strong fit: the Loomly "Hybrid NYC" posting
+    // carries a location note and never tops a remote-preferring candidate's list.
+    const loomly = result.jobs.find((j) => j.company === 'Loomly')
+    expect(loomly?.locationNote).toBeTruthy()
+    expect(result.jobs.indexOf(loomly!)).toBeGreaterThan(0)
   })
 
   it('Brightline lands PARTIAL with Kubernetes named as the gap', () => {

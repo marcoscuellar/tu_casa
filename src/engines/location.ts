@@ -1,16 +1,16 @@
 /**
- * Location fit — "downgrade, don't drop", the same philosophy Engines 3 & 4 use.
+ * Location fit — proximity-tiered, "downgrade, don't drop".
  *
- * A remote role works for everyone. An onsite role:
- *   - in the candidate's own city → full (no penalty).
- *   - elsewhere, but the candidate is willing to go onsite (onsite_ok) → KEPT,
- *     just ranked lower. It's a job they might actually take; hiding it would
- *     contradict the rest of the app.
- *   - elsewhere, and the candidate is remote-only (not onsite_ok) → excluded.
- *     That's the one genuine exclusion — they can't take it.
+ * Remote works for everyone. For an onsite OR hybrid role, distance matters —
+ * and it matters MOST for hybrid, because a hybrid role you can't commute to is
+ * unworkable, not merely inconvenient. So:
+ *   - local (the role is in your city)        → floats to the top (small boost).
+ *   - nearby (same region/state)              → kept, small penalty.
+ *   - far, and you're open to onsite          → kept, big penalty (ranked low).
+ *   - far, and you're remote-only             → excluded (you genuinely can't).
  *
- * The penalty is a relevance nudge applied at RANKING time; it never touches the
- * rubric fit score (which measures résumé↔role fit, not geography).
+ * The adjustment is a RANKING nudge only (fit.score − penalty); it never touches
+ * the displayed rubric score. `penalty` may be negative — that's a boost.
  */
 
 import type { ParsedResume } from './types'
@@ -22,36 +22,80 @@ export interface LocationSignal {
 
 export interface LocationFit {
   include: boolean
-  /** Rank penalty (points) for an onsite role a remote-preferrer would take. */
+  /** Rank adjustment (points). Positive = penalty; negative = a local boost. */
   penalty: number
   note?: string
 }
 
-/** Onsite roles for a remote-preferring candidate rank ~a skill-tier below. */
-const ONSITE_PENALTY = 12
+const LOCAL_BOOST = 4 // local onsite/hybrid floats just above equal-fit remote
+const NEARBY_PENALTY = 8 // same region — a doable commute
+const FAR_ONSITE_PENALTY = 14 // far onsite: a one-time relocation you'd consider
+const FAR_HYBRID_PENALTY = 24 // far hybrid: an ongoing commute — much heavier
+
+const MODE_WORDS = /\b(remote|hybrid|onsite|on-site|in-office|in office)\b/gi
+
+function isHybrid(location: string): boolean {
+  return /\bhybrid\b/i.test(location)
+}
+
+/** Comma/bullet-separated segments of a location, minus mode words. */
+function segments(loc: string): string[] {
+  return loc
+    .toLowerCase()
+    .replace(MODE_WORDS, ' ')
+    .split(/[,•|;/]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
 
 export function locationFit(resume: ParsedResume, job: LocationSignal): LocationFit {
-  if (job.remote) return { include: true, penalty: 0 }
+  const hybrid = isHybrid(job.location)
+  // A hybrid role is proximity-bound even if the board also flags it "remote".
+  if (job.remote && !hybrid) return { include: true, penalty: 0 }
 
   const resumeLoc = resume.location.trim().toLowerCase()
-  const remotePreferred = resumeLoc === '' || resumeLoc.includes('remote')
-  const city = remotePreferred ? '' : resumeLoc
-  const cityMatch = !!city && job.location.toLowerCase().includes(city)
+  const remotePreferred = resumeLoc === '' || /\bremote\b/.test(resumeLoc)
+  const candSegs = remotePreferred ? [] : segments(resume.location)
+  const candCity = candSegs[0] ?? ''
+  const candRegion = candSegs[1] ?? ''
+  const jobSegs = segments(job.location)
+  const jobLoc = jobSegs.join(' , ')
 
-  // Onsite in the candidate's own city → full fit.
-  if (cityMatch) return { include: true, penalty: 0 }
+  const local = candCity.length >= 3 && jobLoc.includes(candCity)
+  const nearby = !local && candRegion.length >= 2 && jobSegs.includes(candRegion)
+  const label = hybrid ? 'Hybrid' : 'Onsite'
 
-  // Onsite elsewhere: keep it if they're open to onsite, just ranked lower.
-  if (resume.onsite_ok) {
+  // Local — the role is in your city. Floats to the top.
+  if (local) {
     return {
       include: true,
-      penalty: ONSITE_PENALTY,
-      note: remotePreferred
-        ? 'Onsite role — shown because you’re open to onsite, ranked below remote fits.'
-        : `Onsite in ${job.location} — outside your area, so it’s ranked lower.`,
+      penalty: -LOCAL_BOOST,
+      note: hybrid ? 'Hybrid, in your area — close to home.' : undefined,
     }
   }
 
-  // Remote-only and not local → they genuinely can't take it.
+  // Nearby — same region/state. Kept with a small penalty.
+  if (nearby) {
+    return {
+      include: true,
+      penalty: NEARBY_PENALTY,
+      note: `${label} near you (${job.location}) — a doable commute.`,
+    }
+  }
+
+  // Far. Hybrid especially needs regular onsite presence, so it only makes sense
+  // if the candidate is open to onsite; a remote-only candidate can't take it.
+  if (resume.onsite_ok) {
+    return {
+      include: true,
+      penalty: hybrid ? FAR_HYBRID_PENALTY : FAR_ONSITE_PENALTY,
+      note: hybrid
+        ? `Hybrid in ${job.location} — far from you; you'd need to be onsite there regularly.`
+        : remotePreferred
+          ? 'Onsite role — shown because you’re open to onsite, ranked below remote fits.'
+          : `Onsite in ${job.location} — outside your area, so it’s ranked lower.`,
+    }
+  }
+
   return { include: false, penalty: 0 }
 }

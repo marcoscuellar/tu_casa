@@ -13,6 +13,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { createLiveDiscovery } from '../src/engines/live/liveDiscovery'
 import type { ParsedResume } from '../src/engines/types'
 
 // Fetching ~40 boards can outrun the default 10s function limit.
@@ -31,9 +32,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(400).json({ error: 'Missing a parsed résumé.' })
       return
     }
-
-    // Lazy-load so any bundling/resolution problem is a readable error, not a crash.
-    const { createLiveDiscovery } = await import('../src/engines/live/liveDiscovery')
 
     // Default fetcher = the runtime's global fetch (server-side, no CORS).
     const discovery = createLiveDiscovery({

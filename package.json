@@ -5,7 +5,8 @@
   "description": "TuCasa — AI-powered job search, free for job seekers.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/bundle-functions.mjs",
+    "build:functions": "node scripts/bundle-functions.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
@@ -22,6 +23,7 @@
     "@types/react-dom": "^18.3.0",
     "@vercel/node": "^5.8.23",
     "@vitejs/plugin-react": "^4.3.2",
+    "esbuild": "^0.21.5",
     "typescript": "^5.6.2",
     "vite": "^5.4.8",
     "vitest": "^2.1.9"

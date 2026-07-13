@@ -12,6 +12,12 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import {
+  extractJson,
+  parseResumeWith,
+  RESUME_PARSE_PROMPT,
+  ResumeParseError,
+} from '../src/engines/live/resumeParser'
 import type { ResumeUpload } from '../src/engines/types'
 
 // Résumé extraction is a simple task; swap to 'claude-haiku-4-5' to cut cost ~5×.
@@ -49,12 +55,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(400).json({ error: 'Provide a résumé as { kind: "text", text } or { kind: "pdf", base64 }.' })
       return
     }
-
-    // Load the deterministic engine code lazily so a bundling/resolution problem
-    // surfaces as a clear error here rather than a cold-start crash.
-    const { extractJson, parseResumeWith, RESUME_PARSE_PROMPT, ResumeParseError } = await import(
-      '../src/engines/live/resumeParser'
-    )
 
     const client = new Anthropic({ apiKey })
 

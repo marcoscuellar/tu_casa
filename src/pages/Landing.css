@@ -193,6 +193,7 @@
   letter-spacing: -0.04em;
   line-height: 0.95;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 .lp-band-big-ink {
   color: #0a0a0a;
@@ -434,6 +435,7 @@
   color: #0a0a0a;
   margin-bottom: 16px;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 .lp-final-sub {
   font-size: 14px;
@@ -523,6 +525,10 @@
   }
   .lp-band {
     padding: 36px 26px;
+  }
+  /* Desktop-tuned line break in the trade band — let mobile balance-wrap. */
+  .lp-br-desk {
+    display: none;
   }
   .lp-desc,
   .lp-how,

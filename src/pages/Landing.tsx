@@ -248,9 +248,7 @@ export function Landing() {
             ONE RÉSUMÉ IN.
             <br />
             <span className="lp-onred">
-              A SHORTLIST WORTH
-              <br />
-              YOUR TIME, OUT.
+              A SHORTLIST WORTH <br className="lp-br-desk" /> YOUR TIME, OUT.
             </span>
           </div>
         </div>

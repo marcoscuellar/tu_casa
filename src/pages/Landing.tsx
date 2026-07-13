@@ -279,9 +279,14 @@ export function Landing() {
           <span>tucasa</span>
           <div className="lp-footer-right">
             <span>free for job seekers, always</span>
-            {/* Swap this <span> for an <a href="LINKEDIN_URL" target="_blank"
-                rel="noopener noreferrer"> once the LinkedIn URL is in hand. */}
-            <span className="lp-footer-credit">by Marcos Cuellar</span>
+            <a
+              className="lp-footer-credit"
+              href="https://www.linkedin.com/in/marcosmcuellar/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              by Marcos Cuellar
+            </a>
           </div>
         </div>
       </div>

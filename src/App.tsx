@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Landing } from './pages/Landing'
 import { SignUp } from './pages/app/SignUp'
 import { Upload } from './pages/app/Upload'
+import { ConfirmInfo } from './pages/app/ConfirmInfo'
 import { Discovery } from './pages/app/Discovery'
 import { FitCheck } from './pages/app/FitCheck'
 import { CheatGen } from './pages/app/CheatGen'
@@ -25,6 +26,7 @@ export function App() {
       {/* App flow */}
       <Route path="/signup" element={<SignUp />} />
       <Route path="/upload" element={<Upload />} />
+      <Route path="/confirm" element={<ConfirmInfo />} />
       <Route path="/discovery" element={<Discovery />} />
       <Route path="/fit" element={<FitCheck />} />
       <Route path="/cheat-generating" element={<CheatGen />} />

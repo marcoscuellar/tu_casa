@@ -88,7 +88,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-      const parsed = await parseResumeWith(upload, callModel)
+      // allowIncomplete: return whatever Claude extracted (even without a title)
+      // so the client's "confirm your info" step can fill any gaps.
+      const parsed = await parseResumeWith(upload, callModel, { allowIncomplete: true })
       res.status(200).json(parsed)
     } catch (err) {
       if (err instanceof ResumeParseError) {

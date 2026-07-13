@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
@@ -39,38 +39,29 @@ export function Upload() {
   const navigate = useNavigate()
   const { live, submitResume, pipelineError } = useAppFlow()
   const [parsing, setParsing] = useState(false)
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
-
-  // Fixtures mode: simulate the ~2s parse, then advance (sample profile is used).
-  const startFixtureSim = () => {
-    if (parsing) return
-    setParsing(true)
-    timer.current = setTimeout(() => navigate('/discovery'), 2000)
-  }
-
-  // Live mode: parse the real résumé with Claude, then advance on success.
-  const startLive = async (upload: ResumeUpload) => {
+  // Parse the résumé (Claude in live mode, the sample in fixtures), then go to
+  // the confirm step where the candidate reviews what we read before we search.
+  const start = async (upload?: ResumeUpload) => {
     if (parsing) return
     setParsing(true)
     const ok = await submitResume(upload)
-    if (ok) navigate('/discovery')
+    if (ok) navigate('/confirm')
     else setParsing(false) // pipelineError is shown below
   }
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (!live) return startFixtureSim()
+    if (!live) return start() // fixtures ignore the file and use the sample
     try {
       if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
         const base64 = await readFileAsBase64(file)
-        await startLive({ kind: 'pdf', base64, filename: file.name })
+        await start({ kind: 'pdf', base64, filename: file.name })
       } else {
         const text = await file.text()
-        await startLive({ kind: 'text', text, filename: file.name })
+        await start({ kind: 'text', text, filename: file.name })
       }
     } catch {
       setParsing(false)
@@ -78,8 +69,8 @@ export function Upload() {
   }
 
   const onSample = () => {
-    if (!live) return startFixtureSim()
-    void startLive({ kind: 'text', text: SAMPLE_RESUME_TEXT })
+    if (!live) return start()
+    void start({ kind: 'text', text: SAMPLE_RESUME_TEXT })
   }
 
   return (

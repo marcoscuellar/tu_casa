@@ -45,9 +45,22 @@ export async function runPipeline(
   providers: Providers,
   opts: { asOfYear?: number; upload?: ResumeUpload } = {},
 ): Promise<PipelineResult> {
+  const resume = await providers.resume.parseResume(opts.upload)
+  return runPipelineFromResume(providers, resume, { asOfYear: opts.asOfYear })
+}
+
+/**
+ * The post-parse half of the pipeline: discover → audit → score → rank on an
+ * already-parsed (and user-confirmed) résumé. Split out so the flow can pause on
+ * a "confirm your info" step between parsing and searching.
+ */
+export async function runPipelineFromResume(
+  providers: Providers,
+  resume: ParsedResume,
+  opts: { asOfYear?: number } = {},
+): Promise<PipelineResult> {
   const asOfYear = opts.asOfYear ?? new Date().getFullYear()
 
-  const resume = await providers.resume.parseResume(opts.upload)
   const raw = await providers.discovery.findPostings(resume)
   const discovered = runDiscovery(raw)
   const signals = providers.audit.recheck(raw)

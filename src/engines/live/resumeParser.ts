@@ -132,7 +132,7 @@ function stringArray(v: unknown): string[] {
  */
 export function validateParsedResume(
   raw: unknown,
-  opts: { asOfYear?: number } = {},
+  opts: { asOfYear?: number; allowIncomplete?: boolean } = {},
 ): ParsedResume {
   const asOfYear = opts.asOfYear ?? new Date().getFullYear()
   if (!raw || typeof raw !== 'object') {
@@ -155,7 +155,10 @@ export function validateParsedResume(
     })
     .filter((t): t is ResumeTitle => t !== null)
 
-  if (titles.length === 0) {
+  // No readable title: by default this is a hard stop, but callers that feed a
+  // "confirm your info" step pass allowIncomplete so the user can fill it in
+  // rather than starting over.
+  if (titles.length === 0 && !opts.allowIncomplete) {
     throw new ResumeParseError(
       'Couldn’t read a job title from that file — is it a résumé? Try a PDF or text résumé.',
     )
@@ -206,7 +209,7 @@ export type ResumeModelCaller = (input: ResumeUpload) => Promise<unknown>
 export async function parseResumeWith(
   input: ResumeUpload,
   callModel: ResumeModelCaller,
-  opts: { asOfYear?: number } = {},
+  opts: { asOfYear?: number; allowIncomplete?: boolean } = {},
 ): Promise<ParsedResume> {
   const raw = await callModel(input)
   return validateParsedResume(raw, opts)

@@ -4648,7 +4648,7 @@ function validateParsedResume(raw, opts = {}) {
     if (!text) return null;
     return { raw: text, family: inferFamily(text), level: inferLevel(text) };
   }).filter((t) => t !== null);
-  if (titles.length === 0) {
+  if (titles.length === 0 && !opts.allowIncomplete) {
     throw new ResumeParseError(
       "Couldn\u2019t read a job title from that file \u2014 is it a r\xE9sum\xE9? Try a PDF or text r\xE9sum\xE9."
     );
@@ -4741,7 +4741,7 @@ ${input.text}` }];
       return extractJson(textBlock.text);
     };
     try {
-      const parsed = await parseResumeWith(upload, callModel);
+      const parsed = await parseResumeWith(upload, callModel, { allowIncomplete: true });
       res.status(200).json(parsed);
     } catch (err) {
       if (err instanceof ResumeParseError) {

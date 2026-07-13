@@ -2,7 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -13,11 +12,11 @@ import {
   buildHiringInsight,
   buildResearch,
   narrateFit,
-  runPipeline,
+  runPipelineFromResume,
   type PipelineResult,
 } from '../engines/pipeline'
 import type { GatedResearch } from '../engines/research'
-import type { HiringInsight, RankedJob, ResumeUpload } from '../engines/types'
+import type { HiringInsight, ParsedResume, RankedJob, ResumeUpload } from '../engines/types'
 
 // Real ATS jobs when VITE_LIVE_JOBS=1 (needs open egress to the ATS hosts);
 // otherwise the fixture pipeline, so the demo works offline and tests are hermetic.
@@ -56,8 +55,12 @@ export interface AppFlowContextValue {
   live: boolean
   /** A résumé-parse or pipeline error to surface on Upload, if any. */
   pipelineError?: string
-  /** Submit an uploaded résumé to run the pipeline (live mode). Resolves true on success. */
-  submitResume: (upload: ResumeUpload) => Promise<boolean>
+  /** Parse an uploaded résumé into a draft profile (does NOT search yet). True on success. */
+  submitResume: (upload?: ResumeUpload) => Promise<boolean>
+  /** The parsed-but-unconfirmed profile, shown on the "confirm your info" step. */
+  draftResume?: ParsedResume
+  /** Confirm the (possibly edited) profile and run discovery. True on success. */
+  confirmResume: (resume: ParsedResume) => Promise<boolean>
 
   /* Selection carried into fit + cheat sheet */
   selectedJob?: RankedJob
@@ -89,37 +92,49 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   const [credits, setCredits] = useState(0)
   const [firstSheetUsed, setFirstSheetUsed] = useState(false)
 
-  // Run the pipeline (async — live discovery fetches real boards, and live
-  // mode parses the uploaded résumé with Claude). In fixtures mode it runs
-  // eagerly on the sample résumé; in live mode it runs when a résumé is
-  // submitted. submitResume returns whether the run succeeded, so the Upload
-  // screen can navigate on success without racing a loading flag.
+  // Two-step: parse the résumé into a draft profile, let the candidate confirm
+  // it, then run discovery on the confirmed profile. Both steps return whether
+  // they succeeded so the screens can navigate without racing the loading flag.
+  const [draftResume, setDraftResume] = useState<ParsedResume | null>(null)
   const [pipeline, setPipeline] = useState<PipelineResult | null>(null)
-  const [loading, setLoading] = useState(!USE_LIVE)
+  const [loading, setLoading] = useState(false)
   const [pipelineError, setPipelineError] = useState<string | undefined>(undefined)
 
-  const runPipelineNow = useCallback(
-    async (upload?: ResumeUpload): Promise<boolean> => {
-      setLoading(true)
-      setPipelineError(undefined)
-      try {
-        const result = await runPipeline(PROVIDERS, { asOfYear: AS_OF_YEAR, upload })
-        setPipeline(result)
-        setLoading(false)
-        return true
-      } catch (e) {
-        setLoading(false)
-        setPipelineError(e instanceof Error ? e.message : 'Something went wrong.')
-        return false
-      }
-    },
-    [],
-  )
+  // Step 1 — parse only (Claude in live mode, the sample in fixtures). The
+  // result is a DRAFT the candidate reviews on the confirm step; we don't search
+  // yet, and a missing field (e.g. no title) is filled in there, not fatal.
+  const submitResume = useCallback(async (upload?: ResumeUpload): Promise<boolean> => {
+    setLoading(true)
+    setPipelineError(undefined)
+    try {
+      const resume = await PROVIDERS.resume.parseResume(upload)
+      setDraftResume(resume)
+      setLoading(false)
+      return true
+    } catch (e) {
+      setLoading(false)
+      setPipelineError(e instanceof Error ? e.message : 'Something went wrong.')
+      return false
+    }
+  }, [])
 
-  // Fixtures mode: run eagerly on the sample résumé. Live mode waits for upload.
-  useEffect(() => {
-    if (!USE_LIVE) void runPipelineNow()
-  }, [runPipelineNow])
+  // Step 2 — the candidate confirmed (and possibly edited) the profile; run
+  // discovery → audit → score → rank on it.
+  const confirmResume = useCallback(async (resume: ParsedResume): Promise<boolean> => {
+    setDraftResume(resume)
+    setLoading(true)
+    setPipelineError(undefined)
+    try {
+      const result = await runPipelineFromResume(PROVIDERS, resume, { asOfYear: AS_OF_YEAR })
+      setPipeline(result)
+      setLoading(false)
+      return true
+    } catch (e) {
+      setLoading(false)
+      setPipelineError(e instanceof Error ? e.message : 'Something went wrong.')
+      return false
+    }
+  }, [])
 
   const jobs = pipeline?.jobs ?? []
   const selectedJob = useMemo(
@@ -139,7 +154,8 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
     return buildHiringInsight(PROVIDERS, research, selectedJob.role)
   }, [selectedJob, research])
 
-  const candidateRole = pipeline?.resume.titles[0]?.raw ?? 'your field'
+  const candidateRole =
+    pipeline?.resume.titles[0]?.raw ?? draftResume?.titles[0]?.raw ?? 'your field'
 
   const value = useMemo<AppFlowContextValue>(
     () => ({
@@ -161,7 +177,9 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       loading,
       live: USE_LIVE,
       pipelineError,
-      submitResume: runPipelineNow,
+      submitResume,
+      draftResume: draftResume ?? undefined,
+      confirmResume,
 
       selectedJob,
       selectJob: (id) => setSelectedId(id),
@@ -187,7 +205,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, candidateRole, pipeline, jobs, loading, pipelineError, selectedJob, research, insight, credits, firstSheetUsed],
+    [name, email, candidateRole, pipeline, jobs, loading, pipelineError, submitResume, draftResume, confirmResume, selectedJob, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

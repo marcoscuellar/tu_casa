@@ -476,22 +476,28 @@
   }
   .lp-hero {
     height: auto;
-    min-height: 520px;
+    min-height: 0;
   }
   .lp-hero-head {
     position: static;
-    padding: 70px 24px 0;
+    padding: 64px 24px 40px;
     right: auto;
   }
   .lp-hero-eyebrow {
     top: 24px;
     left: 24px;
   }
+  /* Clipped watermark reads as a bug at phone widths — drop it here. */
+  .lp-hero-ghost {
+    display: none;
+  }
+  /* Red band flush to the bottom of the card: clean black-top / red-bottom
+     split (mirrors the desktop black-left / red-right), no empty void. */
   .lp-hero-rail {
     position: static;
     width: 100%;
-    min-height: 96px;
-    margin-top: 24px;
+    padding: 44px 24px;
+    margin-top: 0;
   }
   .lp-tiles,
   .lp-stats-grid {

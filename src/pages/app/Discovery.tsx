@@ -193,11 +193,11 @@ export function Discovery() {
 
                 {isOpen && (
                   <div className="disc-card-body">
-                    {/* Structured facts row */}
+                    {/* Facts — the hard specs, no opinion */}
                     <div className="disc-facts">
                       <div className="disc-fact">
-                        <div className="disc-fact-label mono-label">Verdict</div>
-                        <div className="disc-fact-val">{job.fit.verdictHead}</div>
+                        <div className="disc-fact-label mono-label">Fit score</div>
+                        <div className="disc-fact-val">{job.fit.score}/100</div>
                       </div>
                       {job.salary && (
                         <div className="disc-fact">
@@ -210,6 +210,12 @@ export function Discovery() {
                         <div className="disc-fact-val">{workType(job)}</div>
                       </div>
                       <div className="disc-fact">
+                        <div className="disc-fact-label mono-label">Seniority</div>
+                        <div className="disc-fact-val">
+                          {job.fit.seniorityBarMet ? 'You clear it' : 'A stretch'}
+                        </div>
+                      </div>
+                      <div className="disc-fact">
                         <div className="disc-fact-label mono-label">Posted</div>
                         <div className="disc-fact-val">{job.postedDate}</div>
                       </div>
@@ -219,25 +225,60 @@ export function Discovery() {
                       <div className="disc-body-note">{job.locationNote}</div>
                     )}
 
-                    {matched.length > 0 && (
-                      <div className="disc-section">
-                        <div className="disc-body-label mono-label">
-                          Your skills this role asks for
+                    {/* How you measure up — the real answer, straight from the rubric */}
+                    <div className="disc-section">
+                      <div className="disc-body-label mono-label">How you measure up</div>
+                      <div className="disc-measure">
+                        <div className="disc-measure-col">
+                          <div className="disc-measure-head disc-measure-good">
+                            ✓ What you bring
+                          </div>
+                          {job.fit.covered.length > 0 ? (
+                            job.fit.covered.map((c) => (
+                              <div key={c.t} className="disc-measure-item">
+                                <div className="disc-measure-t">{c.t}</div>
+                                <div className="disc-measure-d">{c.d}</div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="disc-measure-empty">
+                              Matched on your title and seniority.
+                            </div>
+                          )}
+                          {matched.length > 0 && (
+                            <div className="disc-match-chips disc-measure-chips">
+                              {matched.map((s) => (
+                                <span key={s} className="disc-match-chip">
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <div className="disc-match-chips">
-                          {matched.map((s) => (
-                            <span key={s} className="disc-match-chip">
-                              {s}
-                            </span>
-                          ))}
+                        <div className="disc-measure-col">
+                          <div className="disc-measure-head disc-measure-gap">
+                            △ Worth addressing
+                          </div>
+                          {job.fit.gaps.length > 0 ? (
+                            job.fit.gaps.map((g) => (
+                              <div key={g.t} className="disc-measure-item">
+                                <div className="disc-measure-t">{g.t}</div>
+                                <div className="disc-measure-d">{g.d}</div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="disc-measure-empty">
+                              Nothing blocking — you&rsquo;re clear on the stated requirements.
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
+                    </div>
 
                     {job.description && (
                       <div className="disc-section">
-                        <div className="disc-body-label mono-label">The role</div>
-                        <p className="disc-desc">{snippet(job.description)}</p>
+                        <div className="disc-body-label mono-label">What the role is</div>
+                        <p className="disc-desc">{snippet(job.description, 460)}</p>
                       </div>
                     )}
 
@@ -251,7 +292,7 @@ export function Discovery() {
                         View &amp; apply →
                       </a>
                       <button className="disc-fit-btn" onClick={() => fullFit(job)}>
-                        Full fit &amp; interview prep
+                        Prep me for the interview →
                       </button>
                       <button
                         className={`disc-applied-btn ${isApplied ? 'is-on' : ''}`}

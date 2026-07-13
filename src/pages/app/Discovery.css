@@ -364,3 +364,59 @@
   display: flex;
   flex-direction: column;
 }
+
+/* "How you measure up" — covered vs gaps */
+.disc-measure {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 24px 32px;
+}
+.disc-measure-head {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.disc-measure-good {
+  color: #128a3e;
+}
+.disc-card-top .disc-measure-good {
+  color: #59e08a;
+}
+.disc-measure-gap {
+  color: var(--red);
+}
+.disc-measure-item {
+  margin-bottom: 13px;
+}
+.disc-measure-t {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.disc-card-top .disc-measure-t {
+  color: #fff;
+}
+.disc-measure-d {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.disc-card-top .disc-measure-d {
+  color: rgba(255, 255, 255, 0.6);
+}
+.disc-measure-empty {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.disc-card-top .disc-measure-empty {
+  color: rgba(255, 255, 255, 0.55);
+}
+.disc-measure-chips {
+  margin-top: 14px;
+}

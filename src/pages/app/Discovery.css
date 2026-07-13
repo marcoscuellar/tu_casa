@@ -19,22 +19,6 @@
   margin-top: 14px;
   max-width: 52ch;
 }
-.disc-count-wrap {
-  text-align: right;
-}
-.disc-count {
-  font-family: var(--font);
-  font-weight: 900;
-  font-size: 60px;
-  line-height: 1;
-  color: var(--red);
-}
-.disc-count-label {
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  color: var(--on-dark-50);
-  margin-top: 4px;
-}
 
 .disc-state {
   margin-top: 14px;
@@ -51,9 +35,12 @@
   gap: 12px;
   margin-top: 14px;
 }
+
+/* Card — collapsed head + expandable body */
 .disc-card {
   border-radius: 22px;
-  padding: 26px 30px;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
 }
 .disc-card-top {
   background: var(--ink);
@@ -63,15 +50,25 @@
   background: #fff;
   color: var(--ink);
 }
-.disc-card-inner {
+.disc-card.is-open {
+  box-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.3);
+}
+
+.disc-card-head {
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
   display: flex;
   align-items: center;
   gap: 24px;
-  flex-wrap: wrap;
+  padding: 26px 30px;
 }
 .disc-score-wrap {
   text-align: center;
-  min-width: 76px;
+  min-width: 72px;
 }
 .disc-score {
   font-family: var(--font);
@@ -93,7 +90,7 @@
 }
 .disc-mid {
   flex: 1;
-  min-width: 220px;
+  min-width: 200px;
 }
 .disc-title-row {
   display: flex;
@@ -106,6 +103,21 @@
   font-weight: 800;
   font-size: 20px;
   letter-spacing: -0.01em;
+}
+.disc-applied-badge {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #128a3e;
+  border: 1px solid #128a3e;
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.disc-card-top .disc-applied-badge {
+  color: #59e08a;
+  border-color: #59e08a;
 }
 .disc-flag {
   font-family: var(--mono);
@@ -122,86 +134,156 @@
   color: #fff;
   border-color: rgba(255, 255, 255, 0.5);
 }
-.disc-flag-note {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.45;
-  margin-top: 6px;
-  max-width: 62ch;
-}
-.disc-card-top .disc-flag-note {
-  color: rgba(255, 255, 255, 0.6);
-}
 .disc-meta {
   font-size: 11px;
   letter-spacing: 0.06em;
   margin-top: 5px;
 }
-.disc-tags {
-  display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-.disc-tag {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 5px 11px;
-}
-.disc-tag-dark {
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.85);
-}
-.disc-tag-light {
-  background: var(--field);
-  color: var(--muted);
-}
-.disc-btn {
+.disc-chevron {
   flex-shrink: 0;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 11px;
-  padding: 14px 20px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.15s, color 0.15s;
-}
-.disc-btn-top {
-  background: #fff;
-  color: var(--ink);
-}
-.disc-btn-plain {
-  background: var(--ink);
-  color: #fff;
-}
-.disc-btn:hover {
-  background: var(--red);
-  color: #fff;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
 }
 
-@media (max-width: 640px) {
-  .disc-header {
-    padding: 30px 28px;
-  }
-  .disc-head {
-    font-size: 40px;
-  }
-  .disc-btn {
-    width: 100%;
-  }
+/* Expanded body */
+.disc-card-body {
+  padding: 0 30px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.disc-body-note {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.disc-card-top .disc-body-note {
+  color: rgba(255, 255, 255, 0.6);
+}
+.disc-desc {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 76ch;
+}
+.disc-card-top .disc-desc {
+  color: rgba(255, 255, 255, 0.72);
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+.disc-body-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 9px;
+}
+.disc-card-top .disc-body-label {
+  color: var(--on-dark-50);
+}
+.disc-match-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.disc-match-chip {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(255, 0, 0, 0.09);
+  color: var(--red);
+  border: 1px solid rgba(255, 0, 0, 0.28);
+}
+.disc-card-top .disc-match-chip {
+  background: rgba(255, 0, 0, 0.18);
+  color: #ff6b5e;
+  border-color: rgba(255, 0, 0, 0.42);
+}
+
+/* Actions */
+.disc-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.disc-apply-btn {
+  background: var(--red);
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 13px 22px;
+  border-radius: 11px;
+  transition: filter 0.15s;
+}
+.disc-apply-btn:hover {
+  filter: brightness(0.92);
+  color: #fff;
+}
+.disc-fit-btn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: inherit;
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 12px 18px;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.disc-card-top .disc-fit-btn {
+  border-color: var(--border-dark);
+}
+.disc-fit-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+.disc-applied-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: inherit;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.disc-card-top .disc-applied-btn {
+  border-color: var(--border-dark);
+}
+.disc-applied-btn:hover {
+  border-color: #128a3e;
+  color: #128a3e;
+}
+.disc-applied-btn.is-on {
+  background: #128a3e;
+  border-color: #128a3e;
+  color: #fff;
 }
 
 /* Show-more control under the shortlist */
 .disc-more-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
   margin-top: 16px;
@@ -226,6 +308,21 @@
   filter: brightness(1.25);
 }
 
-.disc-more-center {
-  justify-content: center;
+@media (max-width: 640px) {
+  .disc-header {
+    padding: 30px 28px;
+  }
+  .disc-head {
+    font-size: 40px;
+  }
+  .disc-card-head {
+    padding: 22px;
+    gap: 16px;
+  }
+  .disc-card-body {
+    padding: 0 22px 24px;
+  }
+  .disc-applied-btn {
+    margin-left: 0;
+  }
 }

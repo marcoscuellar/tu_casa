@@ -47,6 +47,7 @@ function toRawPosting(c: CompanyRef, p: NormalizedPosting): RawPosting {
     link: p.url,
     postedDate: p.postedDate,
     salary: p.salary,
+    description: p.descriptionText,
     // It's currently listed on the company's own ATS → that IS the liveness
     // confirmation. One authoritative source is enough (Engine 4 spec).
     sourceType: 'company-ats',

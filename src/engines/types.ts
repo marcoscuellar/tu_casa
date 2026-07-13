@@ -134,6 +134,8 @@ export interface DiscoveredJob {
   postedDate: string
   /** Salary range as posted, if the posting states one. */
   salary?: string
+  /** Plain-text posting description (for the quick preview on the card). */
+  description?: string
   sourceType: SourceType
   confidence: Confidence
   status: OpenStatus

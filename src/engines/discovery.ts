@@ -25,6 +25,7 @@ export interface RawPosting {
   link: string
   postedDate: string // real date or "Unknown"
   salary?: string
+  description?: string
   sourceType: SourceType
   livenessEvidence: 'confirmed-open' | 'none' | 'confirmed-closed'
   jd: ParsedJD
@@ -72,6 +73,7 @@ export function runDiscovery(raw: RawPosting[]): DiscoveredJob[] {
       link: p.link,
       postedDate: p.postedDate,
       salary: p.salary,
+      description: p.description,
       sourceType: p.sourceType,
       confidence,
       status: statusFor(p.livenessEvidence),

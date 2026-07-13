@@ -6,12 +6,23 @@ import type { RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
 
-// Show the strongest handful first; reveal more on demand (10 at a time) up to
-// a hard cap so a big shortlist stays focused. The cap is a display limit today;
+// Show the strongest handful first; reveal more on demand (7 at a time) up to a
+// hard cap so a big shortlist stays focused. The cap is a display limit today;
 // it becomes a real per-user quota once accounts + the credits model land.
 const INITIAL_SHOWN = 7
 const SHOW_MORE_STEP = 7
 const MAX_SHOWN = 30
+
+// Applied-job tracking, persisted client-side so it survives a refresh. Becomes
+// account-backed once we have real users + a database.
+const APPLIED_KEY = 'tucasa:applied'
+function loadApplied(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(APPLIED_KEY) ?? '[]') as string[])
+  } catch {
+    return new Set()
+  }
+}
 
 /** Prettify a canonical skill id for a tag chip. */
 function prettySkill(canonical: string): string {
@@ -32,12 +43,34 @@ function prettySkill(canonical: string): string {
   )
 }
 
+/** A short, clean preview of the posting text. */
+function snippet(text: string, max = 320): string {
+  const clean = text.replace(/\s+/g, ' ').trim()
+  return clean.length > max ? `${clean.slice(0, max).trimEnd()}…` : clean
+}
+
 export function Discovery() {
   const navigate = useNavigate()
   const { candidateName, candidateRole, jobs, loading, selectJob } = useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [applied, setApplied] = useState<Set<string>>(loadApplied)
 
-  const checkFit = (job: RankedJob) => {
+  const toggleApplied = (id: string) => {
+    setApplied((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      try {
+        localStorage.setItem(APPLIED_KEY, JSON.stringify([...next]))
+      } catch {
+        /* ignore storage failures — tracking is best-effort */
+      }
+      return next
+    })
+  }
+
+  const fullFit = (job: RankedJob) => {
     selectJob(job.id)
     navigate('/fit')
   }
@@ -62,7 +95,7 @@ export function Discovery() {
             <p className="disc-sub">
               {candidateName} · {candidateRole}. Live openings, strongest fit
               first — every score earned against the role&rsquo;s real
-              requirements. Finding &amp; ranking is always free.
+              requirements. Tap any role to see why it fits.
             </p>
           </div>
         </div>
@@ -80,15 +113,28 @@ export function Discovery() {
         <div className="disc-list">
           {shown.map((job, i) => {
             const top = i === 0
+            const isOpen = openId === job.id
+            const isApplied = applied.has(job.id)
             const flagged = job.audit.recheck === 'flagged'
-            // Tags = the required skills this résumé actually matched (why it ranks).
-            const tags = job.fit.hardRequiredMatched.slice(0, 3).map(prettySkill)
+            const matched = (
+              job.fit.hardRequiredMatched.length
+                ? job.fit.hardRequiredMatched.map(prettySkill)
+                : job.fit.covered.map((c) => c.t)
+            ).slice(0, 8)
+            const meta = [job.company, job.location, job.salary].filter(Boolean).join(' · ')
+
             return (
               <div
                 key={job.id}
-                className={`disc-card ${top ? 'disc-card-top' : 'disc-card-plain'}`}
+                className={`disc-card ${top ? 'disc-card-top' : 'disc-card-plain'} ${
+                  isOpen ? 'is-open' : ''
+                } ${isApplied ? 'is-applied' : ''}`}
               >
-                <div className="disc-card-inner">
+                <button
+                  className="disc-card-head"
+                  onClick={() => setOpenId(isOpen ? null : job.id)}
+                  aria-expanded={isOpen}
+                >
                   <div className="disc-score-wrap">
                     <div className="disc-score">{job.fit.score}</div>
                     <div
@@ -102,48 +148,65 @@ export function Discovery() {
                   <div className="disc-mid">
                     <div className="disc-title-row">
                       <div className="disc-title">{job.role}</div>
+                      {isApplied && <span className="disc-applied-badge">✓ Applied</span>}
                       {flagged && (
-                        <span
-                          className={`disc-flag ${top ? 'disc-flag-dark' : ''}`}
-                          title={job.audit.note}
-                        >
-                          ⚑ Verify this one
+                        <span className={`disc-flag ${top ? 'disc-flag-dark' : ''}`} title={job.audit.note}>
+                          ⚑ Verify
                         </span>
                       )}
                     </div>
-                    <div
-                      className={`disc-meta mono-label ${
-                        top ? 'muted-dark' : 'muted-light'
-                      }`}
-                    >
-                      {[job.company, job.location, job.salary]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </div>
-                    {flagged && job.audit.note && (
-                      <div className="disc-flag-note">{job.audit.note}</div>
-                    )}
-                    {job.locationNote && (
-                      <div className="disc-flag-note">{job.locationNote}</div>
-                    )}
-                    <div className="disc-tags">
-                      {tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`disc-tag ${top ? 'disc-tag-dark' : 'disc-tag-light'}`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                    <div className={`disc-meta mono-label ${top ? 'muted-dark' : 'muted-light'}`}>
+                      {meta}
                     </div>
                   </div>
-                  <button
-                    className={`disc-btn ${top ? 'disc-btn-top' : 'disc-btn-plain'}`}
-                    onClick={() => checkFit(job)}
-                  >
-                    Check my fit →
-                  </button>
-                </div>
+                  <span className="disc-chevron" aria-hidden>
+                    {isOpen ? '–' : '+'}
+                  </span>
+                </button>
+
+                {isOpen && (
+                  <div className="disc-card-body">
+                    {job.locationNote && (
+                      <div className="disc-body-note">{job.locationNote}</div>
+                    )}
+                    {job.description && (
+                      <p className="disc-desc">{snippet(job.description)}</p>
+                    )}
+                    {matched.length > 0 && (
+                      <div className="disc-match">
+                        <div className="disc-body-label mono-label">
+                          Matching skills · why it fits you
+                        </div>
+                        <div className="disc-match-chips">
+                          {matched.map((s) => (
+                            <span key={s} className="disc-match-chip">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="disc-card-actions">
+                      <a
+                        className="disc-apply-btn"
+                        href={job.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View &amp; apply →
+                      </a>
+                      <button className="disc-fit-btn" onClick={() => fullFit(job)}>
+                        Full fit &amp; interview prep
+                      </button>
+                      <button
+                        className={`disc-applied-btn ${isApplied ? 'is-on' : ''}`}
+                        onClick={() => toggleApplied(job.id)}
+                      >
+                        {isApplied ? '✓ Applied — undo' : 'Mark as applied'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}

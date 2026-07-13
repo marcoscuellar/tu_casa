@@ -78,52 +78,22 @@ export function Upload() {
 
   return (
     <AppShell>
-      <div className="blk blk-black upload-block pop">
+      <div className="upload-bento pop">
+        <div className="blk blk-black upload-block">
         <div className="upload-header">
           <div className="eyebrow">Step 01 / In</div>
           <div className="upload-step mono-label">Setup · 1 of 2</div>
         </div>
 
-        <div className="upload-intro-row">
-          <div className="upload-intro">
-            <h1 className="head upload-head">
-              Drop your <span className="red">résumé.</span>
-            </h1>
-            <p className="upload-sub">
-              It&rsquo;s the only thing we&rsquo;ll ask you to bring. Your name,
-              role, and experience all come from here — you&rsquo;ll never
-              re-type them. Private to you.
-            </p>
-          </div>
-
-          <ol className="upload-steps">
-            <li className="upload-step-item is-now">
-              <span className="upload-step-n mono-label">01</span>
-              <div>
-                <div className="upload-step-title">Drop your résumé</div>
-                <div className="upload-step-desc">You&rsquo;re here.</div>
-              </div>
-            </li>
-            <li className="upload-step-item">
-              <span className="upload-step-n mono-label">02</span>
-              <div>
-                <div className="upload-step-title">Confirm your info</div>
-                <div className="upload-step-desc">
-                  We show exactly what we read — you fix anything that&rsquo;s off.
-                </div>
-              </div>
-            </li>
-            <li className="upload-step-item">
-              <span className="upload-step-n mono-label">03</span>
-              <div>
-                <div className="upload-step-title">Hit search</div>
-                <div className="upload-step-desc">
-                  Your top 7 matches surface, strongest fit first — pulled from
-                  thousands of live roles. Our engine does the heavy lifting.
-                </div>
-              </div>
-            </li>
-          </ol>
+        <div className="upload-intro">
+          <h1 className="head upload-head">
+            Drop your <span className="red">résumé.</span>
+          </h1>
+          <p className="upload-sub">
+            It&rsquo;s the only thing we&rsquo;ll ask you to bring. Your name,
+            role, and experience all come from here — you&rsquo;ll never re-type
+            them. Private to you.
+          </p>
         </div>
 
         <div className="upload-foot">
@@ -185,6 +155,42 @@ export function Upload() {
               </div>
             </div>
           )}
+        </div>
+        </div>
+
+        <div className="upload-steps-box">
+          <div className="upload-steps-title mono-label">What happens next</div>
+          <ol className="upload-steps">
+            <li className="upload-step-item is-now">
+              <span className="upload-step-n mono-label">01</span>
+              <div>
+                <div className="upload-step-title">Drop your résumé</div>
+                <div className="upload-step-desc">You&rsquo;re here.</div>
+              </div>
+            </li>
+            <li className="upload-step-item">
+              <span className="upload-step-n mono-label">02</span>
+              <div>
+                <div className="upload-step-title">Confirm your info</div>
+                <div className="upload-step-desc">
+                  We show exactly what we read — you fix anything that&rsquo;s off.
+                </div>
+              </div>
+            </li>
+            <li className="upload-step-item">
+              <span className="upload-step-n mono-label">03</span>
+              <div>
+                <div className="upload-step-title">Hit search</div>
+                <div className="upload-step-desc">
+                  Your top 7 matches surface, strongest fit first — pulled from
+                  thousands of live roles. Our engine does the heavy lifting.
+                </div>
+              </div>
+            </li>
+          </ol>
+          <div className="upload-steps-foot mono-label">
+            Free for job seekers · private to you
+          </div>
         </div>
       </div>
     </AppShell>

@@ -44,13 +44,13 @@
   color: #fff;
 }
 .signin-logo .accent {
-  color: var(--red);
+  color: var(--accent-soft);
 }
 .signin-rule {
   width: 44px;
   height: 3px;
   margin: 18px auto 12px;
-  background: var(--red);
+  background: var(--accent-soft);
 }
 .signin-tagline {
   font-family: var(--font);
@@ -108,7 +108,7 @@
   color: rgba(255, 255, 255, 0.65);
 }
 .signin-swap-link {
-  color: var(--red);
+  color: var(--accent-soft);
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
@@ -125,7 +125,7 @@
   text-decoration: underline;
 }
 .auth-err {
-  color: var(--red);
+  color: var(--accent-soft);
   font-size: 13px;
   margin-top: 14px;
   min-height: 16px;
@@ -257,7 +257,7 @@ textarea.onb-input {
   font-size: 56px;
   letter-spacing: -0.04em;
   line-height: 1;
-  color: var(--red);
+  color: var(--accent-soft);
 }
 .onb-free-label {
   font-family: var(--mono);

@@ -203,14 +203,14 @@
   text-transform: uppercase;
   border-radius: 999px;
   padding: 6px 12px;
-  background: rgba(255, 0, 0, 0.09);
+  background: rgba(22, 38, 95, 0.08);
   color: var(--red);
-  border: 1px solid rgba(255, 0, 0, 0.28);
+  border: 1px solid rgba(22, 38, 95, 0.25);
 }
 .disc-card-top .disc-match-chip {
-  background: rgba(255, 0, 0, 0.18);
-  color: #ff6b5e;
-  border-color: rgba(255, 0, 0, 0.42);
+  background: rgba(139, 160, 255, 0.16);
+  color: var(--accent-soft);
+  border-color: rgba(139, 160, 255, 0.4);
 }
 
 /* Actions */
@@ -384,7 +384,15 @@
   color: var(--red);
 }
 .disc-card-top .disc-field-tag.is-diff {
-  color: #ff6b5e;
+  color: var(--accent-soft);
+}
+/* Accent text/marks on the featured (black) card use the lighter tone. */
+.disc-card-top .disc-score,
+.disc-card-top .disc-measure-gap {
+  color: var(--accent-soft);
+}
+.disc-card-top .disc-field-note.is-diff {
+  border-left-color: var(--accent-soft);
 }
 .disc-field-note {
   padding-left: 12px;

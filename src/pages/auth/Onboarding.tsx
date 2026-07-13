@@ -55,7 +55,7 @@ export function Onboarding() {
   }
 
   const dot = (active: boolean) => ({
-    background: active ? 'var(--red)' : 'rgba(255,255,255,.14)',
+    background: active ? 'var(--accent-soft)' : 'rgba(255,255,255,.14)',
   })
 
   return (

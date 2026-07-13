@@ -46,6 +46,12 @@
 .red {
   color: var(--red);
 }
+/* On the near-black bento blocks the deep-navy accent would disappear, so
+   accent text/eyebrows there use the lighter cobalt tone. */
+.blk-black .eyebrow,
+.blk-black .red {
+  color: var(--accent-soft);
+}
 
 /* Buttons */
 .btn {

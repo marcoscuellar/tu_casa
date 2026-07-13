@@ -98,7 +98,7 @@
   font-weight: 900;
   font-size: 82px;
   line-height: 1;
-  color: var(--red);
+  color: var(--accent-soft);
 }
 .fit-verdict-score-label {
   font-size: 10px;

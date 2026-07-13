@@ -6,7 +6,14 @@
   /* Colors */
   --paper: #edebe4;
   --ink: #0f0f0f;
-  --red: #ff0000;
+  /* Brand accent — deep dark blue. Two tones: the deep navy for fills and
+     accent text on light surfaces, and a lighter cobalt for accent text/marks
+     that sit on the near-black bento (a true navy would vanish there). */
+  --accent: #16265f;
+  --accent-soft: #8ba0ff;
+  /* Legacy alias: everything authored as var(--red) now renders the deep navy.
+     On-dark accent text is overridden to var(--accent-soft) per surface. */
+  --red: var(--accent);
   --white: #ffffff;
   --field: #f4f2ec; /* field fill on light */
   --muted: #6b6b6b; /* muted text on light */

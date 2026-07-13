@@ -111,7 +111,7 @@
   top: 32px;
   font-family: var(--mono);
   font-size: 12px;
-  color: var(--red);
+  color: var(--accent-soft);
   line-height: 1.6;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -185,7 +185,7 @@
   color: var(--red);
 }
 .lp-eyebrow-onred {
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.72);
 }
 .lp-band-big {
   font-weight: 800;
@@ -202,7 +202,20 @@
   color: #fff;
 }
 .lp-onred {
-  color: #000;
+  color: #fff;
+}
+
+/* --- Deep-blue accent: legibility overrides by surface --- */
+/* Accent text on the near-black surfaces uses the lighter cobalt tone. */
+.lp-desc .lp-red,
+.lp-band-black .lp-red,
+.lp-band-black .lp-eyebrow-red,
+.lp-stats .lp-eyebrow-red {
+  color: var(--accent-soft);
+}
+/* Accent text sitting on the solid navy fill goes white. */
+.lp-band-red .lp-red {
+  color: #fff;
 }
 
 /* Description + CTA */
@@ -397,7 +410,7 @@
   gap: 14px;
 }
 .lp-stat {
-  border-top: 2px solid var(--red);
+  border-top: 2px solid var(--accent-soft);
   padding-top: 20px;
 }
 .lp-stat-num {

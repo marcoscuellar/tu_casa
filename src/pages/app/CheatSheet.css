@@ -179,7 +179,7 @@
 .cheat-why-label {
   font-size: 10px;
   letter-spacing: 0.14em;
-  color: var(--red);
+  color: var(--accent-soft);
   margin-bottom: 8px;
 }
 .cheat-why-text {

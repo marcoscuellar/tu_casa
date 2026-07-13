@@ -530,6 +530,11 @@
   .lp-br-desk {
     display: none;
   }
+  /* Declutter the topbar on phones: keep just the brand + ADHD toggle. */
+  .lp-tag,
+  .lp-clock {
+    display: none;
+  }
   .lp-desc,
   .lp-how,
   .lp-final {

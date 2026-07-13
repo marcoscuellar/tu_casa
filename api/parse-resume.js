@@ -4563,13 +4563,23 @@ function toCanonical(raw) {
 
 // src/engines/taxonomy.ts
 var FAMILY_KEYWORDS = [
+  // Engineering (specific first)
   ["frontend", ["front end", "frontend", "front-end", "ui engineer", "web engineer"]],
   ["fullstack", ["full stack", "fullstack", "full-stack"]],
   ["backend", ["back end", "backend", "back-end", "server", "platform engineer", "api engineer"]],
   ["mobile", ["mobile", "ios", "android", "react native"]],
   ["data", ["data engineer", "data scientist", "analytics engineer", "data science"]],
   ["ml", ["machine learning", "ml engineer", "ai engineer", "applied scientist"]],
-  ["devops", ["devops", "sre", "site reliability", "infrastructure", "platform reliability"]]
+  ["devops", ["devops", "sre", "site reliability", "infrastructure", "platform reliability"]],
+  // Non-engineering — checked before the generic "engineer" fallback below.
+  ["product", ["product manager", "product owner", "head of product", "director of product", "vp of product", "group product"]],
+  ["marketing", ["marketing", "growth", "demand gen", "brand", "content", "seo", "communications"]],
+  ["sales", ["sales", "account executive", "account manager", "business development", "go to market", "go-to-market", "gtm", "revenue", "partnerships"]],
+  ["design", ["designer", "ux", "ui/ux", "user experience", "product design", "brand design"]],
+  ["customer", ["customer success", "customer support", "account management", "implementation", "onboarding"]],
+  ["operations", ["operations", "program manager", "project manager", "chief of staff", "business operations", "strategy"]],
+  ["finance", ["finance", "accounting", "controller", "fp&a", "financial analyst", "treasury"]],
+  ["people", ["recruiter", "recruiting", "talent", "human resources", "people operations", "people ops"]]
 ];
 var LEVEL_KEYWORDS = [
   ["principal", ["principal", "distinguished"]],
@@ -4584,7 +4594,7 @@ function inferFamily(title) {
   for (const [family, keys] of FAMILY_KEYWORDS) {
     if (keys.some((k) => t.includes(k))) return family;
   }
-  if (/\b(software|swe|developer|engineer|programmer)\b/.test(t)) return "fullstack";
+  if (/\b(software|swe|developer|engineer|engineering|programmer)\b/.test(t)) return "fullstack";
   return "other";
 }
 function inferLevel(title) {

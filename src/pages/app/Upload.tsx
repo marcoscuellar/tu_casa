@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
@@ -37,9 +37,12 @@ function readFileAsBase64(file: File): Promise<string> {
 
 export function Upload() {
   const navigate = useNavigate()
-  const { live, submitResume, pipelineError } = useAppFlow()
+  const { live, submitResume, pipelineError, clearError } = useAppFlow()
   const [parsing, setParsing] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
+
+  // Returning to upload starts fresh — drop any stale error from a prior attempt.
+  useEffect(() => clearError(), [clearError])
 
   // Parse the résumé (Claude in live mode, the sample in fixtures), then go to
   // the confirm step where the candidate reviews what we read before we search.

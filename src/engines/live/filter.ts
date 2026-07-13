@@ -23,17 +23,51 @@ export function searchTermsFrom(resume: ParsedResume): {
   return { families: families.length ? families : ['other'], location, wantsRemote }
 }
 
+// Seniority/structure words that say nothing about the *kind* of role, so they
+// don't count toward title relevance.
+const GENERIC_TITLE_WORDS = new Set([
+  'senior', 'sr', 'junior', 'jr', 'staff', 'lead', 'principal', 'director', 'manager',
+  'head', 'chief', 'vp', 'president', 'associate', 'intern', 'of', 'and', 'the', 'for',
+  'to', 'a', 'an', 'in', 'at', 'i', 'ii', 'iii', 'iv',
+  // role suffixes — they say the seniority/shape, not the KIND of work, so two
+  // roles sharing only "engineer" or "manager" are not therefore related.
+  'engineer', 'engineering', 'developer', 'dev', 'specialist', 'coordinator', 'analyst',
+])
+
+/** Distinctive (role-defining) words in a title, minus seniority/filler. */
+function distinctiveWords(title: string): Set<string> {
+  return new Set(
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !GENERIC_TITLE_WORDS.has(w)),
+  )
+}
+
+/** Fallback relevance for unclassifiable roles: do the titles share a real word? */
+function titleOverlap(resume: ParsedResume, postingRole: string): boolean {
+  const résuméWords = new Set<string>()
+  resume.titles.forEach((t) => distinctiveWords(t.raw).forEach((w) => résuméWords.add(w)))
+  for (const w of distinctiveWords(postingRole)) {
+    if (résuméWords.has(w)) return true
+  }
+  return false
+}
+
 /**
  * Does this posting match the résumé's role family + location?
  *
- * Role family is a hard gate (approved role types). Location follows the
- * "downgrade, don't drop" rule — an onsite role is still *relevant* to an
- * onsite-willing candidate (it's ranked lower downstream, not hidden); only a
- * remote-only candidate excludes a non-local onsite role.
+ * Role family is the primary gate (approved role types). When either side is
+ * unclassifiable ('other'), familyRelated returns false, so we fall back to
+ * distinctive-word overlap between the titles — that keeps a niche/unusual role
+ * matching genuinely-similar postings instead of flooding with everything that
+ * also failed to classify. Location follows "downgrade, don't drop".
  */
 export function isRelevant(resume: ParsedResume, posting: NormalizedPosting): boolean {
   const { families } = searchTermsFrom(resume)
   const postingFamily = parseJDText(posting.role, posting.descriptionText).title.family
   const familyOk = families.some((f) => familyRelated(f, postingFamily))
-  return familyOk && locationFit(resume, posting).include
+  const relevant = familyOk || titleOverlap(resume, posting.role)
+  return relevant && locationFit(resume, posting).include
 }

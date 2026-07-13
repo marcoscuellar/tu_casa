@@ -214,13 +214,23 @@ function locationFit(resume, job) {
 
 // src/engines/taxonomy.ts
 var FAMILY_ADJACENCY = {
+  // engineering
   frontend: ["fullstack", "mobile"],
   backend: ["fullstack", "data", "devops"],
   fullstack: ["frontend", "backend", "mobile"],
   mobile: ["frontend", "fullstack"],
   data: ["backend", "ml"],
   ml: ["data"],
-  devops: ["backend"]
+  devops: ["backend"],
+  // non-engineering
+  sales: ["marketing", "customer"],
+  marketing: ["sales", "product"],
+  product: ["marketing", "design"],
+  design: ["product"],
+  customer: ["sales"],
+  operations: [],
+  finance: [],
+  people: []
 };
 function familiesAdjacent(a, b) {
   const fa = a.trim().toLowerCase();
@@ -230,16 +240,27 @@ function familiesAdjacent(a, b) {
 function familyRelated(a, b) {
   const fa = a.trim().toLowerCase();
   const fb = b.trim().toLowerCase();
+  if (fa === "other" || fb === "other") return false;
   return fa === fb || familiesAdjacent(fa, fb);
 }
 var FAMILY_KEYWORDS = [
+  // Engineering (specific first)
   ["frontend", ["front end", "frontend", "front-end", "ui engineer", "web engineer"]],
   ["fullstack", ["full stack", "fullstack", "full-stack"]],
   ["backend", ["back end", "backend", "back-end", "server", "platform engineer", "api engineer"]],
   ["mobile", ["mobile", "ios", "android", "react native"]],
   ["data", ["data engineer", "data scientist", "analytics engineer", "data science"]],
   ["ml", ["machine learning", "ml engineer", "ai engineer", "applied scientist"]],
-  ["devops", ["devops", "sre", "site reliability", "infrastructure", "platform reliability"]]
+  ["devops", ["devops", "sre", "site reliability", "infrastructure", "platform reliability"]],
+  // Non-engineering — checked before the generic "engineer" fallback below.
+  ["product", ["product manager", "product owner", "head of product", "director of product", "vp of product", "group product"]],
+  ["marketing", ["marketing", "growth", "demand gen", "brand", "content", "seo", "communications"]],
+  ["sales", ["sales", "account executive", "account manager", "business development", "go to market", "go-to-market", "gtm", "revenue", "partnerships"]],
+  ["design", ["designer", "ux", "ui/ux", "user experience", "product design", "brand design"]],
+  ["customer", ["customer success", "customer support", "account management", "implementation", "onboarding"]],
+  ["operations", ["operations", "program manager", "project manager", "chief of staff", "business operations", "strategy"]],
+  ["finance", ["finance", "accounting", "controller", "fp&a", "financial analyst", "treasury"]],
+  ["people", ["recruiter", "recruiting", "talent", "human resources", "people operations", "people ops"]]
 ];
 var LEVEL_KEYWORDS = [
   ["principal", ["principal", "distinguished"]],
@@ -254,7 +275,7 @@ function inferFamily(title) {
   for (const [family, keys] of FAMILY_KEYWORDS) {
     if (keys.some((k) => t.includes(k))) return family;
   }
-  if (/\b(software|swe|developer|engineer|programmer)\b/.test(t)) return "fullstack";
+  if (/\b(software|swe|developer|engineer|engineering|programmer)\b/.test(t)) return "fullstack";
   return "other";
 }
 function inferLevel(title) {
@@ -389,11 +410,64 @@ function searchTermsFrom(resume) {
   const wantsRemote = /remote/i.test(location);
   return { families: families.length ? families : ["other"], location, wantsRemote };
 }
+var GENERIC_TITLE_WORDS = /* @__PURE__ */ new Set([
+  "senior",
+  "sr",
+  "junior",
+  "jr",
+  "staff",
+  "lead",
+  "principal",
+  "director",
+  "manager",
+  "head",
+  "chief",
+  "vp",
+  "president",
+  "associate",
+  "intern",
+  "of",
+  "and",
+  "the",
+  "for",
+  "to",
+  "a",
+  "an",
+  "in",
+  "at",
+  "i",
+  "ii",
+  "iii",
+  "iv",
+  // role suffixes — they say the seniority/shape, not the KIND of work, so two
+  // roles sharing only "engineer" or "manager" are not therefore related.
+  "engineer",
+  "engineering",
+  "developer",
+  "dev",
+  "specialist",
+  "coordinator",
+  "analyst"
+]);
+function distinctiveWords(title) {
+  return new Set(
+    title.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length > 2 && !GENERIC_TITLE_WORDS.has(w))
+  );
+}
+function titleOverlap(resume, postingRole) {
+  const r\u00E9sum\u00E9Words = /* @__PURE__ */ new Set();
+  resume.titles.forEach((t) => distinctiveWords(t.raw).forEach((w) => r\u00E9sum\u00E9Words.add(w)));
+  for (const w of distinctiveWords(postingRole)) {
+    if (r\u00E9sum\u00E9Words.has(w)) return true;
+  }
+  return false;
+}
 function isRelevant(resume, posting) {
   const { families } = searchTermsFrom(resume);
   const postingFamily = parseJDText(posting.role, posting.descriptionText).title.family;
   const familyOk = families.some((f) => familyRelated(f, postingFamily));
-  return familyOk && locationFit(resume, posting).include;
+  const relevant = familyOk || titleOverlap(resume, posting.role);
+  return relevant && locationFit(resume, posting).include;
 }
 
 // src/engines/live/liveDiscovery.ts

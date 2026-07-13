@@ -55,6 +55,8 @@ export interface AppFlowContextValue {
   live: boolean
   /** A résumé-parse or pipeline error to surface on Upload, if any. */
   pipelineError?: string
+  /** Clear any lingering error (e.g. when returning to the upload screen). */
+  clearError: () => void
   /** Parse an uploaded résumé into a draft profile (does NOT search yet). True on success. */
   submitResume: (upload?: ResumeUpload) => Promise<boolean>
   /** The parsed-but-unconfirmed profile, shown on the "confirm your info" step. */
@@ -118,6 +120,8 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const clearError = useCallback(() => setPipelineError(undefined), [])
+
   // Step 2 — the candidate confirmed (and possibly edited) the profile; run
   // discovery → audit → score → rank on it.
   const confirmResume = useCallback(async (resume: ParsedResume): Promise<boolean> => {
@@ -177,6 +181,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       loading,
       live: USE_LIVE,
       pipelineError,
+      clearError,
       submitResume,
       draftResume: draftResume ?? undefined,
       confirmResume,
@@ -205,7 +210,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, candidateRole, pipeline, jobs, loading, pipelineError, submitResume, draftResume, confirmResume, selectedJob, research, insight, credits, firstSheetUsed],
+    [name, email, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, selectedJob, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

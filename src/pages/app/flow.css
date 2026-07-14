@@ -8,6 +8,7 @@
 /* Bento blocks */
 .blk {
   border-radius: 26px;
+  box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.22);
 }
 .blk-black {
   background: var(--ink);

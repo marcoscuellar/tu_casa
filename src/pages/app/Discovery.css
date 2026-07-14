@@ -70,6 +70,7 @@
 .disc-card {
   border-radius: 22px;
   overflow: hidden;
+  box-shadow: 0 10px 28px -16px rgba(0, 0, 0, 0.18);
   transition: box-shadow 0.15s;
 }
 .disc-card-top {

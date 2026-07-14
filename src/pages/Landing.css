@@ -109,6 +109,7 @@
   position: absolute;
   left: 36px;
   top: 32px;
+  z-index: 3;
   font-family: var(--mono);
   font-size: 12px;
   color: var(--accent-soft);
@@ -121,16 +122,20 @@
   left: 36px;
   top: 62px;
   right: 38%;
+  z-index: 3;
   font-weight: 800;
   font-size: clamp(38px, 5.6vw, 66px);
   letter-spacing: -0.035em;
   line-height: 1.02;
   color: #fff;
 }
+/* The ghost wordmark bleeds across the seam: "TUCA" on the black, its tail
+   finishing faintly on the red rail (lifted above the rail's fill, below text). */
 .lp-hero-ghost {
   position: absolute;
   left: 24px;
   bottom: -58px;
+  z-index: 1;
   font-weight: 800;
   font-size: clamp(120px, 20vw, 280px);
   letter-spacing: -0.04em;
@@ -151,6 +156,8 @@
   justify-content: center;
 }
 .lp-hero-arrows {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 10px;
   --arrow-shift: 0px;

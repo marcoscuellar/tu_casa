@@ -17,6 +17,7 @@ await build({
     'parse-resume': 'functions-src/parse-resume.ts',
     discover: 'functions-src/discover.ts',
     'user-store': 'functions-src/user-store.ts',
+    'build-resume': 'functions-src/build-resume.ts',
   },
   outdir: 'api',
   bundle: true,

@@ -134,10 +134,10 @@ export function Upload() {
                 Don&rsquo;t have one?{' '}
                 <a
                   className="upload-sample-link"
-                  onClick={() => navigate('/builder')}
+                  onClick={() => navigate('/ai-resume')}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate('/builder')}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate('/ai-resume')}
                 >
                   We got you — let AI build it →
                 </a>

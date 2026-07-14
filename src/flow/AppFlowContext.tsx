@@ -64,6 +64,8 @@ export interface AppFlowContextValue {
   submitResume: (upload?: ResumeUpload) => Promise<boolean>
   /** The parsed-but-unconfirmed profile, shown on the "confirm your info" step. */
   draftResume?: ParsedResume
+  /** Adopt a profile built elsewhere (e.g. the AI résumé builder) as the draft. */
+  adoptResume: (resume: ParsedResume) => void
   /** Confirm the (possibly edited) profile and run discovery. True on success. */
   confirmResume: (resume: ParsedResume) => Promise<boolean>
 
@@ -188,6 +190,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       clearError,
       submitResume,
       draftResume: draftResume ?? undefined,
+      adoptResume: (resume) => setDraftResume(resume),
       confirmResume,
 
       selectedJob,

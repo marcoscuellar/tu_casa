@@ -437,21 +437,6 @@ export function Landing() {
               </div>
             </div>
           </div>
-
-          <div className="lp-trust-free">
-            <div>
-              <div className="lp-free-title">
-                Free for job seekers. So how do we eat?
-              </div>
-              <div className="lp-free-desc">
-                Finding real jobs and checking your fit stays free — always. When
-                you&rsquo;re actively interviewing, Pro ($15/mo) unlocks cheat
-                sheets and unlimited résumé tailoring. Those subscriptions fund
-                the whole thing.
-              </div>
-            </div>
-            <div className="lp-free-chip">No card · No catch</div>
-          </div>
         </section>
 
         {/* Pricing */}

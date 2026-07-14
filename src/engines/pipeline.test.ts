@@ -1,7 +1,14 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import { buildHiringInsight, buildResearch, runPipeline, type PipelineResult } from './pipeline'
+import {
+  buildHiringInsight,
+  buildResearch,
+  diversifyByCompany,
+  runPipeline,
+  type PipelineResult,
+} from './pipeline'
 import { fixtureProviders } from './providers/fixtures'
 import { groundableRefs } from './reasoning'
+import type { RankedJob } from './types'
 
 // Pin the reference year so the fixtures' recency scoring is deterministic.
 const AS_OF = 2026
@@ -84,5 +91,29 @@ describe('pipeline — discover → audit → score → rank (fixtures)', () => 
     const gated = buildResearch(fixtureProviders, 'Brightline', 'Senior Software Engineer')
     expect(gated.readiness).toBe('THIN')
     expect(buildHiringInsight(fixtureProviders, gated, 'Senior Software Engineer')).toBeNull()
+  })
+})
+
+describe('diversifyByCompany', () => {
+  const job = (id: string, company: string) => ({ id, company }) as unknown as RankedJob
+
+  it('caps a flooding company and defers extras to the overflow tail', () => {
+    const ranked = [
+      job('a1', 'Stripe'),
+      job('a2', 'Stripe'),
+      job('a3', 'Stripe'), // 3rd Stripe → overflow
+      job('b1', 'Figma'),
+      job('a4', 'Stripe'), // 4th Stripe → overflow
+      job('c1', 'Linear'),
+    ]
+    // First two Stripe roles hold their spots; 3rd/4th drop to the tail, in order.
+    expect(diversifyByCompany(ranked, 2).map((j) => j.id)).toEqual([
+      'a1', 'a2', 'b1', 'c1', 'a3', 'a4',
+    ])
+  })
+
+  it('is a no-op when every company is within the cap', () => {
+    const ranked = [job('a1', 'Stripe'), job('b1', 'Figma'), job('a2', 'Stripe')]
+    expect(diversifyByCompany(ranked, 2).map((j) => j.id)).toEqual(['a1', 'b1', 'a2'])
   })
 })

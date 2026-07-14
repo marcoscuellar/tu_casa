@@ -41,6 +41,37 @@ export interface PipelineResult {
   duplicateCount: number
 }
 
+/** At most this many roles from any one company surface before the overflow tail. */
+export const PER_COMPANY_CAP = 2
+
+/**
+ * Keep the shortlist varied. A big employer (e.g. Stripe posting 40 roles)
+ * would otherwise flood the top of the ranked list. Walk the jobs in ranked
+ * order and let each company place its best `cap` roles up front; a company's
+ * cap+1th role and beyond drop to an overflow tail (still ranked, still shown
+ * via "show more") — nothing is removed, the top just reads as a spread of
+ * companies instead of one.
+ */
+export function diversifyByCompany(
+  jobs: RankedJob[],
+  cap = PER_COMPANY_CAP,
+): RankedJob[] {
+  const primary: RankedJob[] = []
+  const overflow: RankedJob[] = []
+  const seen = new Map<string, number>()
+  for (const job of jobs) {
+    const key = job.company.trim().toLowerCase()
+    const count = seen.get(key) ?? 0
+    if (count < cap) {
+      primary.push(job)
+      seen.set(key, count + 1)
+    } else {
+      overflow.push(job)
+    }
+  }
+  return [...primary, ...overflow]
+}
+
 /** Run discover → audit → score → rank on a résumé. */
 export async function runPipeline(
   providers: Providers,
@@ -94,7 +125,7 @@ export async function runPipelineFromResume(
     if (c !== 0) return c
     return a.ranked.id.localeCompare(b.ranked.id)
   })
-  const jobs: RankedJob[] = scored.map((s) => s.ranked)
+  const jobs = diversifyByCompany(scored.map((s) => s.ranked))
 
   return {
     resume,

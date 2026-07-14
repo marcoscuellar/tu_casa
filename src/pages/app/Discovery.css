@@ -169,6 +169,30 @@
   letter-spacing: 0.06em;
   margin-top: 5px;
 }
+/* Meta as pill chips: company · location · industry */
+.disc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+.disc-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 15, 15, 0.05);
+  color: var(--muted);
+  border: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+.disc-card-top .disc-pill {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--on-dark-66);
+  border-color: rgba(255, 255, 255, 0.16);
+}
 .disc-chevron {
   flex-shrink: 0;
   font-weight: 400;

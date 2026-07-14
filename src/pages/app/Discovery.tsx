@@ -226,9 +226,11 @@ export function Discovery() {
             const isApplied = applied.has(job.id)
             const flagged = job.audit.recheck === 'flagged'
             const matched = skillsInPosting(resume, job)
-            const meta = [job.company, prettyLocation(job.location), job.industryLabel]
-              .filter(Boolean)
-              .join(' · ')
+            const metaParts = [
+              job.company,
+              prettyLocation(job.location),
+              job.industryLabel,
+            ].filter(Boolean) as string[]
 
             return (
               <div
@@ -262,8 +264,12 @@ export function Discovery() {
                         </span>
                       )}
                     </div>
-                    <div className={`disc-meta mono-label ${top ? 'muted-dark' : 'muted-light'}`}>
-                      {meta}
+                    <div className="disc-pills">
+                      {metaParts.map((p) => (
+                        <span key={p} className="disc-pill">
+                          {p}
+                        </span>
+                      ))}
                     </div>
                   </div>
                   <span className="disc-chevron" aria-hidden>

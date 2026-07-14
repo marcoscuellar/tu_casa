@@ -276,6 +276,183 @@ export function Landing() {
           </div>
         </div>
 
+        {/* Founder — built by a staffing insider (turn 11) */}
+        <section className="lp-founder">
+          <div className="lp-founder-main">
+            <div className="lp-founder-photo">
+              <img src="/marcos.png" alt="Marcos Cuellar, founder of TuCasa" />
+            </div>
+            <div className="lp-founder-copy">
+              <div className="lp-founder-eyebrow">Why trust us</div>
+              <h2 className="lp-founder-head">
+                I built this for my sister. It landed her the job. Now it&rsquo;s
+                for you.
+              </h2>
+              <p className="lp-founder-body">
+                14 years in staffing. I built the AI engines recruiters rely on —
+                one that verifies a job is real, one that checks whether a
+                candidate actually fits, and one that researches the company
+                behind the role. When my sister was job hunting, I pointed all
+                three at her search. It landed her the job. TuCasa is those same
+                engines, rebuilt for job seekers — free.
+              </p>
+              <div className="lp-founder-quote">
+                The interview cheat sheet? I built that for me first. I pointed my
+                client intelligence engine at the company and asked it to predict
+                what they&rsquo;d ask — it pulled real intel, past and where
+                they&rsquo;re headed, and even flagged their AI capabilities so I
+                could speak to it. It was spot on. That&rsquo;s the reason I
+                stopped walking into interviews cold. Now it builds one for you,
+                automatically, for the exact role.
+              </div>
+              <div className="lp-founder-by">
+                <a
+                  className="lp-founder-name"
+                  href="https://www.linkedin.com/in/marcosmcuellar/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Marcos Cuellar
+                </a>
+                <span className="lp-founder-sep">·</span>
+                <span className="lp-founder-role">Founder · 14 yrs in staffing</span>
+              </div>
+              <div className="lp-founder-chips">
+                <span className="lp-founder-chip">14 yrs in staffing · GLVE</span>
+                <span className="lp-founder-chip">Builds tools for ADHD folks</span>
+              </div>
+            </div>
+          </div>
+          <div className="lp-founder-engine">
+            <div className="lp-founder-eyebrow">One engine, search to offer</div>
+            <div className="lp-engine-steps">
+              {[
+                ['01', 'Find', 'Scans ~40 job boards, then verifies openings against the employer’s own ATS. No ghost jobs.'],
+                ['02', 'Fit', 'QA’s your résumé against the role’s real requirements. Honest scores, no keyword-stuffing.'],
+                ['03', 'Apply', 'Company intel tailors your résumé to what this employer actually wants.'],
+                ['04', 'Interview', 'Builds a live cheat sheet from real company research — questions, answers, and what they care about.'],
+              ].map(([n, label, desc], i) => (
+                <div className="lp-engine-cell" key={n}>
+                  {i > 0 && <span className="lp-engine-arrow" aria-hidden>→</span>}
+                  <div className="lp-engine-step">
+                    <div className="lp-engine-top">
+                      <span className="lp-engine-n">{n}</span>
+                      <span className="lp-engine-label">{label}</span>
+                    </div>
+                    <div className="lp-engine-desc">{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lp-engine-foot">
+              The same engines recruiters pay for — now pointed at your job hunt.
+            </div>
+          </div>
+        </section>
+
+        {/* Trust / proof (turn 10) */}
+        <section className="lp-trust">
+          <div className="lp-trust-stats">
+            <div className="lp-trust-eyebrow">Proof, not promises</div>
+            <div className="lp-trust-grid">
+              <div className="lp-stat-item">
+                <div className="lp-stat-num">
+                  1<span className="lp-stat-unit"> in 7</span>
+                </div>
+                <div className="lp-stat-desc">
+                  job postings are ghost jobs — live 30+ days with no real hiring.
+                  We filter them out.
+                </div>
+                <div className="lp-stat-src">
+                  Clarify Capital · 176,268 Indeed listings · Feb 2026
+                </div>
+              </div>
+              <div className="lp-stat-item">
+                <div className="lp-stat-num">
+                  4.76<span className="lp-stat-unit"> interviews</span>
+                </div>
+                <div className="lp-stat-desc">
+                  is all the average seeker lands — from 62.6 applications. We fix
+                  the ratio.
+                </div>
+                <div className="lp-stat-src">
+                  United Way NCA job-search survey · 2026
+                </div>
+              </div>
+              <div className="lp-stat-item">
+                <div className="lp-stat-num">
+                  93<span className="lp-stat-unit">%</span>
+                </div>
+                <div className="lp-stat-desc">
+                  of HR pros say their employer posts ghost jobs — 45% do it
+                  regularly.
+                </div>
+                <div className="lp-stat-src">LiveCareer HR survey · Mar 2025</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lp-trust-quotes-head">
+            <div className="lp-trust-eyebrow-teal">From early users</div>
+            <div className="lp-trust-sample">sample — swap with real beta quotes</div>
+          </div>
+          <div className="lp-trust-quotes">
+            <div className="lp-quote">
+              <div className="lp-quote-text">
+                “Uploaded my résumé, had 9 real matches by lunch. No ghost jobs, no
+                rabbit holes.”
+              </div>
+              <div className="lp-quote-by">
+                <div className="lp-quote-av">DR</div>
+                <div>
+                  <div className="lp-quote-name">Dani R.</div>
+                  <div className="lp-quote-role">Data analyst · Chicago</div>
+                </div>
+              </div>
+            </div>
+            <div className="lp-quote">
+              <div className="lp-quote-text">
+                “The fit score told me which jobs to skip. That’s the part I
+                actually needed.”
+              </div>
+              <div className="lp-quote-by">
+                <div className="lp-quote-av lp-quote-av-dark">MO</div>
+                <div>
+                  <div className="lp-quote-name">Marcus O.</div>
+                  <div className="lp-quote-role">Ops manager · remote</div>
+                </div>
+              </div>
+            </div>
+            <div className="lp-quote">
+              <div className="lp-quote-text">
+                “Walked into the interview with the cheat sheet already in my head.
+                Got the offer.”
+              </div>
+              <div className="lp-quote-by">
+                <div className="lp-quote-av">SL</div>
+                <div>
+                  <div className="lp-quote-name">Sofia L.</div>
+                  <div className="lp-quote-role">Recruiter · Austin</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lp-trust-free">
+            <div>
+              <div className="lp-free-title">
+                Free for job seekers. So how do we eat?
+              </div>
+              <div className="lp-free-desc">
+                Employers pay to reach verified, well-matched candidates.
+                You&rsquo;re the seeker — never the product. We don&rsquo;t sell
+                your data.
+              </div>
+            </div>
+            <div className="lp-free-chip">No card · No catch</div>
+          </div>
+        </section>
+
         {/* Pricing */}
         <section className="lp-pricing" id="pricing">
           <div className="lp-pricing-head">

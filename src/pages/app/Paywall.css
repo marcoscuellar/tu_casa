@@ -102,12 +102,82 @@
   font-weight: 800;
   font-size: 17px;
 }
-.paywall-buy {
-  margin-top: 18px;
-  background: var(--red);
+/* Flat-Pro plan card */
+.paywall-pro {
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  flex: 1;
+}
+.paywall-pro-tag {
+  align-self: flex-start;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
   color: #fff;
-  border-radius: 12px;
-  padding: 16px;
+  background: var(--accent);
+  padding: 4px 11px;
+  border-radius: 100px;
+  margin-bottom: 14px;
+}
+.paywall-pro-name {
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.paywall-pro-price {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--ink);
+  margin-top: 6px;
+}
+.paywall-pro-per {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey);
+}
+.paywall-pro-feats {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin: 20px 0 22px;
+}
+.paywall-pro-feats li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.paywall-pro-feats li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 800;
+}
+.paywall-buy {
+  margin-top: auto;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 14px 22px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.paywall-buy:hover {
+  filter: brightness(1.08);
 }
 .paywall-later {
   margin-top: 10px;

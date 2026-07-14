@@ -1,33 +1,21 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
 import './flow.css'
 import './Paywall.css'
 
-interface Pack {
-  id: string
-  count: number
-  name: string
-  price: string
-  best?: boolean
-}
-
-const PACKS: Pack[] = [
-  { id: 'starter', count: 3, name: 'Starter', price: '$9' },
-  { id: 'season', count: 10, name: 'Season', price: '$22', best: true },
-]
-
+/**
+ * Flat-Pro upsell (reskin Phase 4.1). Finding + fit + one AI résumé tailor stay
+ * free; unlimited tailoring and interview cheat sheets are Pro ($15/mo). No real
+ * billing yet — "Go Pro" grants an ample balance so the cheat-sheet flow keeps
+ * working, standing in for a real subscription until Stripe is wired.
+ */
 export function Paywall() {
   const navigate = useNavigate()
   const { cheatCompany, cheatRole, addCredits, consumeSheet } = useAppFlow()
-  const [selected, setSelected] = useState('season')
 
-  const buy = () => {
-    const pack = PACKS.find((p) => p.id === selected) ?? PACKS[1]
-    // In production: process the purchase, then credit the balance.
-    addCredits(pack.count)
-    // Immediately spend one on the sheet they came here to build.
+  const goPro = () => {
+    addCredits(999)
     consumeSheet()
     navigate('/cheat-generating')
   }
@@ -37,20 +25,19 @@ export function Paywall() {
       <div className="paywall-grid pop grid-collapse">
         {/* Left */}
         <div className="blk blk-black paywall-left">
-          <div className="eyebrow">The first one was on us</div>
+          <div className="eyebrow">Finding &amp; fit stay free</div>
           <div>
             <h1 className="head paywall-head">
               Nailed the
               <br />
               first one?
               <br />
-              <span className="red">Keep going.</span>
+              <span className="red">Go Pro.</span>
             </h1>
             <p className="paywall-body">
-              Finding jobs and checking your fit stay free, forever. Interview
-              cheat sheets run on credits — because each one is fresh, live
-              research built for one specific room. We hope you won&rsquo;t need
-              many.
+              Finding jobs, checking your fit, and one AI résumé tailor stay
+              free — forever. Pro unlocks the heavy AI lifts: unlimited résumé
+              tailoring and a live interview cheat sheet for every room.
             </p>
           </div>
           <div className="paywall-ready mono-label">
@@ -58,43 +45,33 @@ export function Paywall() {
           </div>
         </div>
 
-        {/* Right */}
+        {/* Right — single Pro plan */}
         <div className="blk blk-white paywall-right">
-          <div className="paywall-credits-label mono-label">
-            Cheat sheet credits
+          <div className="paywall-pro">
+            <span className="paywall-pro-tag mono-label">Most seekers</span>
+            <div className="paywall-pro-name">Pro</div>
+            <div className="paywall-pro-price">
+              $15<span className="paywall-pro-per">/mo · cancel anytime</span>
+            </div>
+            <ul className="paywall-pro-feats">
+              <li>Unlimited AI résumé tailoring — re-done for each role</li>
+              <li>
+                Interview cheat sheets for every interview — company intel,
+                likely questions, ready answers
+              </li>
+              <li>Up to 20 cheat sheets a month</li>
+            </ul>
+            <button className="paywall-buy" onClick={goPro}>
+              Go Pro →
+            </button>
+            <button className="paywall-later" onClick={() => navigate('/discovery')}>
+              Maybe later — keep looking
+            </button>
+            <p className="paywall-foot">
+              Job hunts end. Cancel the moment you land the offer. Finding &amp;
+              fit always free.
+            </p>
           </div>
-          <div className="paywall-packs">
-            {PACKS.map((p) => (
-              <button
-                key={p.id}
-                className={`paywall-pack ${p.best ? 'is-best' : ''} ${
-                  selected === p.id ? 'is-selected' : ''
-                }`}
-                onClick={() => setSelected(p.id)}
-                aria-pressed={selected === p.id}
-              >
-                {p.best && <span className="paywall-ribbon">Best value</span>}
-                <div className={`paywall-pack-num ${p.best ? 'red' : ''}`}>
-                  {p.count}
-                </div>
-                <div className="paywall-pack-mid">
-                  <div className="paywall-pack-name">{p.name}</div>
-                  <div className="paywall-pack-sub">{p.count} cheat sheets</div>
-                </div>
-                <div className="paywall-pack-price">{p.price}</div>
-              </button>
-            ))}
-          </div>
-          <button className="btn btn-red-to-black paywall-buy" onClick={buy}>
-            Get credits &amp; build it
-          </button>
-          <button className="paywall-later" onClick={() => navigate('/discovery')}>
-            Maybe later — keep looking
-          </button>
-          <p className="paywall-foot">
-            No subscription. Credits don&rsquo;t expire. Finding &amp; fit always
-            free.
-          </p>
         </div>
       </div>
     </AppShell>

@@ -312,7 +312,7 @@ export function Landing() {
               <div className="lp-tier-tag">Most seekers</div>
               <div className="lp-tier-name">Pro</div>
               <div className="lp-tier-price">
-                $12<span className="lp-tier-per">/mo · cancel anytime</span>
+                $15<span className="lp-tier-per">/mo · cancel anytime</span>
               </div>
               <p className="lp-tier-desc">
                 For when you&rsquo;re actively interviewing. Everything in Free, plus:

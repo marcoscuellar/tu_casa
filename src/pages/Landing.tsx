@@ -276,8 +276,71 @@ export function Landing() {
           </div>
         </div>
 
+        {/* Pricing */}
+        <section className="lp-pricing" id="pricing">
+          <div className="lp-pricing-head">
+            <div className="lp-pricing-eyebrow">Pricing</div>
+            <h2 className="lp-pricing-title">Finding real jobs is free. Always.</h2>
+            <p className="lp-pricing-sub">
+              You never pay to search, verify, or see your fit. You only pay when
+              the AI does personalized work for you — because that runs on a
+              frontier model.
+            </p>
+          </div>
+
+          <div className="lp-tiers">
+            {/* Free */}
+            <div className="lp-tier">
+              <div className="lp-tier-name">Free</div>
+              <div className="lp-tier-price">
+                $0<span className="lp-tier-per"> · no card</span>
+              </div>
+              <p className="lp-tier-desc">Everything you need to find the right roles.</p>
+              <ul className="lp-tier-feats">
+                <li>Verified matches from ~40 boards</li>
+                <li>Ghost jobs filtered — every listing checked against the employer&rsquo;s ATS</li>
+                <li>Honest fit scores on every role</li>
+                <li>Tailor your résumé for one role with AI</li>
+              </ul>
+              <Link to="/upload" className="lp-tier-cta">
+                Upload your résumé — free
+              </Link>
+            </div>
+
+            {/* Pro */}
+            <div className="lp-tier lp-tier-pro">
+              <div className="lp-tier-tag">Most seekers</div>
+              <div className="lp-tier-name">Pro</div>
+              <div className="lp-tier-price">
+                $12<span className="lp-tier-per">/mo · cancel anytime</span>
+              </div>
+              <p className="lp-tier-desc">
+                For when you&rsquo;re actively interviewing. Everything in Free, plus:
+              </p>
+              <ul className="lp-tier-feats">
+                <li>Unlimited AI résumé tailoring — re-done for each role</li>
+                <li>
+                  Interview cheat sheets for every interview — company intel, likely
+                  questions, ready answers
+                </li>
+                <li>Up to 20 cheat sheets a month</li>
+              </ul>
+              <Link to="/signup" className="lp-tier-cta lp-tier-cta-pro">
+                Go Pro
+              </Link>
+              <div className="lp-tier-note">
+                Job hunts end. Cancel the moment you land the offer.
+              </div>
+            </div>
+          </div>
+
+          <div className="lp-pricing-foot">
+            Built with Claude. AI-generated — always review before you send.
+          </div>
+        </section>
+
         {/* Final CTA */}
-        <div className="lp-final" id="pricing">
+        <div className="lp-final">
           <div className="lp-final-head">
             APPLY TO LESS GHOST JOBS.
             <br />

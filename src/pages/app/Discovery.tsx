@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
+import { loadUserStore, saveUserStore, type SavedJob } from '../../lib/userStore'
 import type { ParsedResume, RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
@@ -93,7 +94,7 @@ function skillsInPosting(resume: ParsedResume | undefined, job: RankedJob): stri
 
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, loading, selectJob, hasAccount, resume } =
+  const { candidateName, candidateRole, jobs, loading, selectJob, hasAccount, email, resume } =
     useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
   const [openId, setOpenId] = useState<string | null>(null)
@@ -106,18 +107,54 @@ export function Discovery() {
     }
   })
 
+  // Hydrate from the KV store when signed in. If the store isn't connected yet
+  // (or the fetch fails) this no-ops and the localStorage-seeded state stands.
+  useEffect(() => {
+    if (!email) return
+    let alive = true
+    void loadUserStore(email).then((store) => {
+      if (!alive || !store) return
+      setApplied(new Set(store.applied))
+      setListSaved(store.saved.length > 0)
+    })
+    return () => {
+      alive = false
+    }
+  }, [email])
+
+  // Persist locally (instant, offline) AND to the store (cross-device).
+  const persistApplied = (ids: string[]) => {
+    try {
+      localStorage.setItem(APPLIED_KEY, JSON.stringify(ids))
+    } catch {
+      /* ignore storage failures — tracking is best-effort */
+    }
+    void saveUserStore(email, { applied: ids })
+  }
+
   // Saving the shortlist is an account feature — send them to sign in first,
-  // otherwise persist the ranked ids so the list survives a refresh.
+  // otherwise persist a snapshot of the ranked list (survives a refresh, and
+  // follows the user across devices once KV is connected).
   const saveList = () => {
     if (!hasAccount) {
       navigate('/signup', { state: { next: '/discovery' } })
       return
     }
+    const snapshots: SavedJob[] = jobs.map((j) => ({
+      id: j.id,
+      role: j.role,
+      company: j.company,
+      location: j.location,
+      score: j.fit.score,
+      link: j.link,
+      salary: j.salary,
+    }))
     try {
-      localStorage.setItem(SAVED_KEY, JSON.stringify(jobs.map((j) => j.id)))
+      localStorage.setItem(SAVED_KEY, JSON.stringify(snapshots.map((s) => s.id)))
     } catch {
       /* ignore storage failures — saving is best-effort */
     }
+    void saveUserStore(email, { saved: snapshots })
     setListSaved(true)
   }
 
@@ -127,17 +164,11 @@ export function Discovery() {
       navigate('/signup', { state: { next: '/discovery' } })
       return
     }
-    setApplied((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      try {
-        localStorage.setItem(APPLIED_KEY, JSON.stringify([...next]))
-      } catch {
-        /* ignore storage failures — tracking is best-effort */
-      }
-      return next
-    })
+    const next = new Set(applied)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setApplied(next)
+    persistApplied([...next])
   }
 
   const fullFit = (job: RankedJob) => {

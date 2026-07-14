@@ -16,6 +16,7 @@ await build({
   entryPoints: {
     'parse-resume': 'functions-src/parse-resume.ts',
     discover: 'functions-src/discover.ts',
+    'user-store': 'functions-src/user-store.ts',
   },
   outdir: 'api',
   bundle: true,
@@ -25,4 +26,4 @@ await build({
   logLevel: 'info',
 })
 
-console.log('✓ Bundled serverless functions → api/parse-resume.js, api/discover.js')
+console.log('✓ Bundled serverless functions → api/parse-resume.js, api/discover.js, api/user-store.js')

@@ -374,21 +374,8 @@
   user-select: none;
   transition: background 0.18s, border-color 0.18s;
 }
-/* Open card comes alive in teal (dark text stays legible on the bright fill). */
-.lp-acc.is-open {
-  background: var(--accent-soft);
-  border-color: var(--accent-soft);
-}
-.lp-acc.is-open .lp-acc-name,
-.lp-acc.is-open .lp-acc-sign {
-  color: var(--ink);
-}
-.lp-acc.is-open .lp-acc-n {
-  color: rgba(15, 15, 15, 0.55);
-}
-.lp-acc.is-open .lp-acc-body {
-  color: rgba(15, 15, 15, 0.82);
-}
+/* The header stays light; only the panel that unfolds turns blue (see
+   .lp-acc-body below). */
 .lp-acc-top {
   display: flex;
   align-items: center;
@@ -416,10 +403,14 @@
   color: rgba(0, 0, 0, 0.35);
   padding: 6px 22px 0;
 }
+/* The unfolding panel — the blue part. Header above it stays white. */
 .lp-acc-body {
-  padding: 14px 22px 22px;
+  margin-top: 12px;
+  padding: 18px 22px 22px;
+  background: var(--accent-soft);
   font-size: 12.5px;
-  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+  color: var(--ink);
   line-height: 1.55;
 }
 .lp-acc-spacer {

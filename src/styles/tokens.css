@@ -3,21 +3,23 @@
    Canonical values from the design handoff (App Flow palette).
    ============================================================ */
 :root {
-  /* Colors */
+  /* Colors — teal-led "2b" palette (reskin) */
   --paper: #ffffff; /* page background — white */
-  --card: #edebe4; /* "crete" — warm concrete card surface on the white page */
-  --ink: #0f0f0f;
-  /* Brand accent — burgundy + teal. Two tones: the deep burgundy for fills and
-     accent text on light surfaces, and the teal for accent text/marks that sit
-     on the near-black bento (the burgundy would vanish there). */
-  --accent: #640018; /* burgundy — fills + accent text on light */
-  --accent-soft: #3fbfc9; /* teal — accent marks on the dark bento */
+  --card: #f5f2ea; /* warm off-white — every card that used to be #fff */
+  --cream: #f5f1e8; /* landing statement bands */
+  --bento: #0b1020; /* dark bento surface */
+  --ink: #0f0f0f; /* ink text / darkest */
+  /* Brand accent — teal-led. Teal fills + accent text on light; bright teal for
+     marks on the dark #0b1020 bento; burgundy is a SPARING secondary only. */
+  --accent: #00747d; /* teal — primary accent */
+  --accent-soft: #3fbfc9; /* bright teal — accent marks on the dark bento */
   --accent-teal-ink: #0e8f9b; /* deeper teal — teal accent text on light surfaces */
-  /* Legacy alias: everything authored as var(--red) now renders the deep navy.
-     On-dark accent text is overridden to var(--accent-soft) per surface. */
+  --burgundy: #640018; /* sparing secondary (plain card score, founder border) */
+  /* Legacy alias: everything authored as var(--red) now renders teal. */
   --red: var(--accent);
   --white: #ffffff;
   --field: #f4f2ec; /* field fill on light */
+  --chip-neutral: #f0ede4; /* neutral chip fill */
   --muted: #6b6b6b; /* muted text on light */
   --grey: #9a968c; /* secondary / label grey */
 
@@ -28,7 +30,7 @@
   --on-dark-40: rgba(255, 255, 255, 0.4);
 
   /* Borders */
-  --hairline: rgba(15, 15, 15, 0.1);
+  --hairline: rgba(15, 15, 15, 0.12);
   --hairline-14: rgba(15, 15, 15, 0.14);
   --border-light: rgba(15, 15, 15, 0.2);
   --border-dark: rgba(255, 255, 255, 0.16);

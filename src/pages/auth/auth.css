@@ -27,7 +27,7 @@
   max-width: 410px;
   width: 100%;
   text-align: center;
-  background: var(--ink);
+  background: var(--bento);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
   box-shadow: 0 2px 5px rgba(17, 17, 17, 0.06), 0 14px 40px rgba(17, 17, 17, 0.28);
@@ -137,7 +137,7 @@
 .onb-card {
   max-width: 460px;
   width: 100%;
-  background: var(--ink);
+  background: var(--bento);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
   box-shadow: 0 2px 5px rgba(17, 17, 17, 0.06), 0 14px 40px rgba(17, 17, 17, 0.14);

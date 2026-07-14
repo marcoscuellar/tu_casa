@@ -422,7 +422,7 @@
 .confirm-aside-callout {
   margin-top: auto;
   padding: 18px 20px;
-  background: var(--ink);
+  background: var(--bento);
   border-radius: 14px;
   display: flex;
   flex-direction: column;

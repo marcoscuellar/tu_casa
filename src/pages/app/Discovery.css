@@ -74,7 +74,7 @@
   transition: box-shadow 0.15s;
 }
 .disc-card-top {
-  background: var(--ink);
+  background: var(--bento);
   color: #fff;
 }
 .disc-card-plain {
@@ -345,7 +345,7 @@
   color: var(--muted);
 }
 .disc-more-btn {
-  background: var(--ink);
+  background: var(--bento);
   color: #fff;
   border: none;
   border-radius: 100px;

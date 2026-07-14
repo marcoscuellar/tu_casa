@@ -170,7 +170,7 @@
 
 /* "Why this role exists" callout */
 .cheat-why {
-  background: var(--ink);
+  background: var(--bento);
   color: #fff;
   border-radius: 16px;
   padding: 20px 22px;
@@ -271,7 +271,7 @@
 
 /* Posture */
 .cheat-posture {
-  background: var(--ink);
+  background: var(--bento);
   color: #fff;
   border-radius: 18px;
   padding: 28px 30px;

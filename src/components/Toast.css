@@ -3,7 +3,7 @@
   left: 50%;
   bottom: 24px;
   transform: translateX(-50%);
-  background: var(--ink);
+  background: var(--bento);
   color: #fff;
   font-family: var(--mono);
   font-size: 11px;

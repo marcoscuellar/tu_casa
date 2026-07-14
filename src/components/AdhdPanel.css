@@ -52,7 +52,7 @@
   transition: background 0.15s, color 0.15s;
 }
 .adhd-close:hover {
-  background: #0a0a0a;
+  background: var(--bento);
   color: #fff;
 }
 .adhd-body {
@@ -71,7 +71,7 @@
 }
 .adhd-timer {
   margin-top: 16px;
-  background: #0a0a0a;
+  background: var(--bento);
   color: #fff;
   padding: 16px;
   border-radius: 14px;
@@ -92,7 +92,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #0a0a0a;
+  background: var(--bento);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,7 +130,7 @@
   border: 1.5px solid rgba(236, 232, 222, 0.5);
 }
 .adhd-btn-dark {
-  background: #0a0a0a;
+  background: var(--bento);
   color: #fff;
   border: none;
 }
@@ -161,7 +161,7 @@
   transition: background 0.16s, color 0.16s;
 }
 .adhd-try:hover {
-  background: #0a0a0a;
+  background: var(--bento);
   color: #fff;
   border-color: #0a0a0a;
 }
@@ -212,7 +212,7 @@
   cursor: pointer;
 }
 .adhd-offload-remove:hover {
-  background: #0a0a0a;
+  background: var(--bento);
   color: #fff;
 }
 .adhd-mood {

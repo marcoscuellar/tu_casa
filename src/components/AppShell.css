@@ -68,7 +68,7 @@
   white-space: nowrap;
 }
 .tc-adhd-pill:hover {
-  background: var(--ink);
+  background: var(--bento);
   color: #fff;
   border-color: var(--ink);
 }

@@ -131,7 +131,7 @@ export function Upload() {
                 </a>
               </p>
               <p className="upload-sample">
-                Don&rsquo;t have a résumé yet?{' '}
+                Don&rsquo;t have one?{' '}
                 <a
                   className="upload-sample-link"
                   onClick={() => navigate('/builder')}
@@ -139,7 +139,7 @@ export function Upload() {
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && navigate('/builder')}
                 >
-                  Build one in a minute →
+                  We got you — let AI build it →
                 </a>
               </p>
               {pipelineError && <p className="upload-error">{pipelineError}</p>}

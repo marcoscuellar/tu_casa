@@ -267,7 +267,8 @@ export function ConfirmInfo() {
               Industry / field <span className="confirm-count">{industriesList.length}</span>
             </span>
             <span className="confirm-field-hint">
-              We use this to float same-field roles to the top — worth a quick check.
+              Steer what surfaces — add fields you&rsquo;d move into, remove ones
+              you&rsquo;re done with.
             </span>
             {industriesList.length > 0 ? (
               <div className="confirm-chips">

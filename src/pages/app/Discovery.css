@@ -68,14 +68,19 @@
 
 /* Card — collapsed head + expandable body */
 .disc-card {
-  border-radius: 22px;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 10px 28px -16px rgba(0, 0, 0, 0.18);
   transition: box-shadow 0.15s;
 }
+/* Top match: bright white with a 2px teal border + teal score (board turn 12) */
 .disc-card-top {
-  background: var(--bento);
-  color: #fff;
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid var(--accent);
+}
+.disc-card-top .disc-score {
+  color: var(--accent);
 }
 .disc-card-plain {
   background: var(--card);
@@ -106,7 +111,7 @@
   font-weight: 900;
   font-size: 40px;
   line-height: 1;
-  color: var(--accent-teal-ink);
+  color: var(--burgundy);
 }
 .disc-score-label {
   font-size: 9px;
@@ -146,10 +151,6 @@
   padding: 3px 9px;
   white-space: nowrap;
 }
-.disc-card-top .disc-applied-badge {
-  color: #59e08a;
-  border-color: #59e08a;
-}
 .disc-flag {
   font-family: var(--mono);
   font-size: 9.5px;
@@ -167,8 +168,25 @@
 }
 .disc-meta {
   font-size: 11px;
-  letter-spacing: 0.06em;
-  margin-top: 5px;
+  letter-spacing: 0.05em;
+  color: var(--grey);
+  margin-top: 6px;
+}
+/* Matched-skill chips in the card head (board turn 12) */
+.disc-head-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+.disc-head-chip {
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 11px;
+  color: #fff;
+  background: var(--accent);
+  padding: 3px 10px;
+  border-radius: 20px;
 }
 /* Meta as pill chips: company · location · industry */
 .disc-pills {
@@ -188,11 +206,6 @@
   color: var(--muted);
   border: 1px solid var(--hairline);
   white-space: nowrap;
-}
-.disc-card-top .disc-pill {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--on-dark-66);
-  border-color: rgba(255, 255, 255, 0.16);
 }
 .disc-chevron {
   flex-shrink: 0;
@@ -219,9 +232,6 @@
   color: var(--muted);
   line-height: 1.45;
 }
-.disc-card-top .disc-body-note {
-  color: rgba(255, 255, 255, 0.6);
-}
 .disc-desc {
   margin: 0;
   font-size: 14px;
@@ -229,17 +239,11 @@
   color: var(--muted);
   max-width: 78ch;
 }
-.disc-card-top .disc-desc {
-  color: rgba(255, 255, 255, 0.72);
-}
 .disc-body-label {
   font-size: 10px;
   letter-spacing: 0.12em;
   color: var(--muted);
   margin-bottom: 9px;
-}
-.disc-card-top .disc-body-label {
-  color: var(--on-dark-50);
 }
 .disc-match-chips {
   display: flex;
@@ -257,11 +261,6 @@
   color: var(--accent-teal-ink);
   border: 1px solid rgba(63, 191, 201, 0.4);
 }
-.disc-card-top .disc-match-chip {
-  background: rgba(63, 191, 201, 0.16);
-  color: var(--accent-soft);
-  border-color: rgba(63, 191, 201, 0.42);
-}
 
 /* Actions */
 .disc-card-actions {
@@ -271,64 +270,147 @@
   align-items: center;
 }
 .disc-apply-btn {
-  background: var(--red);
+  background: var(--accent);
   color: #fff;
   text-decoration: none;
   font-family: var(--font);
   font-weight: 700;
-  font-size: 13.5px;
-  padding: 13px 22px;
-  border-radius: 11px;
+  font-size: 13px;
+  padding: 12px 20px;
+  border-radius: 100px;
   transition: filter 0.15s;
 }
 .disc-apply-btn:hover {
-  filter: brightness(0.92);
+  filter: brightness(1.08);
   color: #fff;
 }
 .disc-fit-btn {
-  background: transparent;
-  border: 1px solid var(--border-light);
-  color: inherit;
+  background: #fff;
+  border: 1px solid var(--accent);
+  color: var(--accent);
   font-family: var(--font);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
-  padding: 12px 18px;
-  border-radius: 11px;
+  padding: 12px 20px;
+  border-radius: 100px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-.disc-card-top .disc-fit-btn {
-  border-color: var(--border-dark);
+  transition: background 0.15s, color 0.15s;
 }
 .disc-fit-btn:hover {
-  border-color: var(--red);
-  color: var(--red);
+  background: var(--accent);
+  color: #fff;
 }
 .disc-applied-btn {
   margin-left: auto;
-  background: transparent;
-  border: 1px solid var(--border-light);
-  color: inherit;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 12px 16px;
-  border-radius: 11px;
+  background: var(--chip-neutral);
+  border: none;
+  color: var(--muted);
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 12px 20px;
+  border-radius: 100px;
   cursor: pointer;
   transition: all 0.15s;
 }
-.disc-card-top .disc-applied-btn {
-  border-color: var(--border-dark);
-}
 .disc-applied-btn:hover {
-  border-color: #128a3e;
-  color: #128a3e;
+  color: var(--ink);
 }
 .disc-applied-btn.is-on {
-  background: #128a3e;
-  border-color: #128a3e;
+  background: var(--accent);
   color: #fff;
+}
+
+/* Save-my-shortlist bar (board turn 13) */
+.disc-savebar {
+  margin-top: 16px;
+  background: var(--bento);
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.disc-savebar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.disc-savebar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.disc-savebar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.disc-savebar-title {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+}
+.disc-savebar-sub {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  max-width: 42ch;
+}
+.disc-savebar-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.disc-savebar-input {
+  font-family: var(--font);
+  font-size: 13px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 11px 16px;
+  border-radius: 100px;
+  min-width: 180px;
+  transition: border-color 0.15s;
+}
+.disc-savebar-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.disc-savebar-input:focus {
+  outline: none;
+  border-color: var(--accent-soft);
+}
+.disc-savebar-btn {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  padding: 11px 22px;
+  border-radius: 100px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s;
+}
+.disc-savebar-btn:hover {
+  filter: brightness(1.1);
+}
+@media (max-width: 560px) {
+  .disc-savebar-form {
+    width: 100%;
+  }
+  .disc-savebar-input {
+    flex: 1;
+  }
 }
 
 /* Show-more control under the shortlist */
@@ -401,17 +483,19 @@
   }
 }
 
-/* Structured facts row inside the expanded card */
+/* Structured facts grid inside the expanded card (board: 3 columns) */
 .disc-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 36px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 20px;
   padding: 18px 0;
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
 }
-.disc-card-top .disc-facts {
-  border-color: rgba(255, 255, 255, 0.14);
+@media (max-width: 560px) {
+  .disc-facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .disc-fact-label {
   font-size: 9.5px;
@@ -419,18 +503,12 @@
   color: var(--muted);
   margin-bottom: 6px;
 }
-.disc-card-top .disc-fact-label {
-  color: var(--on-dark-50);
-}
 .disc-fact-val {
   font-family: var(--font);
   font-weight: 800;
   font-size: 15px;
   letter-spacing: -0.02em;
   color: var(--ink);
-}
-.disc-card-top .disc-fact-val {
-  color: #fff;
 }
 .disc-section {
   display: flex;
@@ -449,23 +527,10 @@
 .disc-field-tag.is-same {
   color: #128a3e;
 }
-.disc-card-top .disc-field-tag.is-same {
-  color: #59e08a;
-}
 .disc-field-tag.is-diff {
   color: var(--red);
 }
-.disc-card-top .disc-field-tag.is-diff {
-  color: var(--accent-soft);
-}
 /* Accent text/marks on the featured (black) card use the lighter tone. */
-.disc-card-top .disc-score,
-.disc-card-top .disc-measure-gap {
-  color: var(--accent-soft);
-}
-.disc-card-top .disc-field-note.is-diff {
-  border-left-color: var(--accent-soft);
-}
 .disc-field-note {
   padding-left: 12px;
   border-left: 2px solid transparent;
@@ -490,14 +555,12 @@
   text-transform: uppercase;
   margin-bottom: 14px;
 }
+/* Board: both measure headers are burgundy; the ✓/△ glyphs are the only signal. */
 .disc-measure-good {
-  color: #128a3e;
-}
-.disc-card-top .disc-measure-good {
-  color: #59e08a;
+  color: var(--burgundy);
 }
 .disc-measure-gap {
-  color: var(--red);
+  color: var(--burgundy);
 }
 .disc-measure-item {
   margin-bottom: 13px;
@@ -509,25 +572,16 @@
   letter-spacing: -0.02em;
   color: var(--ink);
 }
-.disc-card-top .disc-measure-t {
-  color: #fff;
-}
 .disc-measure-d {
   font-size: 12.5px;
   line-height: 1.45;
   color: var(--muted);
   margin-top: 2px;
 }
-.disc-card-top .disc-measure-d {
-  color: rgba(255, 255, 255, 0.6);
-}
 .disc-measure-empty {
   font-size: 13px;
   line-height: 1.5;
   color: var(--muted);
-}
-.disc-card-top .disc-measure-empty {
-  color: rgba(255, 255, 255, 0.55);
 }
 .disc-measure-chips {
   margin-top: 14px;

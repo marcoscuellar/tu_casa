@@ -106,6 +106,7 @@ export function Discovery() {
       return false
     }
   })
+  const [saveEmail, setSaveEmail] = useState(email)
 
   // Hydrate from the KV store when signed in. If the store isn't connected yet
   // (or the fetch fails) this no-ops and the localStorage-seeded state stands.
@@ -132,15 +133,11 @@ export function Discovery() {
     void saveUserStore(email, { applied: ids })
   }
 
-  // Saving the shortlist is an account feature — send them to sign in first,
-  // otherwise persist a snapshot of the ranked list (survives a refresh, and
-  // follows the user across devices once KV is connected).
-  const saveList = () => {
-    if (!hasAccount) {
-      navigate('/signup', { state: { next: '/discovery' } })
-      return
-    }
-    const snapshots: SavedJob[] = jobs.map((j) => ({
+  // Save-my-shortlist bar (board turn 13): email capture, no signup wall. Snapshots
+  // the ranked list keyed by the entered email so it survives reload and can be
+  // emailed/kept updated later.
+  const snapshotJobs = (): SavedJob[] =>
+    jobs.map((j) => ({
       id: j.id,
       role: j.role,
       company: j.company,
@@ -149,12 +146,17 @@ export function Discovery() {
       link: j.link,
       salary: j.salary,
     }))
+
+  const saveShortlist = () => {
+    const addr = saveEmail.trim()
+    if (!/.+@.+\..+/.test(addr)) return
+    const snapshots = snapshotJobs()
     try {
       localStorage.setItem(SAVED_KEY, JSON.stringify(snapshots.map((s) => s.id)))
     } catch {
-      /* ignore storage failures — saving is best-effort */
+      /* best-effort */
     }
-    void saveUserStore(email, { saved: snapshots })
+    void saveUserStore(addr, { saved: snapshots })
     setListSaved(true)
   }
 
@@ -199,14 +201,6 @@ export function Discovery() {
               requirements. Tap any role to see why it fits.
             </p>
           </div>
-          {jobs.length > 0 && (
-            <button
-              className={`disc-save-btn ${listSaved ? 'is-saved' : ''}`}
-              onClick={saveList}
-            >
-              {listSaved ? '★ List saved' : '☆ Save my list'}
-            </button>
-          )}
         </div>
 
         {/* Match list */}
@@ -246,31 +240,28 @@ export function Discovery() {
                 >
                   <div className="disc-score-wrap">
                     <div className="disc-score">{job.fit.score}</div>
-                    <div
-                      className={`disc-score-label mono-label ${
-                        top ? 'muted-dark' : 'muted-light'
-                      }`}
-                    >
-                      Fit score
-                    </div>
+                    <div className="disc-score-label mono-label muted-light">Fit score</div>
                   </div>
                   <div className="disc-mid">
                     <div className="disc-title-row">
                       <div className="disc-title">{job.role}</div>
                       {isApplied && <span className="disc-applied-badge">✓ Applied</span>}
                       {flagged && (
-                        <span className={`disc-flag ${top ? 'disc-flag-dark' : ''}`} title={job.audit.note}>
+                        <span className="disc-flag" title={job.audit.note}>
                           ⚑ Verify
                         </span>
                       )}
                     </div>
-                    <div className="disc-pills">
-                      {metaParts.map((p) => (
-                        <span key={p} className="disc-pill">
-                          {p}
-                        </span>
-                      ))}
-                    </div>
+                    <div className="disc-meta mono-label">{metaParts.join(' · ')}</div>
+                    {matched.length > 0 && (
+                      <div className="disc-head-chips">
+                        {matched.slice(0, 4).map((s) => (
+                          <span key={s} className="disc-head-chip">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <span className="disc-chevron" aria-hidden>
                     {isOpen ? '–' : '+'}
@@ -354,15 +345,6 @@ export function Discovery() {
                               Matched on your title and seniority.
                             </div>
                           )}
-                          {matched.length > 0 && (
-                            <div className="disc-match-chips disc-measure-chips">
-                              {matched.map((s) => (
-                                <span key={s} className="disc-match-chip">
-                                  {s}
-                                </span>
-                              ))}
-                            </div>
-                          )}
                         </div>
                         <div className="disc-measure-col">
                           <div className="disc-measure-head disc-measure-gap">
@@ -432,6 +414,43 @@ export function Discovery() {
             <span className="disc-more-count mono-label">
               That&rsquo;s your top {MAX_SHOWN} — refine your résumé to sharpen the list.
             </span>
+          </div>
+        )}
+
+        {/* Save-my-shortlist bar (turn 13) */}
+        {jobs.length > 0 && (
+          <div className="disc-savebar">
+            <div className="disc-savebar-left">
+              <div className="disc-savebar-icon" aria-hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 4h14a1 1 0 0 1 1 1v15l-8-4-8 4V5a1 1 0 0 1 1-1z" />
+                </svg>
+              </div>
+              <div className="disc-savebar-copy">
+                <div className="disc-savebar-title">
+                  {listSaved ? 'Shortlist saved ✓' : 'Save my shortlist'}
+                </div>
+                <div className="disc-savebar-sub">
+                  {jobs.length} matches, ranked. We&rsquo;ll email it and keep it
+                  updated as new roles land.
+                </div>
+              </div>
+            </div>
+            {!listSaved && (
+              <div className="disc-savebar-form">
+                <input
+                  className="disc-savebar-input"
+                  type="email"
+                  placeholder="you@email.com"
+                  value={saveEmail}
+                  onChange={(e) => setSaveEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && saveShortlist()}
+                />
+                <button className="disc-savebar-btn" onClick={saveShortlist}>
+                  Save shortlist →
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

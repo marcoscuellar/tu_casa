@@ -280,7 +280,7 @@ export function Landing() {
         <section className="lp-founder">
           <div className="lp-founder-main">
             <div className="lp-founder-photo">
-              <img src="/marcos.png" alt="Marcos Cuellar, founder of TuCasa" />
+              <img src="/marcos.jpg" alt="Marcos Cuellar, founder of TuCasa" />
             </div>
             <div className="lp-founder-copy">
               <div className="lp-founder-eyebrow">Why trust us</div>

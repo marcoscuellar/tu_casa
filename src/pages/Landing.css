@@ -1,10 +1,11 @@
 /* ============================================================
-   Marketing / landing page. Paper/ink use the landing prototype's
-   own values (#f4f1ea paper, #0a0a0a ink); red comes from the shared
-   --red token so landing and app never drift.
+   Marketing / landing page. Page background is white (the shared
+   --paper token); white content cards use the --card "crete" tone.
+   Ink #0a0a0a; red/teal come from the shared tokens so landing and
+   app never drift.
    ============================================================ */
 .lp {
-  background: #f4f1ea;
+  background: var(--paper);
   color: #fff;
   min-height: 100vh;
 }

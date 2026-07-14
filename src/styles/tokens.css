@@ -4,8 +4,8 @@
    ============================================================ */
 :root {
   /* Colors — teal-led "2b" palette (reskin) */
-  --paper: #ffffff; /* page background — white */
-  --card: #f5f2ea; /* warm off-white — every card that used to be #fff */
+  --paper: #f5f2ea; /* page background — cream (no stark white) */
+  --card: #faf8f2; /* a hair lighter than the page for cards/light bands */
   --cream: #f5f1e8; /* landing statement bands */
   --bento: #0b1020; /* dark bento surface */
   --ink: #0f0f0f; /* ink text / darkest */

@@ -18,14 +18,44 @@
   color: var(--red);
 }
 
-/* shared block shadow */
-.lp-hero,
+/* The hero keeps its floating signature; everything below flows as flush,
+   rhythmic full-width bands (no shadows, no gaps, no rounded slices). */
+.lp-hero {
+  box-shadow: 0 18px 44px -16px rgba(0, 0, 0, 0.22);
+}
+
+/* --- Section rhythm: flush, even, alternating cream / dark --- */
 .lp-band,
 .lp-desc,
-.lp-tile,
+.lp-tiles,
 .lp-how,
+.lp-founder,
+.lp-trust,
+.lp-pricing,
 .lp-final {
-  box-shadow: 0 18px 44px -16px rgba(0, 0, 0, 0.22);
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+/* Light bands sit a hair lighter than the cream page; dark bands are the bento. */
+.lp-band-white,
+.lp-how,
+.lp-founder,
+.lp-trust,
+.lp-pricing,
+.lp-final {
+  background: var(--card);
+  border: none;
+}
+.lp-desc,
+.lp-band-black {
+  background: var(--bento);
+}
+/* First band under the hero re-establishes a small breath from the hero card. */
+.lp-band:first-of-type {
+  margin-top: 14px;
 }
 
 /* Topbar */
@@ -1113,4 +1143,59 @@
     grid-template-columns: 1fr;
     gap: 18px;
   }
+}
+
+/* ===== Landing background rhythm — overrides (win by cascade order) =====
+   Kill the teal band + teal tile (teal is CTAs + the one "how we stay free"
+   strip only); dark-close on the trade + final bands. */
+.lp-tiles {
+  background: var(--card);
+}
+.lp-band-red,
+.lp-final {
+  background: var(--bento);
+}
+.lp-tile-red {
+  background: var(--bento);
+}
+.lp-band-red .lp-red {
+  color: var(--accent-soft);
+}
+.lp-final-head {
+  color: #fff;
+}
+.lp-final-sub {
+  color: rgba(255, 255, 255, 0.72);
+}
+.lp-final-note {
+  color: rgba(255, 255, 255, 0.5);
+}
+.lp-final .lp-red,
+.lp-final .lp-alt-cta-center {
+  color: var(--accent-soft);
+}
+
+/* Flush rhythm — placed last so it wins over the per-section rules above.
+   No gaps, no rounded slices, even vertical padding on every band. */
+.lp-band,
+.lp-desc,
+.lp-tiles,
+.lp-how,
+.lp-founder,
+.lp-trust,
+.lp-pricing,
+.lp-final {
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.lp-band-white,
+.lp-how,
+.lp-founder,
+.lp-trust,
+.lp-pricing {
+  background: var(--card);
+  border: none;
 }

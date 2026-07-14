@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { useClock } from '../lib/useClock'
 import { AdhdPanel } from './AdhdPanel'
+import { Logo } from './Logo'
 import './AppShell.css'
 
 /** Shared top bar for the app-flow screens. */
@@ -11,10 +11,7 @@ export function TopBar() {
   return (
     <>
       <div className="tc-topbar">
-        <span className="tc-topbar-dot" />
-        <Link to="/" className="tc-wordmark">
-          TUCASA
-        </Link>
+        <Logo to="/" />
         <span className="tc-topbar-tag">Free for job seekers</span>
         <span className="tc-topbar-clock">{clock}</span>
         <button

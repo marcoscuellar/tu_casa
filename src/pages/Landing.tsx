@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useClock } from '../lib/useClock'
 import { AdhdPanel } from '../components/AdhdPanel'
+import { Logo } from '../components/Logo'
 import './Landing.css'
 
 interface Step {
@@ -49,10 +50,7 @@ export function Landing() {
         {/* Topbar */}
         <div className="lp-topbar">
           <div className="lp-topbar-left">
-            <div className="lp-brand">
-              <div className="lp-brand-square" />
-              TUCASA
-            </div>
+            <Logo to={null} />
             <span className="lp-tag">Free for job seekers</span>
           </div>
           <div className="lp-topbar-right">
@@ -274,7 +272,7 @@ export function Landing() {
 
         {/* Footer */}
         <div className="lp-footer">
-          <span>tucasa</span>
+          <Logo to="/" size={12} />
           <div className="lp-footer-right">
             <span>free for job seekers, always</span>
             <a

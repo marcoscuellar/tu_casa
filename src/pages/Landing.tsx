@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useClock } from '../lib/useClock'
 import { AdhdPanel } from '../components/AdhdPanel'
@@ -43,6 +43,28 @@ export function Landing() {
   const clock = useClock()
   const [open, setOpen] = useState<string | null>('search')
   const [adhdOpen, setAdhdOpen] = useState(false)
+  const arrowsRef = useRef<HTMLDivElement>(null)
+
+  // Bob the hero arrows apart/together as the page scrolls — the down arrow
+  // dips, the up arrow lifts, tracing a gentle wave tied to scroll position.
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    let raf = 0
+    const apply = () => {
+      raf = 0
+      const el = arrowsRef.current
+      if (el) el.style.setProperty('--arrow-shift', `${Math.sin(window.scrollY / 70) * 9}px`)
+    }
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(apply)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    apply()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
 
   return (
     <div className="lp">
@@ -79,7 +101,7 @@ export function Landing() {
           </div>
           {/* Solid red rail with a down + up arrow pair (white). */}
           <div className="lp-hero-rail" aria-hidden>
-            <div className="lp-hero-arrows">
+            <div className="lp-hero-arrows" ref={arrowsRef}>
               <svg width="46" height="46" viewBox="0 0 24 24" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M5 12l7 7 7-7" />
               </svg>
@@ -96,7 +118,7 @@ export function Landing() {
           <div className="lp-band-big lp-band-big-ink">
             Finding a genuine job
             <br />
-            should be this&nbsp;<span className="lp-red">easy.</span>
+            should be this&nbsp;<span className="lp-teal">easy.</span>
           </div>
         </div>
 
@@ -182,7 +204,7 @@ export function Landing() {
               return (
                 <div
                   key={it.id}
-                  className="lp-acc"
+                  className={`lp-acc ${isOpen ? 'is-open' : ''}`}
                   onClick={() => setOpen(isOpen ? null : it.id)}
                 >
                   <div className="lp-acc-top">

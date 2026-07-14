@@ -153,9 +153,18 @@
 .lp-hero-arrows {
   display: flex;
   gap: 10px;
+  --arrow-shift: 0px;
 }
 .lp-hero-arrows svg {
   display: block;
+  transition: transform 0.12s linear;
+}
+/* Down arrow dips, up arrow lifts — a scroll-tied wave (see Landing.tsx). */
+.lp-hero-arrows svg:first-child {
+  transform: translateY(var(--arrow-shift));
+}
+.lp-hero-arrows svg:last-child {
+  transform: translateY(calc(-1 * var(--arrow-shift)));
 }
 /* Statement bands */
 .lp-band {
@@ -183,6 +192,9 @@
 }
 .lp-eyebrow-red {
   color: var(--red);
+}
+.lp-teal {
+  color: var(--accent-teal-ink);
 }
 .lp-eyebrow-onred {
   color: rgba(255, 255, 255, 0.72);
@@ -353,6 +365,22 @@
   background: rgba(0, 0, 0, 0.03);
   cursor: pointer;
   user-select: none;
+  transition: background 0.18s, border-color 0.18s;
+}
+/* Open card comes alive in teal (dark text stays legible on the bright fill). */
+.lp-acc.is-open {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+.lp-acc.is-open .lp-acc-name,
+.lp-acc.is-open .lp-acc-sign {
+  color: var(--ink);
+}
+.lp-acc.is-open .lp-acc-n {
+  color: rgba(15, 15, 15, 0.55);
+}
+.lp-acc.is-open .lp-acc-body {
+  color: rgba(15, 15, 15, 0.82);
 }
 .lp-acc-top {
   display: flex;

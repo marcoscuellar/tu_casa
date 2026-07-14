@@ -11,6 +11,7 @@
      on the near-black bento (the burgundy would vanish there). */
   --accent: #640018; /* burgundy — fills + accent text on light */
   --accent-soft: #3fbfc9; /* teal — accent marks on the dark bento */
+  --accent-teal-ink: #0e8f9b; /* deeper teal — teal accent text on light surfaces */
   /* Legacy alias: everything authored as var(--red) now renders the deep navy.
      On-dark accent text is overridden to var(--accent-soft) per surface. */
   --red: var(--accent);

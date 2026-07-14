@@ -29,6 +29,8 @@ export function ConfirmInfo() {
   const [titleErr, setTitleErr] = useState('')
   const [skillsList, setSkillsList] = useState<ResumeSkill[]>([])
   const [newSkill, setNewSkill] = useState('')
+  const [industriesList, setIndustriesList] = useState<string[]>([])
+  const [newIndustry, setNewIndustry] = useState('')
   // Default to a clean read-only review; open editing automatically if a
   // required field (the title) came back empty so it can't be missed.
   const [editing, setEditing] = useState(false)
@@ -45,6 +47,7 @@ export function ConfirmInfo() {
     setOnsiteOk(draftResume.onsite_ok)
     setYears(draftResume.years_total ? String(draftResume.years_total) : '')
     setSkillsList(draftResume.skills)
+    setIndustriesList(draftResume.industries)
     setEditing(!t.trim())
   }, [draftResume, navigate])
 
@@ -61,6 +64,18 @@ export function ConfirmInfo() {
   const removeSkill = (canonical: string) =>
     setSkillsList((list) => list.filter((s) => s.canonical !== canonical))
 
+  const addIndustry = () => {
+    const v = newIndustry.trim()
+    if (!v) return
+    // Free text (the ranking engine canonicalizes these); dedupe case-insensitively.
+    if (!industriesList.some((i) => i.toLowerCase() === v.toLowerCase())) {
+      setIndustriesList((list) => [...list, v])
+    }
+    setNewIndustry('')
+  }
+  const removeIndustry = (value: string) =>
+    setIndustriesList((list) => list.filter((i) => i !== value))
+
   const submit = async () => {
     const t = title.trim()
     if (!t) {
@@ -75,7 +90,7 @@ export function ConfirmInfo() {
       titles: [{ raw: t, family: inferFamily(t), level: inferLevel(t) }],
       skills: skillsList, // parsed + user-edited, canonicalized
       years_total: Number.isFinite(yrs) ? Math.min(60, Math.max(0, Math.round(yrs))) : 0,
-      industries: draftResume.industries,
+      industries: industriesList,
       certs_clearances: draftResume.certs_clearances,
       location: location.trim(),
       onsite_ok: onsiteOk,
@@ -104,17 +119,20 @@ export function ConfirmInfo() {
         </div>
 
         <div className="confirm-editbar">
+          <span className="confirm-editbar-note mono-label">
+            {editing ? 'Editing — tap Done when finished' : 'Pulled from your résumé'}
+          </span>
           <button
             type="button"
-            className="confirm-edit-btn"
+            className={`confirm-edit-btn ${editing ? 'is-editing' : ''}`}
             onClick={() => setEditing((v) => !v)}
           >
-            {editing ? 'Done' : '✎ Edit'}
+            {editing ? '✓ Done' : '✎ Edit'}
           </button>
         </div>
 
         <div className="confirm-fields">
-          <div className="confirm-field">
+          <div className="confirm-field confirm-field-hero">
             <span className="confirm-flabel mono-label">Your title / role</span>
             {editing ? (
               <>
@@ -185,7 +203,7 @@ export function ConfirmInfo() {
                 </button>
               </div>
             ) : (
-              <span className="confirm-value">
+              <span className={`confirm-pill ${onsiteOk ? 'is-onsite' : ''}`}>
                 {onsiteOk ? 'Open to onsite' : 'Remote only'}
               </span>
             )}
@@ -193,7 +211,7 @@ export function ConfirmInfo() {
 
           <div className="confirm-field">
             <span className="confirm-flabel mono-label">
-              Skills we found · {skillsList.length}
+              Skills we found <span className="confirm-count">{skillsList.length}</span>
             </span>
             {skillsList.length > 0 ? (
               <div className="confirm-chips">
@@ -243,6 +261,62 @@ export function ConfirmInfo() {
               </div>
             )}
           </div>
+
+          <div className="confirm-field">
+            <span className="confirm-flabel mono-label">
+              Industry / field <span className="confirm-count">{industriesList.length}</span>
+            </span>
+            <span className="confirm-field-hint">
+              We use this to float same-field roles to the top — worth a quick check.
+            </span>
+            {industriesList.length > 0 ? (
+              <div className="confirm-chips">
+                {industriesList.map((ind) => (
+                  <span
+                    key={ind}
+                    className={`confirm-chip ${editing ? 'is-editable' : ''}`}
+                  >
+                    {ind}
+                    {editing && (
+                      <button
+                        type="button"
+                        className="confirm-chip-x"
+                        onClick={() => removeIndustry(ind)}
+                        aria-label={`Remove ${ind}`}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span className="confirm-chip-empty">
+                {editing
+                  ? 'None yet — add the industries you’ve worked in.'
+                  : 'None detected — tap Edit to add your industry.'}
+              </span>
+            )}
+            {editing && (
+              <div className="confirm-add-skill">
+                <input
+                  className="confirm-input confirm-add-input"
+                  value={newIndustry}
+                  onChange={(e) => setNewIndustry(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addIndustry()
+                    }
+                  }}
+                  placeholder="e.g. Fintech, Healthcare, E-commerce"
+                />
+                <button type="button" className="confirm-add-btn" onClick={addIndustry}>
+                  + Add
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="confirm-actions">
@@ -257,16 +331,30 @@ export function ConfirmInfo() {
         </div>
 
         <aside className="confirm-aside">
-          <div className="confirm-aside-title mono-label">Why this step</div>
-          <ul className="confirm-aside-list">
-            <li>
-              We match jobs against <b>exactly this</b> — so a minute here sharpens
-              every result.
+          <div className="confirm-aside-title mono-label">How it works</div>
+          <ol className="confirm-steps">
+            <li className="confirm-step is-done">
+              <span className="confirm-step-n mono-label">01</span>
+              <span className="confirm-step-t">Résumé read</span>
+              <span className="confirm-step-tick">✓</span>
             </li>
-            <li>Add or trim skills to steer what surfaces.</li>
-            <li>Private to you. Nothing here is shared.</li>
-          </ul>
-          <div className="confirm-aside-foot mono-label">Next → your top 7</div>
+            <li className="confirm-step is-now">
+              <span className="confirm-step-n mono-label">02</span>
+              <span className="confirm-step-t">Confirm your details</span>
+            </li>
+            <li className="confirm-step">
+              <span className="confirm-step-n mono-label">03</span>
+              <span className="confirm-step-t">Your top 7 matches</span>
+            </li>
+          </ol>
+          <p className="confirm-aside-note">
+            We match jobs against <b>exactly this</b> — so a minute here sharpens
+            every result. Private to you; nothing is shared.
+          </p>
+          <div className="confirm-aside-callout">
+            <span className="confirm-callout-label mono-label">Up next</span>
+            <span className="confirm-callout-val">Your top 7 →</span>
+          </div>
         </aside>
       </div>
     </AppShell>

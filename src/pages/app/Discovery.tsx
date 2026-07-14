@@ -24,6 +24,10 @@ function loadApplied(): Set<string> {
   }
 }
 
+// Saved shortlist — the ranked list the candidate chose to keep. Client-side
+// for now; account-backed once we have real users + a database.
+const SAVED_KEY = 'tucasa:savedList'
+
 /** Prettify a canonical skill id for a tag chip. */
 function prettySkill(canonical: string): string {
   const SPECIAL: Record<string, string> = {
@@ -94,6 +98,28 @@ export function Discovery() {
   const [visible, setVisible] = useState(INITIAL_SHOWN)
   const [openId, setOpenId] = useState<string | null>(null)
   const [applied, setApplied] = useState<Set<string>>(loadApplied)
+  const [listSaved, setListSaved] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(SAVED_KEY) !== null
+    } catch {
+      return false
+    }
+  })
+
+  // Saving the shortlist is an account feature — send them to sign in first,
+  // otherwise persist the ranked ids so the list survives a refresh.
+  const saveList = () => {
+    if (!hasAccount) {
+      navigate('/signup', { state: { next: '/discovery' } })
+      return
+    }
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(jobs.map((j) => j.id)))
+    } catch {
+      /* ignore storage failures — saving is best-effort */
+    }
+    setListSaved(true)
+  }
 
   const toggleApplied = (id: string) => {
     // Tracking applications is an account feature — send them to sign in first.
@@ -142,6 +168,14 @@ export function Discovery() {
               requirements. Tap any role to see why it fits.
             </p>
           </div>
+          {jobs.length > 0 && (
+            <button
+              className={`disc-save-btn ${listSaved ? 'is-saved' : ''}`}
+              onClick={saveList}
+            >
+              {listSaved ? '★ List saved' : '☆ Save my list'}
+            </button>
+          )}
         </div>
 
         {/* Match list */}

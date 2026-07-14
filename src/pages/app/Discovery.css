@@ -20,6 +20,31 @@
   max-width: 52ch;
 }
 
+/* Save-my-list — teal accent, pops on the black header */
+.disc-save-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--accent-soft);
+  color: var(--accent-soft);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 13px 22px;
+  border-radius: 100px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.disc-save-btn:hover {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.disc-save-btn.is-saved {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--ink);
+}
+
 .disc-state {
   margin-top: 14px;
   background: #fff;
@@ -80,7 +105,7 @@
   font-weight: 900;
   font-size: 40px;
   line-height: 1;
-  color: var(--red);
+  color: var(--accent-teal-ink);
 }
 .disc-score-label {
   font-size: 9px;
@@ -203,14 +228,14 @@
   text-transform: uppercase;
   border-radius: 999px;
   padding: 6px 12px;
-  background: rgba(22, 38, 95, 0.08);
-  color: var(--red);
-  border: 1px solid rgba(22, 38, 95, 0.25);
+  background: rgba(63, 191, 201, 0.12);
+  color: var(--accent-teal-ink);
+  border: 1px solid rgba(63, 191, 201, 0.4);
 }
 .disc-card-top .disc-match-chip {
-  background: rgba(139, 160, 255, 0.16);
+  background: rgba(63, 191, 201, 0.16);
   color: var(--accent-soft);
-  border-color: rgba(139, 160, 255, 0.4);
+  border-color: rgba(63, 191, 201, 0.42);
 }
 
 /* Actions */

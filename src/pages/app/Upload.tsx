@@ -130,6 +130,18 @@ export function Upload() {
                   Use a sample to look around →
                 </a>
               </p>
+              <p className="upload-sample">
+                Don&rsquo;t have a résumé yet?{' '}
+                <a
+                  className="upload-sample-link"
+                  onClick={() => navigate('/builder')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate('/builder')}
+                >
+                  Build one in a minute →
+                </a>
+              </p>
               {pipelineError && <p className="upload-error">{pipelineError}</p>}
             </>
           ) : (

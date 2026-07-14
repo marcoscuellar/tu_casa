@@ -444,9 +444,10 @@ export function Landing() {
                 Free for job seekers. So how do we eat?
               </div>
               <div className="lp-free-desc">
-                Employers pay to reach verified, well-matched candidates.
-                You&rsquo;re the seeker — never the product. We don&rsquo;t sell
-                your data.
+                Finding real jobs and checking your fit stays free — always. When
+                you&rsquo;re actively interviewing, Pro ($15/mo) unlocks cheat
+                sheets and unlimited résumé tailoring. Those subscriptions fund
+                the whole thing.
               </div>
             </div>
             <div className="lp-free-chip">No card · No catch</div>

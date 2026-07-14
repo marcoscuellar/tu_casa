@@ -181,7 +181,7 @@
   overflow: hidden;
 }
 .lp-band-white {
-  background: #fff;
+  background: var(--card);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 .lp-band-black {
@@ -305,7 +305,7 @@
   height: 200px;
 }
 .lp-tile-white {
-  background: #fff;
+  background: var(--card);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 .lp-tile-black {
@@ -343,7 +343,7 @@
 
 /* How the AI works */
 .lp-how {
-  background: #fff;
+  background: var(--card);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 20px;
   padding: 36px 40px;
@@ -459,7 +459,7 @@
 
 /* Final CTA */
 .lp-final {
-  background: #fff;
+  background: var(--card);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 20px;
   padding: 48px;

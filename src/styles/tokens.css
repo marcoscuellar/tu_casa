@@ -4,7 +4,8 @@
    ============================================================ */
 :root {
   /* Colors */
-  --paper: #edebe4;
+  --paper: #ffffff; /* page background — white */
+  --card: #edebe4; /* "crete" — warm concrete card surface on the white page */
   --ink: #0f0f0f;
   /* Brand accent — burgundy + teal. Two tones: the deep burgundy for fills and
      accent text on light surfaces, and the teal for accent text/marks that sit

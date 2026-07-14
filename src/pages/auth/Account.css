@@ -61,7 +61,7 @@
 .acct-nudge {
   border: 1px solid var(--hairline-14);
   border-left: 3px solid var(--red);
-  background: #fff;
+  background: var(--card);
   border-radius: 12px;
   padding: 10px 14px;
   margin-bottom: 14px;
@@ -77,7 +77,7 @@
 }
 
 .acct-card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--hairline-14);
   border-radius: 12px;
   box-shadow: 0 2px 5px rgba(17, 17, 17, 0.06), 0 14px 40px rgba(17, 17, 17, 0.1);

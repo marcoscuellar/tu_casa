@@ -33,7 +33,7 @@
 
 /* White steps box */
 .upload-steps-box {
-  background: #fff;
+  background: var(--card);
   border-radius: 20px;
   border: 1px solid rgba(15, 15, 15, 0.08);
   box-shadow: 0 18px 44px -16px rgba(0, 0, 0, 0.18);

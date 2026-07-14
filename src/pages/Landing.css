@@ -283,6 +283,28 @@
   display: inline-block;
   padding: 16px 32px;
 }
+/* Secondary CTA — "build one free". Teal on the dark desc panel. */
+.lp-alt-cta {
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent-soft);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.lp-alt-cta:hover {
+  color: #fff;
+}
+/* On the light final panel it needs the deeper teal to read. */
+.lp-alt-cta-center {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  color: var(--accent-teal-ink);
+}
+.lp-alt-cta-center:hover {
+  color: var(--accent);
+}
 .lp-desc-note {
   font-family: var(--mono);
   font-size: 11px;

@@ -133,6 +133,9 @@ export function Landing() {
             <Link to="/upload" className="lp-pill">
               Upload your résumé — free
             </Link>
+            <Link to="/builder" className="lp-alt-cta">
+              No résumé yet? Build one free →
+            </Link>
             <div className="lp-desc-note">Every match verified. No inflated scores.</div>
           </div>
         </div>
@@ -286,6 +289,9 @@ export function Landing() {
           </p>
           <Link to="/upload" className="lp-pill lp-pill-lg">
             Upload your résumé — free
+          </Link>
+          <Link to="/builder" className="lp-alt-cta lp-alt-cta-center">
+            No résumé yet? Build one free →
           </Link>
           <div className="lp-final-note">
             Free for job seekers. No credit card. No catch.

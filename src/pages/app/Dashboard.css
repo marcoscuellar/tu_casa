@@ -1,0 +1,161 @@
+.dash {
+  background: #f7f6f2;
+  border-radius: 20px;
+  border: 1px solid var(--hairline);
+  padding: 30px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.dash-head {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.dash-accent {
+  color: var(--accent);
+}
+
+/* Stat cards */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.dash-card {
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 20px;
+}
+.dash-card.is-dark {
+  background: var(--bento);
+  border-color: var(--bento);
+}
+.dash-card-num {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--ink);
+}
+.dash-card.is-dark .dash-card-num {
+  color: #fff;
+}
+.dash-card.is-teal .dash-card-num {
+  color: var(--accent);
+}
+.dash-card-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--grey);
+  margin-top: 8px;
+}
+.dash-card.is-dark .dash-card-label {
+  color: var(--accent-soft);
+}
+
+/* Application table */
+.dash-table {
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.dash-row {
+  display: grid;
+  grid-template-columns: 2.4fr 1.4fr 1fr 1fr;
+  gap: 12px;
+  padding: 14px 20px;
+  align-items: center;
+  border-bottom: 1px solid rgba(15, 15, 15, 0.07);
+}
+.dash-row:last-child {
+  border-bottom: none;
+}
+.dash-row-head {
+  background: #faf9f6;
+  border-bottom: 1px solid rgba(15, 15, 15, 0.1);
+  padding: 12px 20px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+.dash-role {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+}
+.dash-company {
+  font-size: 12px;
+  color: var(--muted);
+}
+.dash-date {
+  font-size: 11px;
+  color: var(--grey);
+}
+.dash-status {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+.dash-status.is-applied {
+  color: var(--muted);
+  background: var(--chip-neutral);
+}
+.dash-status.is-interviewing {
+  color: var(--accent);
+  background: rgba(0, 116, 125, 0.1);
+}
+.dash-status.is-offer {
+  color: #0f7a52;
+  background: rgba(15, 122, 82, 0.1);
+}
+.dash-status.is-rejected {
+  color: var(--burgundy);
+  background: rgba(100, 0, 24, 0.09);
+}
+.dash-empty {
+  padding: 30px 20px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.dash-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .dash-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dash-row {
+    grid-template-columns: 2fr 1fr;
+    gap: 6px 12px;
+  }
+  .dash-row-head span:nth-child(3),
+  .dash-row-head span:nth-child(4),
+  .dash-date {
+    display: none;
+  }
+}

@@ -5,6 +5,7 @@ import { Upload } from './pages/app/Upload'
 import { ResumeBuilder } from './pages/app/ResumeBuilder'
 import { ConfirmInfo } from './pages/app/ConfirmInfo'
 import { Discovery } from './pages/app/Discovery'
+import { Dashboard } from './pages/app/Dashboard'
 import { FitCheck } from './pages/app/FitCheck'
 import { CheatGen } from './pages/app/CheatGen'
 import { CheatSheet } from './pages/app/CheatSheet'
@@ -30,6 +31,7 @@ export function App() {
       <Route path="/builder" element={<ResumeBuilder />} />
       <Route path="/confirm" element={<ConfirmInfo />} />
       <Route path="/discovery" element={<Discovery />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/fit" element={<FitCheck />} />
       <Route path="/cheat-generating" element={<CheatGen />} />
       <Route path="/cheatsheet" element={<CheatSheet />} />

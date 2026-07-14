@@ -75,7 +75,7 @@ export function Landing() {
             RIGHT NOW.
           </div>
           <div className="lp-hero-ghost" aria-hidden>
-            TuCasa
+            TUCASA
           </div>
           {/* Solid red rail with a down + up arrow pair (white). */}
           <div className="lp-hero-rail" aria-hidden>

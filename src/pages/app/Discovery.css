@@ -310,6 +310,14 @@
   filter: brightness(1.25);
 }
 
+/* Narrow screens: a single column so cards get full width (the 2-up grid
+   squeezes titles until they clip). */
+@media (max-width: 760px) {
+  .disc-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .disc-header {
     padding: 30px 28px;
@@ -320,6 +328,20 @@
   .disc-card-head {
     padding: 22px;
     gap: 16px;
+  }
+  /* Let the title take the room and wrap instead of overflowing. */
+  .disc-mid {
+    min-width: 0;
+  }
+  .disc-title {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+  .disc-score {
+    font-size: 34px;
+  }
+  .disc-score-wrap {
+    min-width: 56px;
   }
   .disc-card-body {
     padding: 0 22px 24px;

@@ -57,6 +57,19 @@ function workType(job: RankedJob): string {
 }
 
 /**
+ * Postings often list many cities joined by ";" (Denver, CO;Atlanta, GA;…).
+ * Show the first and collapse the rest so the meta line stays readable.
+ */
+function prettyLocation(loc: string): string {
+  const parts = loc
+    .split(/[;|]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  if (parts.length <= 1) return loc.trim()
+  return `${parts[0]} +${parts.length - 1} more`
+}
+
+/**
  * The candidate's own skills that this posting actually names — cross-referenced
  * against the description, so "why it fits you" is concrete, not generic.
  */
@@ -148,7 +161,7 @@ export function Discovery() {
             const isApplied = applied.has(job.id)
             const flagged = job.audit.recheck === 'flagged'
             const matched = skillsInPosting(resume, job)
-            const meta = [job.company, job.location, job.industryLabel]
+            const meta = [job.company, prettyLocation(job.location), job.industryLabel]
               .filter(Boolean)
               .join(' · ')
 

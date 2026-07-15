@@ -13,7 +13,7 @@ import './FitCheck.css'
  */
 export function FitCheck() {
   const navigate = useNavigate()
-  const { selectedJob, narrate, needsCredits, consumeSheet, hasAccount } = useAppFlow()
+  const { selectedJob, narrate } = useAppFlow()
 
   // Reached without a selection (e.g. a refresh) → back to the shortlist.
   useEffect(() => {
@@ -24,20 +24,9 @@ export function FitCheck() {
   const { fit, company, role } = selectedJob
   const body = narrate(selectedJob)
 
-  const prepMe = () => {
-    // The cheat sheet is where we ask for an account — everything up to here
-    // (upload, discovery, fit) is free and anonymous.
-    if (!hasAccount) {
-      navigate('/signup', { state: { next: '/cheat-generating' } })
-      return
-    }
-    if (needsCredits()) {
-      navigate('/paywall')
-      return
-    }
-    consumeSheet()
-    navigate('/cheat-generating')
-  }
+  // The cheat sheet is now intake-driven: open the intake pre-filled with this
+  // job's company + role; the intake asks who they're meeting, then gates + builds.
+  const prepMe = () => navigate('/cheat-intake')
 
   return (
     <AppShell>

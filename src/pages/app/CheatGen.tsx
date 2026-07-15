@@ -7,21 +7,26 @@ import './CheatGen.css'
 
 export function CheatGen() {
   const navigate = useNavigate()
-  const { cheatCompany, selectedJob } = useAppFlow()
+  const { interview, departmentBrief } = useAppFlow()
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // In production this is driven off the real research/generation job's
-  // completion. Here we simulate the ~2.2s build, then reveal the sheet.
+  // In production this is driven off the real Engine 5 research completion.
+  // Here we simulate the ~2.2s build, then reveal the sheet.
   useEffect(() => {
-    if (!selectedJob) {
-      navigate('/discovery', { replace: true })
+    if (!interview) {
+      navigate('/cheat-intake', { replace: true })
       return
     }
     timer.current = setTimeout(() => navigate('/cheatsheet'), 2200)
     return () => {
       if (timer.current) clearTimeout(timer.current)
     }
-  }, [navigate, selectedJob])
+  }, [navigate, interview])
+
+  const company = interview?.company || 'the company'
+  const dept = departmentBrief?.department && departmentBrief.department !== 'the team'
+    ? departmentBrief.department
+    : 'the team'
 
   return (
     <AppShell>
@@ -29,22 +34,21 @@ export function CheatGen() {
         <div className="cheatgen-spinner" />
         <div className="eyebrow cheatgen-eyebrow">Building your cheat sheet</div>
         <h1 className="head cheatgen-head">
-          Researching {cheatCompany}
+          Researching {company}
           <br />
           so you don&rsquo;t have to.
         </h1>
         <div className="cheatgen-steps">
           <div className="cheatgen-step">
-            <span className="cheatgen-tick">✓</span> Company &amp; product,
-            current signals
+            <span className="cheatgen-tick">✓</span> {dept} — why they&rsquo;re
+            hiring
           </div>
           <div className="cheatgen-step">
-            <span className="cheatgen-tick">✓</span> Likely questions for this
-            role
+            <span className="cheatgen-tick">✓</span> Recent news, org &amp;
+            launches
           </div>
           <div className="cheatgen-step cheatgen-step-pending">
-            <span className="cheatgen-ring" /> Drafting answers from your
-            background
+            <span className="cheatgen-ring" /> What your interviewer cares about
           </div>
         </div>
       </div>

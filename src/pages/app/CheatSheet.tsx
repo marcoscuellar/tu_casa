@@ -2,39 +2,70 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { useAppFlow } from '../../flow/AppFlowContext'
-import { CHEAT_NAV, PREFLIGHT } from '../../flow/data'
+import { PREFLIGHT } from '../../flow/data'
 import './flow.css'
 import './CheatSheet.css'
 
-const GENERIC_ASKS = [
-  'How will you know the person in this role is succeeding in the first 90 days?',
-  'What does the team most need help with right now?',
-  'How does the team make decisions when priorities conflict?',
+type Theme = 'calm' | 'light' | 'dark'
+
+const SECTIONS: { id: string; num: string; label: string }[] = [
+  { id: 'why', num: '01', label: 'Why they’re hiring' },
+  { id: 'news', num: '02', label: 'Recent news' },
+  { id: 'org', num: '03', label: 'Org & leadership' },
+  { id: 'launch', num: '04', label: 'What’s launching' },
+  { id: 'cares', num: '05', label: 'What they care about' },
+  { id: 'posture', num: '06', label: 'Posture' },
+  { id: 'preflight', num: '07', label: 'Pre-flight' },
 ]
+
+function readStored<T extends string>(key: string, fallback: T): T {
+  try {
+    return (localStorage.getItem(key) as T) || fallback
+  } catch {
+    return fallback
+  }
+}
 
 export function CheatSheet() {
   const navigate = useNavigate()
-  const {
-    selectedJob,
-    research,
-    insight,
-    needsCredits,
-    consumeSheet,
-    hasAccount,
-  } = useAppFlow()
-  const [active, setActive] = useState('company')
+  const { interview, departmentBrief } = useAppFlow()
+
+  const [active, setActive] = useState('why')
   const [checked, setChecked] = useState<Record<number, boolean>>({})
+  // Reader preferences default NEUTRAL — the user chooses; nothing is forced.
+  const [theme, setTheme] = useState<Theme>(() => readStored<Theme>('tucasa:cheatTheme', 'calm'))
+  const [adhd, setAdhd] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('tucasa:cheatAdhd') === '1'
+    } catch {
+      return false
+    }
+  })
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const jumpingUntil = useRef(0)
 
-  // Reached without a selection/research → back to the shortlist.
+  // No intake yet (e.g. a refresh with nothing stored) → send them to build one.
   useEffect(() => {
-    if (!selectedJob) navigate('/discovery', { replace: true })
-  }, [selectedJob, navigate])
+    if (!interview) navigate('/cheat-intake', { replace: true })
+  }, [interview, navigate])
 
-  // Section jump: smooth-scroll the content panel to the chosen section.
+  useEffect(() => {
+    try {
+      localStorage.setItem('tucasa:cheatTheme', theme)
+    } catch {
+      /* best-effort */
+    }
+  }, [theme])
+  useEffect(() => {
+    try {
+      localStorage.setItem('tucasa:cheatAdhd', adhd ? '1' : '0')
+    } catch {
+      /* best-effort */
+    }
+  }, [adhd])
+
   const jumpTo = (id: string) => {
     setActive(id)
     jumpingUntil.current = Date.now() + 800
@@ -42,14 +73,11 @@ export function CheatSheet() {
     const c = scrollRef.current
     if (!el || !c) return
     const top =
-      el.getBoundingClientRect().top -
-      c.getBoundingClientRect().top +
-      c.scrollTop -
-      18
+      el.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 18
     c.scrollTo({ top, behavior: 'smooth' })
   }
 
-  // Scroll-spy: update the active nav item as the user scrolls the panel.
+  // Scroll-spy: track the active section as the panel scrolls.
   useEffect(() => {
     const c = scrollRef.current
     if (!c) return
@@ -59,75 +87,49 @@ export function CheatSheet() {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        if (visible[0]) {
-          const id = visible[0].target.getAttribute('data-sec')
-          if (id) setActive(id)
-        }
+        const id = visible[0]?.target.getAttribute('data-sec')
+        if (id) setActive(id)
       },
       { root: c, rootMargin: '0px 0px -70% 0px', threshold: 0 },
     )
     Object.values(sectionRefs.current).forEach((el) => el && observer.observe(el))
     return () => observer.disconnect()
-  }, [selectedJob])
+  }, [departmentBrief])
 
-  if (!selectedJob || !research) return null
-
-  const brief = research.brief
-  const thin = research.readiness === 'THIN'
-
-  const tryNewSheet = () => {
-    if (!hasAccount) {
-      navigate('/signup', { state: { next: '/cheat-generating' } })
-      return
-    }
-    if (needsCredits()) {
-      navigate('/paywall')
-      return
-    }
-    consumeSheet()
-    navigate('/cheat-generating')
-  }
-
-  const toggleCheck = (i: number) => setChecked((c) => ({ ...c, [i]: !c[i] }))
-  const setSectionRef = (id: string) => (el: HTMLDivElement | null) => {
+  if (!interview || !departmentBrief) return null
+  const b = departmentBrief
+  const setRef = (id: string) => (el: HTMLDivElement | null) => {
     sectionRefs.current[id] = el
   }
+  const toggleCheck = (i: number) => setChecked((c) => ({ ...c, [i]: !c[i] }))
+  const who = b.interviewerName || 'your interviewer'
+  const dept = b.department === 'the team' ? 'their team' : `${b.department}`
 
-  // Section 01 tiles — only from confirmable facts.
-  const tiles: { label: string; val: string }[] = []
-  if (brief.stageSize) tiles.push({ label: 'Stage', val: brief.stageSize })
-  if (brief.signals[0]) tiles.push({ label: 'Signal', val: brief.signals[0].signal })
-  if (brief.mainProduct) tiles.push({ label: 'Focus', val: brief.mainProduct })
-
-  // Section 02/03 are driven by the reasoned "why this role exists" when we have
-  // one (real, grounded signals). Otherwise they fall back to role-based prep.
-  const hasInsight = !!insight && insight.talkingPoints.length > 0
-
-  const fallbackTalkingPoints =
-    brief.statedPriorities.length > 0
-      ? brief.statedPriorities.map((p) => ({ title: p.priority, body: p.howToUse }))
-      : brief.likelyThemes.map((t) => ({
-          title: `Have a story ready: ${t}`,
-          body: 'Draw it from your own experience — a concrete example beats a general claim.',
-        }))
-
-  // Section 04 — sourced questions to ask, topped up with safe generics.
-  const asks = [
-    ...brief.signals.map((s) => s.youCouldSay),
-    ...GENERIC_ASKS,
-  ].slice(0, 4)
+  // A bulleted list — the base unit. In ADHD mode CSS calls out the first item
+  // and opens up the spacing; no big blocks of text anywhere.
+  const Bullets = ({ items }: { items: string[] }) => (
+    <ul className="cheat-bullets">
+      {items.map((t) => (
+        <li key={t} className="cheat-bullet">
+          {t}
+        </li>
+      ))}
+    </ul>
+  )
 
   return (
     <AppShell>
       <div className="cheat-grid pop">
         {/* Side nav */}
-        <div className="blk blk-black cheat-nav">
-          <div className="eyebrow cheat-nav-eyebrow">Interview cheat sheet</div>
-          <div className="cheat-nav-role">{selectedJob.role}</div>
-          <div className="cheat-nav-company mono-label">{selectedJob.company}</div>
+        <div className="cheat-nav">
+          <div className="cheat-nav-eyebrow mono-label">Interview cheat sheet</div>
+          <div className="cheat-nav-role">{b.role || interview.role}</div>
+          <div className="cheat-nav-company mono-label">
+            {b.company} · {b.department}
+          </div>
           <div className="cheat-divider" />
           <div className="cheat-nav-list">
-            {CHEAT_NAV.map((n) => (
+            {SECTIONS.map((n) => (
               <button
                 key={n.id}
                 className={`cheat-nav-item ${active === n.id ? 'is-active' : ''}`}
@@ -139,202 +141,127 @@ export function CheatSheet() {
             ))}
           </div>
           <div className="cheat-divider" />
-          <div className="cheat-nav-hint mono-label">
-            Keep this open during the call. Tap any section to jump.
+
+          {/* Reader controls — background + ADHD-friendly, both user's choice. */}
+          <div className="cheat-controls">
+            <div className="cheat-ctl-label mono-label">Reading</div>
+            <div className="cheat-theme-seg" role="group" aria-label="Background">
+              {(['calm', 'light', 'dark'] as Theme[]).map((t) => (
+                <button
+                  key={t}
+                  className={`cheat-theme-opt ${theme === t ? 'is-on' : ''}`}
+                  onClick={() => setTheme(t)}
+                >
+                  {t === 'calm' ? 'Calm' : t === 'light' ? 'Light' : 'Dark'}
+                </button>
+              ))}
+            </div>
+            <button
+              className={`cheat-adhd-toggle ${adhd ? 'is-on' : ''}`}
+              onClick={() => setAdhd((v) => !v)}
+              aria-pressed={adhd}
+            >
+              <span className="cheat-adhd-dot" aria-hidden />
+              ADHD-friendly
+            </button>
           </div>
-          <button className="cheat-new-btn" onClick={tryNewSheet}>
+
+          <button className="cheat-new-btn" onClick={() => navigate('/cheat-intake')}>
             + New cheat sheet
           </button>
         </div>
 
         {/* Content */}
-        <div className="blk-white cheat-content" ref={scrollRef}>
-          {thin && (
-            <div className="cheat-thin">
-              Public info on {selectedJob.company} was limited — this sheet leans
-              on role-based prep. That&rsquo;s honest and still works.
+        <div
+          className={`cheat-content theme-${theme} ${adhd ? 'is-adhd' : ''}`}
+          ref={scrollRef}
+        >
+          {b.sample && (
+            <div className="cheat-sample">
+              Sample intel — your live sheet pulls the real, current research for{' '}
+              {b.company}.
             </div>
           )}
 
-          {/* 01 Company snapshot */}
-          <div data-sec="company" ref={setSectionRef('company')} className="cheat-sec">
-            <div className="cheat-sec-eyebrow mono-label">01 · Company snapshot</div>
-            <h2 className="cheat-sec-head">
-              Who you&rsquo;re
-              <br />
-              walking in to.
-            </h2>
-            <p className="cheat-para">
-              {brief.companyOneLiner}
-              {brief.mainProduct ? ` ${brief.mainProduct}` : ''}
-            </p>
-            {tiles.length > 0 && (
-              <div className="cheat-tiles">
-                {tiles.map((tile) => (
-                  <div key={tile.label} className="cheat-tile">
-                    <div className="cheat-tile-label mono-label">{tile.label}</div>
-                    <div className="cheat-tile-val">{tile.val}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="cheat-hairline" />
-
-          {/* 02 Talking points — reasoned from why the role exists */}
-          <div data-sec="talking" ref={setSectionRef('talking')} className="cheat-sec">
-            <div className="cheat-sec-eyebrow mono-label">02 · Talking points</div>
-            <h2 className="cheat-sec-head">Lead with these.</h2>
-
-            {hasInsight && insight && (
-              <div className="cheat-why">
-                <div className="cheat-why-label mono-label">Why this role exists</div>
-                <div className="cheat-why-text">{insight.why}</div>
-              </div>
-            )}
-
-            <div className="cheat-talk-list">
-              {hasInsight && insight
-                ? insight.talkingPoints.map((tp) => (
-                    <div key={tp.point} className="cheat-talk">
-                      <div className="cheat-talk-title">{tp.point}</div>
-                      <p className="cheat-talk-body">{tp.because}</p>
-                      <div className="cheat-src mono-label">
-                        Based on: {tp.sources.join(' · ')}
-                      </div>
-                    </div>
-                  ))
-                : fallbackTalkingPoints.map((tp) => (
-                    <div key={tp.title} className="cheat-talk">
-                      <div className="cheat-talk-title">{tp.title}</div>
-                      <p className="cheat-talk-body">{tp.body}</p>
-                    </div>
-                  ))}
+          {/* Intro */}
+          <div className="cheat-intro">
+            <div className="cheat-dept-chip">{b.department}</div>
+            <h1 className="cheat-intro-head">
+              Prepping for {b.role || 'the role'} at {b.company}.
+            </h1>
+            <div className="cheat-intro-meeting">
+              Meeting <b>{who}</b>
+              {b.interviewerTitle ? ` · ${b.interviewerTitle}` : ''}
             </div>
           </div>
 
-          <div className="cheat-hairline" />
-
-          {/* 03 Likely questions — generated FROM the company's situation */}
-          <div data-sec="questions" ref={setSectionRef('questions')} className="cheat-sec">
-            <div className="cheat-sec-eyebrow mono-label">03 · Likely questions</div>
-            {hasInsight && insight && insight.likelyQuestions.length > 0 ? (
-              <>
-                <h2 className="cheat-sec-head">
-                  What they&rsquo;ll dig
-                  <br />
-                  into — and why.
-                </h2>
-                <div className="cheat-qa-list">
-                  {insight.likelyQuestions.map((q) => (
-                    <div key={q.question} className="cheat-qa">
-                      <div className="cheat-qa-q">{q.question}</div>
-                      <p className="cheat-qa-a">
-                        <b className="cheat-you">Why:</b> {q.why}
-                      </p>
-                      <div className="cheat-src mono-label">
-                        Based on: {q.sources.join(' · ')}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className="cheat-sec-head">
-                  What this role
-                  <br />
-                  tends to draw.
-                </h2>
-                <div className="cheat-qa-note">
-                  Not enough public signal to infer why they&rsquo;re hiring —
-                  preparing for the role itself.
-                </div>
-                <div className="cheat-qa-list">
-                  {brief.likelyThemes.map((theme) => (
-                    <div key={theme} className="cheat-qa">
-                      <div className="cheat-qa-q">
-                        Expect questions on {theme.toLowerCase()}.
-                      </div>
-                      <p className="cheat-qa-a">
-                        <b className="cheat-you">Prep:</b> pull your answer from your
-                        own background — a specific example lands better than a
-                        general claim.
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+          {/* 01 Why they're hiring */}
+          <div data-sec="why" ref={setRef('why')} className="cheat-sec">
+            <div className="cheat-sec-eyebrow mono-label">01 · Why {dept} is hiring</div>
+            <Bullets items={b.whyHiring} />
           </div>
-
           <div className="cheat-hairline" />
 
-          {/* 04 Questions to ask */}
-          <div data-sec="askback" ref={setSectionRef('askback')} className="cheat-sec">
-            <div className="cheat-sec-eyebrow mono-label">04 · Ask them back</div>
-            <h2 className="cheat-sec-head">
-              Turn it into
-              <br />
-              a conversation.
-            </h2>
-            <ul className="cheat-ask-list">
-              {asks.map((q) => (
-                <li key={q} className="cheat-ask">
-                  <span className="cheat-arrow">→</span> {q}
+          {/* 02 Recent news */}
+          <div data-sec="news" ref={setRef('news')} className="cheat-sec">
+            <div className="cheat-sec-eyebrow mono-label">02 · Recent {dept} news</div>
+            <ul className="cheat-bullets">
+              {b.recentNews.map((n) => (
+                <li key={n.text} className="cheat-bullet">
+                  {n.text}
+                  {(n.source || n.date) && (
+                    <span className="cheat-src mono-label">
+                      {[n.source, n.date].filter(Boolean).join(' · ')}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
-
           <div className="cheat-hairline" />
 
-          {/* 05 Posture */}
-          <div data-sec="posture" ref={setSectionRef('posture')} className="cheat-sec">
-            <div className="cheat-sec-eyebrow mono-label">05 · Posture</div>
+          {/* 03 Org & leadership */}
+          <div data-sec="org" ref={setRef('org')} className="cheat-sec">
+            <div className="cheat-sec-eyebrow mono-label">03 · Org &amp; leadership changes</div>
+            <Bullets items={b.orgChanges} />
+          </div>
+          <div className="cheat-hairline" />
+
+          {/* 04 What's launching */}
+          <div data-sec="launch" ref={setRef('launch')} className="cheat-sec">
+            <div className="cheat-sec-eyebrow mono-label">04 · What they&rsquo;re launching</div>
+            <Bullets items={b.launches} />
+          </div>
+          <div className="cheat-hairline" />
+
+          {/* 05 What they care about */}
+          <div data-sec="cares" ref={setRef('cares')} className="cheat-sec">
+            <div className="cheat-sec-eyebrow mono-label">05 · What {who} cares about</div>
+            <Bullets items={b.interviewerCares} />
+          </div>
+          <div className="cheat-hairline" />
+
+          {/* 06 Posture */}
+          <div data-sec="posture" ref={setRef('posture')} className="cheat-sec">
+            <div className="cheat-sec-eyebrow mono-label">06 · Posture</div>
             <div className="cheat-posture">
-              <div className="cheat-posture-title">
-                You&rsquo;re not being judged. You&rsquo;re both figuring out if
-                this fits.
-              </div>
-              <p className="cheat-posture-body">
-                You&rsquo;ve already done the work — this résumé earned the room.
-                Slow down, answer the question they asked, and it&rsquo;s fine to
-                take two seconds before you speak. You&rsquo;ve got this.
-              </p>
+              You&rsquo;re not being judged — you&rsquo;re both figuring out if this
+              fits. Slow down, answer the question they asked, and it&rsquo;s fine to
+              take two seconds before you speak.
             </div>
           </div>
-
           <div className="cheat-hairline" />
 
-          {/* 06 Pre-flight */}
-          <div
-            data-sec="preflight"
-            ref={setSectionRef('preflight')}
-            className="cheat-sec cheat-sec-last"
-          >
-            <div className="cheat-sec-eyebrow mono-label">06 · Pre-flight</div>
-            <h2 className="cheat-sec-head">
-              Right before
-              <br />
-              the call.
-            </h2>
+          {/* 07 Pre-flight */}
+          <div data-sec="preflight" ref={setRef('preflight')} className="cheat-sec cheat-sec-last">
+            <div className="cheat-sec-eyebrow mono-label">07 · Pre-flight</div>
             <div className="cheat-preflight">
               {PREFLIGHT.map((label, i) => {
                 const on = !!checked[i]
                 return (
-                  <label
-                    key={label}
-                    className="cheat-pf-row"
-                    onClick={() => toggleCheck(i)}
-                  >
-                    <span className={`cheat-pf-box ${on ? 'is-on' : ''}`}>
-                      {on ? '✓' : ''}
-                    </span>
-                    <span className={`cheat-pf-label ${on ? 'is-on' : ''}`}>
-                      {label}
-                    </span>
+                  <label key={label} className="cheat-pf-row" onClick={() => toggleCheck(i)}>
+                    <span className={`cheat-pf-box ${on ? 'is-on' : ''}`}>{on ? '✓' : ''}</span>
+                    <span className={`cheat-pf-label ${on ? 'is-on' : ''}`}>{label}</span>
                   </label>
                 )
               })}

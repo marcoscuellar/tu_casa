@@ -8,6 +8,7 @@ import { ConfirmInfo } from './pages/app/ConfirmInfo'
 import { Discovery } from './pages/app/Discovery'
 import { Dashboard } from './pages/app/Dashboard'
 import { FitCheck } from './pages/app/FitCheck'
+import { CheatIntake } from './pages/app/CheatIntake'
 import { CheatGen } from './pages/app/CheatGen'
 import { CheatSheet } from './pages/app/CheatSheet'
 import { Paywall } from './pages/app/Paywall'
@@ -35,6 +36,7 @@ export function App() {
       <Route path="/discovery" element={<Discovery />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/fit" element={<FitCheck />} />
+      <Route path="/cheat-intake" element={<CheatIntake />} />
       <Route path="/cheat-generating" element={<CheatGen />} />
       <Route path="/cheatsheet" element={<CheatSheet />} />
       <Route path="/paywall" element={<Paywall />} />

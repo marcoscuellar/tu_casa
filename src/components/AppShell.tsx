@@ -16,7 +16,7 @@ const FREE_NAV: { label: string; to: string }[] = [
 const GATED_NAV: { label: string; to: string }[] = [
   { label: 'Dashboard', to: '/dashboard' },
   { label: 'Profile', to: '/account' },
-  { label: 'Cheat sheets', to: '/cheatsheet' },
+  { label: 'Cheat sheets', to: '/cheat-intake' },
 ]
 
 // The nudge shown when a pre-credential visitor taps a gated item.

@@ -288,7 +288,7 @@ export function Landing() {
             <div className="lp-founder-by">
               <a
                 className="lp-founder-name"
-                href="https://www.linkedin.com/in/marcosmcuellar/"
+                href="https://dosystems.app"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -444,7 +444,17 @@ export function Landing() {
         {/* Footer */}
         <footer className="lp-footer">
           <span>tucasa</span>
-          <span>free for job seekers, always</span>
+          <span className="lp-footer-right">
+            free for job seekers, always ·{' '}
+            <a
+              className="lp-footer-link"
+              href="https://dosystems.app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              by Marcos Cuellar
+            </a>
+          </span>
         </footer>
       </div>
 

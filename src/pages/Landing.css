@@ -759,6 +759,13 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+.lp-footer-link {
+  color: var(--accent-teal-ink);
+  transition: color 0.15s;
+}
+.lp-footer-link:hover {
+  color: var(--wine);
+}
 
 /* Responsive ------------------------------------------------ */
 @media (max-width: 900px) {

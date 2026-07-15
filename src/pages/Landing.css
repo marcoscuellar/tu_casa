@@ -1,54 +1,63 @@
 /* ============================================================
    Landing — TuCasa reskin (turn 24 assembled page).
-   Full-bleed alternating bands (cream / dark / burgundy),
-   flush seams, cream page. Teal-led palette.
+   BENTO look: every section is its own floating rounded tile on
+   the cream page. Smooth rhythm comes from CONSISTENCY —
+   identical gap, corner radius, shadow, and internal padding on
+   every tile. Hero split stays the signature. Teal-led palette.
    ============================================================ */
 
 .lp {
+  --tile-radius: 18px;
+  --tile-shadow: 0 10px 30px rgba(15, 15, 15, 0.1);
+  --tile-gap: 16px;
+  --tile-pad: 44px;
+  --tile-gutter: 20px;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font);
   overflow-x: hidden;
+  padding: var(--tile-gap) 0;
 }
 
-/* Full-bleed band + centered inner column ------------------- */
+/* Each band = a gutter wrapper; the inner column IS the tile. --- */
 .lp-band {
   width: 100%;
+  padding: 0 var(--tile-gutter);
+  margin-bottom: var(--tile-gap);
+}
+.lp-band:last-child {
+  margin-bottom: 0;
 }
 .lp-in {
   max-width: 1040px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: var(--tile-pad);
+  border-radius: var(--tile-radius);
+  box-shadow: var(--tile-shadow);
 }
-.lp-band-cream {
-  background: var(--paper);
+/* Tile surface by band tone (cream page shows in the gaps). */
+.lp-band-cream .lp-in {
+  background: var(--card);
 }
-.lp-band-dark {
+.lp-band-dark .lp-in {
   background: var(--bento);
 }
-.lp-band-burgundy {
+.lp-band-burgundy .lp-in {
   background: var(--burgundy);
 }
 
-/* Shared band section spacing (cream/dark/burgundy content) */
-.lp-pillars,
-.lp-diff,
-.lp-founder,
-.lp-quotes,
-.lp-pricing,
-.lp-final {
-  padding-top: 56px;
-  padding-bottom: 56px;
-}
-
-/* Topbar ---------------------------------------------------- */
+/* Topbar — its own slim cream tile, same radius/shadow/gutter. */
 .lp-topbar {
-  background: var(--paper);
+  padding: 0 var(--tile-gutter);
+  margin-bottom: var(--tile-gap);
 }
 .lp-topbar-in {
   max-width: 1040px;
   margin: 0 auto;
-  padding: 22px 40px;
+  padding: 18px var(--tile-pad);
+  background: var(--card);
+  border-radius: var(--tile-radius);
+  box-shadow: var(--tile-shadow);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -85,18 +94,20 @@
   border-color: var(--accent);
 }
 
-/* Hero ------------------------------------------------------ */
-.lp-hero-band {
-  background: var(--paper);
-  padding-bottom: 24px;
+/* Hero — the split IS the tile, so its .lp-in stays bare. */
+.lp-hero-band .lp-in {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
 }
 .lp-hero {
   position: relative;
-  border-radius: 18px;
+  border-radius: var(--tile-radius);
   overflow: hidden;
   display: flex;
   min-height: 340px;
-  box-shadow: 0 10px 24px rgba(15, 15, 15, 0.12);
+  box-shadow: var(--tile-shadow);
 }
 .lp-hero-ghost {
   position: absolute;
@@ -686,8 +697,6 @@
   align-items: center;
   gap: 18px;
   text-align: center;
-  padding-top: 64px;
-  padding-bottom: 64px;
 }
 .lp-final-head {
   font: 900 40px var(--font);
@@ -702,15 +711,12 @@
 }
 
 /* Footer ---------------------------------------------------- */
-.lp-footer-band {
-  border-top: 1px solid var(--hairline);
-}
-.lp-footer {
+/* Footer — slim cream tile, matching the topbar bar rhythm. */
+.lp-footer-band .lp-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 26px;
-  padding-bottom: 26px;
+  padding: 18px var(--tile-pad);
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -732,10 +738,18 @@
 
 /* Responsive ------------------------------------------------ */
 @media (max-width: 860px) {
-  .lp-in,
+  .lp {
+    --tile-pad: 26px;
+    --tile-gutter: 12px;
+  }
   .lp-topbar-in {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 16px 22px;
+  }
+  .lp-footer-band .lp-footer {
+    padding: 16px 22px;
+  }
+  .lp-hero-band .lp-in {
+    padding: 0;
   }
   .lp-hero {
     flex-direction: column;

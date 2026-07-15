@@ -20,7 +20,15 @@ import {
   type PipelineResult,
 } from '../engines/pipeline'
 import type { GatedResearch } from '../engines/research'
-import type { HiringInsight, ParsedResume, RankedJob, ResumeUpload } from '../engines/types'
+import { buildDepartmentBrief } from '../engines/department'
+import type {
+  DepartmentBrief,
+  HiringInsight,
+  InterviewInput,
+  ParsedResume,
+  RankedJob,
+  ResumeUpload,
+} from '../engines/types'
 
 // Real ATS jobs when VITE_LIVE_JOBS=1 (needs open egress to the ATS hosts);
 // otherwise the fixture pipeline, so the demo works offline and tests are hermetic.
@@ -103,6 +111,12 @@ export interface AppFlowContextValue {
   selectedJob?: RankedJob
   selectJob: (id: string) => void
 
+  /* Cheat-sheet intake — who you're meeting, company, role (Engine 5 input). */
+  interview?: InterviewInput
+  setInterview: (input: InterviewInput) => void
+  /** Department-scoped brief derived from the intake (fixtures now, live later). */
+  departmentBrief?: DepartmentBrief
+
   /* Derived per selected job */
   cheatCompany: string
   cheatRole: string
@@ -133,6 +147,9 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   const [restored] = useState(loadSession)
   const [name, setName] = useState(restored?.name ?? '')
   const [email, setEmail] = useState(restored?.email ?? '')
+  const [interview, setInterviewState] = useState<InterviewInput | null>(
+    restored?.interview ?? null,
+  )
   const [accountGate, setAccountGate] = useState<AccountGate | null>(null)
   const pendingAction = useRef<((email: string) => void) | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(restored?.selectedId ?? null)
@@ -201,8 +218,8 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   // Persist the working shortlist (and any soft account) so closing the tab
   // before an explicit save doesn't lose it. Only writes once a search exists.
   useEffect(() => {
-    if (pipeline) saveSession({ name, email, selectedId, pipeline })
-  }, [pipeline, name, email, selectedId])
+    if (pipeline) saveSession({ name, email, selectedId, interview, pipeline })
+  }, [pipeline, name, email, selectedId, interview])
 
   // Step 2 — the candidate confirmed (and possibly edited) the profile; run
   // discovery → audit → score → rank on it.
@@ -239,6 +256,13 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
     if (!selectedJob || !research) return null
     return buildHiringInsight(PROVIDERS, research, selectedJob.role)
   }, [selectedJob, research])
+
+  // Department-scoped intel derived from the cheat-sheet intake. Deterministic
+  // fixture intel today; live Engine 5 is a clean swap inside buildDepartmentBrief.
+  const departmentBrief = useMemo<DepartmentBrief | undefined>(
+    () => (interview ? buildDepartmentBrief(interview) : undefined),
+    [interview],
+  )
 
   const candidateRole =
     pipeline?.resume.titles[0]?.raw ?? draftResume?.titles[0]?.raw ?? 'your field'
@@ -280,6 +304,10 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       selectedJob,
       selectJob: (id) => setSelectedId(id),
 
+      interview: interview ?? undefined,
+      setInterview: (input) => setInterviewState(input),
+      departmentBrief,
+
       cheatCompany: selectedJob?.company ?? '',
       cheatRole: selectedJob?.role ?? '',
       research,
@@ -301,7 +329,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, accountGate, requireAccount, submitAccountGate, cancelAccountGate, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, selectedJob, research, insight, credits, firstSheetUsed],
+    [name, email, accountGate, requireAccount, submitAccountGate, cancelAccountGate, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, selectedJob, interview, departmentBrief, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

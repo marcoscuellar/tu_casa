@@ -9,6 +9,7 @@
  */
 
 import type { PipelineResult } from '../engines/pipeline'
+import type { InterviewInput } from '../engines/types'
 
 const KEY = 'tucasa:session'
 const VERSION = 1
@@ -21,6 +22,8 @@ export interface SessionSnapshot {
   email: string
   selectedId: string | null
   pipeline: PipelineResult
+  /** Cheat-sheet intake, so it survives a signup round-trip / reload. */
+  interview?: InterviewInput | null
 }
 
 export function saveSession(s: Omit<SessionSnapshot, 'version'>): void {
@@ -30,6 +33,7 @@ export function saveSession(s: Omit<SessionSnapshot, 'version'>): void {
       name: s.name,
       email: s.email,
       selectedId: s.selectedId,
+      interview: s.interview ?? null,
       pipeline: {
         ...s.pipeline,
         broaderJobs: s.pipeline.broaderJobs.slice(0, MAX_BROADER),

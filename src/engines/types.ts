@@ -235,6 +235,49 @@ export interface ResearchBrief {
 }
 
 /* ============================================================
+   Engine 5 · department-scoped interview intel (intake-driven)
+   The user names WHO they're meeting; Engine 5 scopes intel to that
+   person's department rather than the company in general.
+   ============================================================ */
+
+/** The three fields the user gives on the cheat-sheet intake. */
+export interface InterviewInput {
+  interviewerName: string
+  interviewerTitle: string
+  company: string
+  role: string
+}
+
+/** A dated, optionally-sourced intel line. */
+export interface DeptSignal {
+  text: string
+  source?: string
+  date?: string
+}
+
+/** Department-scoped brief — the raw material for the cheat sheet sections. */
+export interface DepartmentBrief {
+  /** Derived from the interviewer's title/role (e.g. "Marketing"). */
+  department: string
+  company: string
+  role: string
+  interviewerName: string
+  interviewerTitle: string
+  /** Why this department is hiring. */
+  whyHiring: string[]
+  /** Recent department news / signals. */
+  recentNews: DeptSignal[]
+  /** Org / leadership changes touching this department. */
+  orgChanges: string[]
+  /** Launches / initiatives the department is driving. */
+  launches: string[]
+  /** What this specific interviewer likely cares about (from title/role). */
+  interviewerCares: string[]
+  /** True while this is illustrative fixture intel, not live research. */
+  sample: boolean
+}
+
+/* ============================================================
    Hiring-need reasoning ("why does this role exist?")
    ============================================================ */
 

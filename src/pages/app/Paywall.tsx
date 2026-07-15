@@ -12,7 +12,9 @@ import './Paywall.css'
  */
 export function Paywall() {
   const navigate = useNavigate()
-  const { cheatCompany, cheatRole, addCredits, consumeSheet } = useAppFlow()
+  const { cheatCompany, cheatRole, interview, addCredits, consumeSheet } = useAppFlow()
+  const readyCompany = interview?.company || cheatCompany
+  const readyRole = interview?.role || cheatRole
 
   const goPro = () => {
     addCredits(999)
@@ -40,9 +42,11 @@ export function Paywall() {
               tailoring and a live interview cheat sheet for every room.
             </p>
           </div>
-          <div className="paywall-ready mono-label">
-            Ready for: {cheatCompany} · {cheatRole}
-          </div>
+          {(readyCompany || readyRole) && (
+            <div className="paywall-ready mono-label">
+              Ready for: {[readyRole, readyCompany].filter(Boolean).join(' · ')}
+            </div>
+          )}
         </div>
 
         {/* Right — single Pro plan */}

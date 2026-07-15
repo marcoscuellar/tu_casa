@@ -2,12 +2,14 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
   type ReactNode,
 } from 'react'
 import { track } from '../lib/analytics'
+import { loadSession, saveSession } from '../lib/session'
 import { fixtureProviders } from '../engines/providers/fixtures'
 import { liveProviders } from '../engines/providers/live'
 import {
@@ -127,11 +129,13 @@ const DEFAULT_GATE: AccountGate = {
 }
 
 export function AppFlowProvider({ children }: { children: ReactNode }) {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  // Rehydrate an unsaved working shortlist from a previous tab, if one exists.
+  const [restored] = useState(loadSession)
+  const [name, setName] = useState(restored?.name ?? '')
+  const [email, setEmail] = useState(restored?.email ?? '')
   const [accountGate, setAccountGate] = useState<AccountGate | null>(null)
   const pendingAction = useRef<((email: string) => void) | null>(null)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(restored?.selectedId ?? null)
   const [credits, setCredits] = useState(0)
   const [firstSheetUsed, setFirstSheetUsed] = useState(false)
 
@@ -139,7 +143,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   // it, then run discovery on the confirmed profile. Both steps return whether
   // they succeeded so the screens can navigate without racing the loading flag.
   const [draftResume, setDraftResume] = useState<ParsedResume | null>(null)
-  const [pipeline, setPipeline] = useState<PipelineResult | null>(null)
+  const [pipeline, setPipeline] = useState<PipelineResult | null>(restored?.pipeline ?? null)
   const [loading, setLoading] = useState(false)
   const [pipelineError, setPipelineError] = useState<string | undefined>(undefined)
 
@@ -193,6 +197,12 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
     setAccountGate(null)
     track('account_gate_dismissed')
   }, [])
+
+  // Persist the working shortlist (and any soft account) so closing the tab
+  // before an explicit save doesn't lose it. Only writes once a search exists.
+  useEffect(() => {
+    if (pipeline) saveSession({ name, email, selectedId, pipeline })
+  }, [pipeline, name, email, selectedId])
 
   // Step 2 — the candidate confirmed (and possibly edited) the profile; run
   // discovery → audit → score → rank on it.

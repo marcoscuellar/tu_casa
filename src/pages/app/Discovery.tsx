@@ -7,10 +7,11 @@ import type { ParsedResume, RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
 
-// Reveal the shortlist a handful at a time (7) so even the focused top-50 lands
-// calmly. The focus cap itself lives in the pipeline; here we only paginate.
-const INITIAL_SHOWN = 7
-const SHOW_MORE_STEP = 7
+// Reveal the shortlist a page at a time so even the focused top-50 lands calmly
+// and scannable. Start with 10, then "show next 10". The focus cap itself lives
+// in the pipeline; here we only paginate.
+const INITIAL_SHOWN = 10
+const SHOW_MORE_STEP = 10
 
 // Fit-score tier boundary: at/above this reads as an "Excellent fit", below as
 // a "Strong fit". Everything shown is already among the best matches.

@@ -2,6 +2,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import {
   buildHiringInsight,
   buildResearch,
+  clampFocusLimit,
+  DEFAULT_FOCUS_LIMIT,
   diversifyByCompany,
   runPipeline,
   type PipelineResult,
@@ -68,6 +70,15 @@ describe('pipeline — discover → audit → score → rank (fixtures)', () => 
     expect(bright?.fit.gaps.some((g) => /kubernetes/i.test(g.t))).toBe(true)
   })
 
+  it('reports rawCount + focusLimit, with an empty broader tail below the cap', () => {
+    // 6 raw postings reviewed; the focused set is well under the default 50, so
+    // nothing spills into the broader tail.
+    expect(result.rawCount).toBe(6)
+    expect(result.focusLimit).toBe(DEFAULT_FOCUS_LIMIT)
+    expect(result.broaderJobs).toHaveLength(0)
+    expect(result.jobs.length).toBeLessThanOrEqual(result.focusLimit)
+  })
+
   it('research gate returns GO for Northwind and THIN for an unknown company', () => {
     expect(buildResearch(fixtureProviders, 'Northwind Apparel', 'SFE').readiness).toBe('GO')
     expect(buildResearch(fixtureProviders, 'Obscure Co', 'SFE').readiness).toBe('THIN')
@@ -115,5 +126,21 @@ describe('diversifyByCompany', () => {
   it('is a no-op when every company is within the cap', () => {
     const ranked = [job('a1', 'Stripe'), job('b1', 'Figma'), job('a2', 'Stripe')]
     expect(diversifyByCompany(ranked, 2).map((j) => j.id)).toEqual(['a1', 'b1', 'a2'])
+  })
+})
+
+describe('clampFocusLimit', () => {
+  it('holds a requested limit inside the tunable 30–75 band', () => {
+    expect(clampFocusLimit(50)).toBe(50)
+    expect(clampFocusLimit(30)).toBe(30)
+    expect(clampFocusLimit(75)).toBe(75)
+    expect(clampFocusLimit(10)).toBe(30) // below floor → floor
+    expect(clampFocusLimit(500)).toBe(75) // above ceiling → ceiling
+    expect(clampFocusLimit(47.6)).toBe(48) // rounds
+  })
+
+  it('falls back to the default for a non-finite request', () => {
+    expect(clampFocusLimit(Number.NaN)).toBe(DEFAULT_FOCUS_LIMIT)
+    expect(clampFocusLimit(Infinity)).toBe(DEFAULT_FOCUS_LIMIT)
   })
 })

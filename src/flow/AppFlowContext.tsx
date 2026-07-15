@@ -49,7 +49,13 @@ export interface AppFlowContextValue {
 
   /* Ranked openings */
   jobs: RankedJob[]
+  /** The ranked tail beyond the focus cap — revealed on "show broader matches". */
+  broaderJobs: RankedJob[]
   matchCount: number
+  /** Postings reviewed before the focus cap (for "we reviewed N, ranked best M"). */
+  rawCount: number
+  /** The focus cap applied to `jobs` (default 50). */
+  focusLimit: number
   droppedCount: number
   duplicateCount: number
   /** True while the (possibly live) pipeline is still resolving. */
@@ -181,7 +187,10 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
 
       resume: pipeline?.resume,
       jobs,
+      broaderJobs: pipeline?.broaderJobs ?? [],
       matchCount: jobs.length,
+      rawCount: pipeline?.rawCount ?? 0,
+      focusLimit: pipeline?.focusLimit ?? 0,
       droppedCount: pipeline?.droppedCount ?? 0,
       duplicateCount: pipeline?.duplicateCount ?? 0,
       loading,

@@ -38,6 +38,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       onSkip: (c, reason) => console.warn(`discover: skipped ${c.slug} — ${reason}`),
     })
     const postings = await discovery.findPostings(resume)
+    // Observability: how many postings the ~40-board pull surfaced this search.
+    // The focus cap (top ~50) is applied client-side after ranking; this is the
+    // raw pull the client then reviews. No LLM runs over this list.
+    console.info(`discover: ${postings.length} raw postings returned (pre-rank)`)
     res.status(200).json({ postings })
   } catch (err) {
     console.error('discover failed:', err)

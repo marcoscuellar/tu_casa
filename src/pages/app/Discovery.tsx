@@ -7,12 +7,14 @@ import type { ParsedResume, RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
 
-// Show the strongest handful first; reveal more on demand (7 at a time) up to a
-// hard cap so a big shortlist stays focused. The cap is a display limit today;
-// it becomes a real per-user quota once accounts + the credits model land.
+// Reveal the shortlist a handful at a time (7) so even the focused top-50 lands
+// calmly. The focus cap itself lives in the pipeline; here we only paginate.
 const INITIAL_SHOWN = 7
 const SHOW_MORE_STEP = 7
-const MAX_SHOWN = 30
+
+// Fit-score tier boundary: at/above this reads as an "Excellent fit", below as
+// a "Strong fit". Everything shown is already among the best matches.
+const EXCELLENT_FIT = 85
 
 // Applied-job tracking, persisted client-side so it survives a refresh. Becomes
 // account-backed once we have real users + a database.
@@ -94,9 +96,11 @@ function skillsInPosting(resume: ParsedResume | undefined, job: RankedJob): stri
 
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, loading, selectJob, hasAccount, email, resume } =
+  const { candidateName, candidateRole, jobs, broaderJobs, rawCount, loading, selectJob, hasAccount, email, resume } =
     useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
+  const [showBroader, setShowBroader] = useState(false)
+  const [broaderVisible, setBroaderVisible] = useState(INITIAL_SHOWN)
   const [openId, setOpenId] = useState<string | null>(null)
   const [applied, setApplied] = useState<Set<string>>(loadApplied)
   const [listSaved, setListSaved] = useState<boolean>(() => {
@@ -178,10 +182,197 @@ export function Discovery() {
     navigate('/fit')
   }
 
-  const cap = Math.min(jobs.length, MAX_SHOWN)
-  const shown = jobs.slice(0, Math.min(visible, cap))
-  const remaining = cap - shown.length
-  const cappedOut = shown.length >= MAX_SHOWN && jobs.length > MAX_SHOWN
+  // The focused shortlist (already capped in the pipeline), paginated + tiered.
+  const focusedShown = jobs.slice(0, Math.min(visible, jobs.length))
+  const excellent = focusedShown.filter((j) => j.fit.score >= EXCELLENT_FIT)
+  const strong = focusedShown.filter((j) => j.fit.score < EXCELLENT_FIT)
+  const focusedRemaining = jobs.length - focusedShown.length
+  const topId = jobs[0]?.id
+
+  // One card renderer, reused across the Excellent / Strong / Broader groups.
+  const renderCard = (job: RankedJob) => {
+    const top = job.id === topId
+    const isOpen = openId === job.id
+    const isApplied = applied.has(job.id)
+    const flagged = job.audit.recheck === 'flagged'
+    const matched = skillsInPosting(resume, job)
+    const metaParts = [
+      job.company,
+      prettyLocation(job.location),
+      job.industryLabel,
+    ].filter(Boolean) as string[]
+
+    return (
+      <div
+        key={job.id}
+        className={`disc-card ${top ? 'disc-card-top' : 'disc-card-plain'} ${
+          isOpen ? 'is-open' : ''
+        } ${isApplied ? 'is-applied' : ''}`}
+      >
+        <button
+          className="disc-card-head"
+          onClick={() => setOpenId(isOpen ? null : job.id)}
+          aria-expanded={isOpen}
+        >
+          <div className="disc-score-wrap">
+            <div className="disc-score">{job.fit.score}</div>
+            <div className="disc-score-label mono-label muted-light">Fit score</div>
+          </div>
+          <div className="disc-mid">
+            <div className="disc-title-row">
+              <div className="disc-title">{job.role}</div>
+              {isApplied && <span className="disc-applied-badge">✓ Applied</span>}
+              {flagged && (
+                <span className="disc-flag" title={job.audit.note}>
+                  ⚑ Verify
+                </span>
+              )}
+            </div>
+            <div className="disc-meta mono-label">{metaParts.join(' · ')}</div>
+            {matched.length > 0 && (
+              <div className="disc-head-chips">
+                {matched.slice(0, 4).map((s) => (
+                  <span key={s} className="disc-head-chip">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <span className="disc-chevron" aria-hidden>
+            {isOpen ? '–' : '+'}
+          </span>
+        </button>
+
+        {isOpen && (
+          <div className="disc-card-body">
+            {/* Facts — the hard specs, no opinion */}
+            <div className="disc-facts">
+              <div className="disc-fact">
+                <div className="disc-fact-label mono-label">Fit score</div>
+                <div className="disc-fact-val">{job.fit.score}/100</div>
+              </div>
+              {job.salary && (
+                <div className="disc-fact">
+                  <div className="disc-fact-label mono-label">Pay</div>
+                  <div className="disc-fact-val">{job.salary}</div>
+                </div>
+              )}
+              <div className="disc-fact">
+                <div className="disc-fact-label mono-label">Work type</div>
+                <div className="disc-fact-val">{workType(job)}</div>
+              </div>
+              {job.industryLabel && (
+                <div className="disc-fact">
+                  <div className="disc-fact-label mono-label">Industry</div>
+                  <div className="disc-fact-val">
+                    {job.industryLabel}
+                    {job.industryMatch === 'same' && (
+                      <span className="disc-field-tag is-same"> ✓ your field</span>
+                    )}
+                    {job.industryMatch === 'different' && (
+                      <span className="disc-field-tag is-diff"> ✕ new field</span>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="disc-fact">
+                <div className="disc-fact-label mono-label">Seniority</div>
+                <div className="disc-fact-val">
+                  {job.fit.seniorityBarMet ? 'You clear it' : 'A stretch'}
+                </div>
+              </div>
+              <div className="disc-fact">
+                <div className="disc-fact-label mono-label">Posted</div>
+                <div className="disc-fact-val">{job.postedDate}</div>
+              </div>
+            </div>
+
+            {job.locationNote && (
+              <div className="disc-body-note">{job.locationNote}</div>
+            )}
+            {job.industryNote && (
+              <div
+                className={`disc-body-note disc-field-note ${
+                  job.industryMatch === 'same' ? 'is-same' : 'is-diff'
+                }`}
+              >
+                {job.industryNote}
+              </div>
+            )}
+
+            {/* How you measure up — the real answer, straight from the rubric */}
+            <div className="disc-section">
+              <div className="disc-body-label mono-label">How you measure up</div>
+              <div className="disc-measure">
+                <div className="disc-measure-col">
+                  <div className="disc-measure-head disc-measure-good">
+                    ✓ What you bring
+                  </div>
+                  {job.fit.covered.length > 0 ? (
+                    job.fit.covered.map((c) => (
+                      <div key={c.t} className="disc-measure-item">
+                        <div className="disc-measure-t">{c.t}</div>
+                        <div className="disc-measure-d">{c.d}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="disc-measure-empty">
+                      Matched on your title and seniority.
+                    </div>
+                  )}
+                </div>
+                <div className="disc-measure-col">
+                  <div className="disc-measure-head disc-measure-gap">
+                    △ Worth addressing
+                  </div>
+                  {job.fit.gaps.length > 0 ? (
+                    job.fit.gaps.map((g) => (
+                      <div key={g.t} className="disc-measure-item">
+                        <div className="disc-measure-t">{g.t}</div>
+                        <div className="disc-measure-d">{g.d}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="disc-measure-empty">
+                      Nothing blocking — you&rsquo;re clear on the stated requirements.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {job.description && (
+              <div className="disc-section">
+                <div className="disc-body-label mono-label">What the role is</div>
+                <p className="disc-desc">{snippet(job.description, 460)}</p>
+              </div>
+            )}
+
+            <div className="disc-card-actions">
+              <a
+                className="disc-apply-btn"
+                href={job.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View &amp; apply →
+              </a>
+              <button className="disc-fit-btn" onClick={() => fullFit(job)}>
+                Prep me for the interview →
+              </button>
+              <button
+                className={`disc-applied-btn ${isApplied ? 'is-on' : ''}`}
+                onClick={() => toggleApplied(job.id)}
+              >
+                {isApplied ? '✓ Applied — undo' : 'Mark as applied'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <AppShell>
@@ -200,6 +391,12 @@ export function Discovery() {
               first — every score earned against the role&rsquo;s real
               requirements. Tap any role to see why it fits.
             </p>
+            {rawCount > jobs.length && (
+              <div className="disc-reviewed mono-label">
+                We reviewed {rawCount} live postings and ranked your best{' '}
+                {jobs.length}.
+              </div>
+            )}
           </div>
           {jobs.length > 0 && (
             <div className="disc-header-count">
@@ -220,207 +417,60 @@ export function Discovery() {
           </div>
         )}
         <div className="disc-list">
-          {shown.map((job, i) => {
-            const top = i === 0
-            const isOpen = openId === job.id
-            const isApplied = applied.has(job.id)
-            const flagged = job.audit.recheck === 'flagged'
-            const matched = skillsInPosting(resume, job)
-            const metaParts = [
-              job.company,
-              prettyLocation(job.location),
-              job.industryLabel,
-            ].filter(Boolean) as string[]
-
-            return (
-              <div
-                key={job.id}
-                className={`disc-card ${top ? 'disc-card-top' : 'disc-card-plain'} ${
-                  isOpen ? 'is-open' : ''
-                } ${isApplied ? 'is-applied' : ''}`}
-              >
-                <button
-                  className="disc-card-head"
-                  onClick={() => setOpenId(isOpen ? null : job.id)}
-                  aria-expanded={isOpen}
-                >
-                  <div className="disc-score-wrap">
-                    <div className="disc-score">{job.fit.score}</div>
-                    <div className="disc-score-label mono-label muted-light">Fit score</div>
-                  </div>
-                  <div className="disc-mid">
-                    <div className="disc-title-row">
-                      <div className="disc-title">{job.role}</div>
-                      {isApplied && <span className="disc-applied-badge">✓ Applied</span>}
-                      {flagged && (
-                        <span className="disc-flag" title={job.audit.note}>
-                          ⚑ Verify
-                        </span>
-                      )}
-                    </div>
-                    <div className="disc-meta mono-label">{metaParts.join(' · ')}</div>
-                    {matched.length > 0 && (
-                      <div className="disc-head-chips">
-                        {matched.slice(0, 4).map((s) => (
-                          <span key={s} className="disc-head-chip">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <span className="disc-chevron" aria-hidden>
-                    {isOpen ? '–' : '+'}
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="disc-card-body">
-                    {/* Facts — the hard specs, no opinion */}
-                    <div className="disc-facts">
-                      <div className="disc-fact">
-                        <div className="disc-fact-label mono-label">Fit score</div>
-                        <div className="disc-fact-val">{job.fit.score}/100</div>
-                      </div>
-                      {job.salary && (
-                        <div className="disc-fact">
-                          <div className="disc-fact-label mono-label">Pay</div>
-                          <div className="disc-fact-val">{job.salary}</div>
-                        </div>
-                      )}
-                      <div className="disc-fact">
-                        <div className="disc-fact-label mono-label">Work type</div>
-                        <div className="disc-fact-val">{workType(job)}</div>
-                      </div>
-                      {job.industryLabel && (
-                        <div className="disc-fact">
-                          <div className="disc-fact-label mono-label">Industry</div>
-                          <div className="disc-fact-val">
-                            {job.industryLabel}
-                            {job.industryMatch === 'same' && (
-                              <span className="disc-field-tag is-same"> ✓ your field</span>
-                            )}
-                            {job.industryMatch === 'different' && (
-                              <span className="disc-field-tag is-diff"> ✕ new field</span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      <div className="disc-fact">
-                        <div className="disc-fact-label mono-label">Seniority</div>
-                        <div className="disc-fact-val">
-                          {job.fit.seniorityBarMet ? 'You clear it' : 'A stretch'}
-                        </div>
-                      </div>
-                      <div className="disc-fact">
-                        <div className="disc-fact-label mono-label">Posted</div>
-                        <div className="disc-fact-val">{job.postedDate}</div>
-                      </div>
-                    </div>
-
-                    {job.locationNote && (
-                      <div className="disc-body-note">{job.locationNote}</div>
-                    )}
-                    {job.industryNote && (
-                      <div
-                        className={`disc-body-note disc-field-note ${
-                          job.industryMatch === 'same' ? 'is-same' : 'is-diff'
-                        }`}
-                      >
-                        {job.industryNote}
-                      </div>
-                    )}
-
-                    {/* How you measure up — the real answer, straight from the rubric */}
-                    <div className="disc-section">
-                      <div className="disc-body-label mono-label">How you measure up</div>
-                      <div className="disc-measure">
-                        <div className="disc-measure-col">
-                          <div className="disc-measure-head disc-measure-good">
-                            ✓ What you bring
-                          </div>
-                          {job.fit.covered.length > 0 ? (
-                            job.fit.covered.map((c) => (
-                              <div key={c.t} className="disc-measure-item">
-                                <div className="disc-measure-t">{c.t}</div>
-                                <div className="disc-measure-d">{c.d}</div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="disc-measure-empty">
-                              Matched on your title and seniority.
-                            </div>
-                          )}
-                        </div>
-                        <div className="disc-measure-col">
-                          <div className="disc-measure-head disc-measure-gap">
-                            △ Worth addressing
-                          </div>
-                          {job.fit.gaps.length > 0 ? (
-                            job.fit.gaps.map((g) => (
-                              <div key={g.t} className="disc-measure-item">
-                                <div className="disc-measure-t">{g.t}</div>
-                                <div className="disc-measure-d">{g.d}</div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="disc-measure-empty">
-                              Nothing blocking — you&rsquo;re clear on the stated requirements.
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {job.description && (
-                      <div className="disc-section">
-                        <div className="disc-body-label mono-label">What the role is</div>
-                        <p className="disc-desc">{snippet(job.description, 460)}</p>
-                      </div>
-                    )}
-
-                    <div className="disc-card-actions">
-                      <a
-                        className="disc-apply-btn"
-                        href={job.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View &amp; apply →
-                      </a>
-                      <button className="disc-fit-btn" onClick={() => fullFit(job)}>
-                        Prep me for the interview →
-                      </button>
-                      <button
-                        className={`disc-applied-btn ${isApplied ? 'is-on' : ''}`}
-                        onClick={() => toggleApplied(job.id)}
-                      >
-                        {isApplied ? '✓ Applied — undo' : 'Mark as applied'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+          {excellent.length > 0 && (
+            <div className="disc-tier mono-label">Excellent fits · {excellent.length}</div>
+          )}
+          {excellent.map(renderCard)}
+          {strong.length > 0 && (
+            <div className="disc-tier mono-label">Strong fits · {strong.length}</div>
+          )}
+          {strong.map(renderCard)}
         </div>
 
-        {remaining > 0 && (
+        {focusedRemaining > 0 && (
           <div className="disc-more-row disc-more-center">
             <button
               className="disc-more-btn"
-              onClick={() => setVisible((v) => Math.min(v + SHOW_MORE_STEP, cap))}
+              onClick={() => setVisible((v) => Math.min(v + SHOW_MORE_STEP, jobs.length))}
             >
-              Show me the next {SHOW_MORE_STEP} →
+              Show me the next {Math.min(SHOW_MORE_STEP, focusedRemaining)} →
             </button>
           </div>
         )}
-        {cappedOut && (
+
+        {focusedRemaining === 0 && broaderJobs.length > 0 && !showBroader && (
           <div className="disc-more-row disc-more-center">
-            <span className="disc-more-count mono-label">
-              That&rsquo;s your top {MAX_SHOWN} — refine your résumé to sharpen the list.
-            </span>
+            <button
+              className="disc-more-btn disc-broader-btn"
+              onClick={() => setShowBroader(true)}
+            >
+              Show broader matches ({broaderJobs.length}) →
+            </button>
           </div>
+        )}
+
+        {showBroader && broaderJobs.length > 0 && (
+          <>
+            <div className="disc-tier disc-tier-broad mono-label">
+              Broader matches · {broaderJobs.length}
+            </div>
+            <div className="disc-list">
+              {broaderJobs.slice(0, broaderVisible).map(renderCard)}
+            </div>
+            {broaderVisible < broaderJobs.length && (
+              <div className="disc-more-row disc-more-center">
+                <button
+                  className="disc-more-btn"
+                  onClick={() =>
+                    setBroaderVisible((v) => Math.min(v + SHOW_MORE_STEP, broaderJobs.length))
+                  }
+                >
+                  Show me the next{' '}
+                  {Math.min(SHOW_MORE_STEP, broaderJobs.length - broaderVisible)} →
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         {/* Save-my-shortlist bar (turn 13) */}

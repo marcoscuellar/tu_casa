@@ -35,7 +35,14 @@ const CONFIDENCE_RANK: Record<Confidence, number> = {
 
 export interface PipelineResult {
   resume: ParsedResume
+  /** The focused, ranked shortlist — the top `focusLimit` matches. */
   jobs: RankedJob[]
+  /** The ranked tail beyond the focus cap, revealed on "show broader matches". */
+  broaderJobs: RankedJob[]
+  /** Postings actually reviewed (fetched + relevance-filtered) before the cap. */
+  rawCount: number
+  /** The focus cap applied to `jobs` this run. */
+  focusLimit: number
   /** How many postings were dropped/collapsed, for honest UI messaging. */
   droppedCount: number
   duplicateCount: number
@@ -43,6 +50,26 @@ export interface PipelineResult {
 
 /** At most this many roles from any one company surface before the overflow tail. */
 export const PER_COMPANY_CAP = 2
+
+/**
+ * Focus cap — after QA + rubric + rank run on ALL raw postings (quality is never
+ * cut early), we surface the strongest `FOCUS_LIMIT` as the shortlist and hold
+ * the rest as a "broader matches" tail. 700 fit-for roles overwhelms people
+ * (especially our neurodivergent users); the best 50 is a calm, honest set.
+ *
+ * Note: discovery is fully deterministic — no LLM runs over the job list — so
+ * this cap saves ~0 LLM tokens today. Its wins are UX, payload, and render cost,
+ * and it future-proofs the day fit-scoring/research move onto an LLM.
+ */
+export const DEFAULT_FOCUS_LIMIT = 50
+export const MIN_FOCUS_LIMIT = 30
+export const MAX_FOCUS_LIMIT = 75
+
+/** Keep a requested focus limit inside the tunable 30–75 band. */
+export function clampFocusLimit(n: number): number {
+  if (!Number.isFinite(n)) return DEFAULT_FOCUS_LIMIT
+  return Math.max(MIN_FOCUS_LIMIT, Math.min(MAX_FOCUS_LIMIT, Math.round(n)))
+}
 
 /**
  * Keep the shortlist varied. A big employer (e.g. Stripe posting 40 roles)
@@ -75,10 +102,10 @@ export function diversifyByCompany(
 /** Run discover → audit → score → rank on a résumé. */
 export async function runPipeline(
   providers: Providers,
-  opts: { asOfYear?: number; upload?: ResumeUpload } = {},
+  opts: { asOfYear?: number; upload?: ResumeUpload; limit?: number } = {},
 ): Promise<PipelineResult> {
   const resume = await providers.resume.parseResume(opts.upload)
-  return runPipelineFromResume(providers, resume, { asOfYear: opts.asOfYear })
+  return runPipelineFromResume(providers, resume, { asOfYear: opts.asOfYear, limit: opts.limit })
 }
 
 /**
@@ -89,11 +116,13 @@ export async function runPipeline(
 export async function runPipelineFromResume(
   providers: Providers,
   resume: ParsedResume,
-  opts: { asOfYear?: number } = {},
+  opts: { asOfYear?: number; limit?: number } = {},
 ): Promise<PipelineResult> {
   const asOfYear = opts.asOfYear ?? new Date().getFullYear()
+  const focusLimit = clampFocusLimit(opts.limit ?? DEFAULT_FOCUS_LIMIT)
 
   const raw = await providers.discovery.findPostings(resume)
+  const rawCount = raw.length
   const discovered = runDiscovery(raw)
   const signals = providers.audit.recheck(raw)
   const { survivors, dropped, duplicates } = runAudit(discovered, signals)
@@ -125,11 +154,25 @@ export async function runPipelineFromResume(
     if (c !== 0) return c
     return a.ranked.id.localeCompare(b.ranked.id)
   })
-  const jobs = diversifyByCompany(scored.map((s) => s.ranked))
+  // Rank everything, THEN cap. Capping after the rubric guarantees the shortlist
+  // is the genuinely strongest matches — never an arbitrary early slice.
+  const ranked = diversifyByCompany(scored.map((s) => s.ranked))
+  const jobs = ranked.slice(0, focusLimit)
+  const broaderJobs = ranked.slice(focusLimit)
+
+  // Observability: raw pulled → focused, so the number can be monitored/tuned.
+  // Token note: discovery is deterministic — 0 LLM tokens spent over this list.
+  console.info(
+    `[discovery] reviewed ${rawCount} postings → ${jobs.length} focused` +
+      ` (+${broaderJobs.length} broader) · LLM tokens: 0 (deterministic pipeline)`,
+  )
 
   return {
     resume,
     jobs,
+    broaderJobs,
+    rawCount,
+    focusLimit,
     droppedCount: dropped.length,
     duplicateCount: duplicates.length,
   }

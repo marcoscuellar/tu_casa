@@ -23,9 +23,40 @@
 .disc-you {
   color: var(--accent-soft);
 }
+/* "We reviewed N postings, ranked your best M." — honest reframe of the pull. */
+.disc-reviewed {
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--accent-soft);
+}
 /* Right-side match count. */
 .disc-header-count {
   text-align: right;
+}
+/* Tier subheaders in the list (Excellent / Strong / Broader). */
+.disc-tier {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  padding: 6px 2px 2px;
+}
+.disc-tier:not(:first-child) {
+  margin-top: 8px;
+}
+.disc-tier-broad {
+  color: var(--grey);
+}
+/* "Show broader matches" — secondary/outline, distinct from the primary pager. */
+.disc-broader-btn {
+  background: transparent;
+  color: var(--wine);
+  border: 1.5px solid var(--wine);
+}
+.disc-broader-btn:hover {
+  background: var(--wine);
+  color: #fff;
+  filter: none;
 }
 .disc-count-num {
   font-family: var(--font);

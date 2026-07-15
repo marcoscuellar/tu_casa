@@ -55,6 +55,42 @@
   background: #fff;
   box-shadow: 0 1px 3px rgba(15, 15, 15, 0.12);
 }
+/* Gated items render as buttons — reset native chrome, de-emphasize. */
+button.tc-nav-link {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.tc-nav-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--grey);
+  opacity: 0.72;
+}
+.tc-nav-locked:hover {
+  color: var(--ink);
+  opacity: 1;
+}
+.tc-lock {
+  font-size: 9px;
+  line-height: 1;
+}
+/* Pre-credential avatar → a dashed "add" chip that nudges to soft signup. */
+.tc-nav-avatar-ghost {
+  background: transparent;
+  border: 1.5px dashed rgba(15, 15, 15, 0.22);
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.tc-nav-avatar-ghost:hover {
+  border-color: var(--wine);
+  color: var(--wine);
+}
 .tc-nav-right {
   display: flex;
   align-items: center;

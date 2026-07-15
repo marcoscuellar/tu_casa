@@ -3,9 +3,11 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { track } from '../lib/analytics'
 import { fixtureProviders } from '../engines/providers/fixtures'
 import { liveProviders } from '../engines/providers/live'
 import {
@@ -32,6 +34,12 @@ const PROVIDERS = USE_LIVE ? liveProviders : fixtureProviders
  * live LLM/web later — the UI only ever touches this context, never the engines.
  */
 
+/** Copy shown by the soft-signup modal when a gated action is attempted. */
+export interface AccountGate {
+  title: string
+  sub?: string
+}
+
 export interface AppFlowContextValue {
   /* Account (from signup) */
   name: string
@@ -39,6 +47,20 @@ export interface AppFlowContextValue {
   /** True once a (fake, in-memory) account exists — the cheat-sheet gate. */
   hasAccount: boolean
   setAccount: (name: string, email: string) => void
+
+  /* Deferred / on-gate signup — the soft-signup modal + pending action. */
+  /** Non-null while the soft-signup modal is open (its copy). */
+  accountGate: AccountGate | null
+  /**
+   * Run `action` if the visitor already has an account; otherwise open the
+   * soft-signup modal and run it once they finish. The action receives the
+   * (freshly captured) email so save/apply flows can use it immediately.
+   */
+  requireAccount: (action: (email: string) => void, gate?: AccountGate) => void
+  /** Complete the soft signup: set the account, then run the pending action. */
+  submitAccountGate: (name: string, email: string) => void
+  /** Dismiss the soft-signup modal without creating an account. */
+  cancelAccountGate: () => void
 
   /* Parsed profile (name from signup, role from the résumé) */
   candidateName: string
@@ -98,9 +120,17 @@ const AppFlowContext = createContext<AppFlowContextValue | null>(null)
 
 const AS_OF_YEAR = new Date().getFullYear()
 
+/** Fallback copy when a caller opens the soft-signup gate without its own. */
+const DEFAULT_GATE: AccountGate = {
+  title: 'Create a quick profile',
+  sub: 'Save your work and unlock more features. Takes 10 seconds.',
+}
+
 export function AppFlowProvider({ children }: { children: ReactNode }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [accountGate, setAccountGate] = useState<AccountGate | null>(null)
+  const pendingAction = useRef<((email: string) => void) | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [credits, setCredits] = useState(0)
   const [firstSheetUsed, setFirstSheetUsed] = useState(false)
@@ -132,6 +162,37 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const clearError = useCallback(() => setPipelineError(undefined), [])
+
+  // Deferred / on-gate signup: run the action now if signed in, else stash it,
+  // open the soft-signup modal, and run it once the account is created.
+  const requireAccount = useCallback(
+    (action: (email: string) => void, gate?: AccountGate) => {
+      if (email.trim().length > 0) {
+        action(email.trim())
+        return
+      }
+      pendingAction.current = action
+      setAccountGate(gate ?? DEFAULT_GATE)
+      track('account_gate_shown', { title: (gate ?? DEFAULT_GATE).title })
+    },
+    [email],
+  )
+
+  const submitAccountGate = useCallback((n: string, e: string) => {
+    setName(n)
+    setEmail(e)
+    track('account_created')
+    const act = pendingAction.current
+    pendingAction.current = null
+    setAccountGate(null)
+    act?.(e.trim())
+  }, [])
+
+  const cancelAccountGate = useCallback(() => {
+    pendingAction.current = null
+    setAccountGate(null)
+    track('account_gate_dismissed')
+  }, [])
 
   // Step 2 — the candidate confirmed (and possibly edited) the profile; run
   // discovery → audit → score → rank on it.
@@ -181,6 +242,10 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
         setName(n)
         setEmail(e)
       },
+      accountGate,
+      requireAccount,
+      submitAccountGate,
+      cancelAccountGate,
 
       candidateName: name.trim() || 'there',
       candidateRole,
@@ -226,7 +291,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, selectedJob, research, insight, credits, firstSheetUsed],
+    [name, email, accountGate, requireAccount, submitAccountGate, cancelAccountGate, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, selectedJob, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

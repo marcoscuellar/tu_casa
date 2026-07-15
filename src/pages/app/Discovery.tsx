@@ -1,11 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
-import { useAppFlow } from '../../flow/AppFlowContext'
+import { useAppFlow, type AccountGate } from '../../flow/AppFlowContext'
+import { track } from '../../lib/analytics'
 import { loadUserStore, saveUserStore, type SavedJob } from '../../lib/userStore'
 import type { ParsedResume, RankedJob } from '../../engines/types'
 import './flow.css'
 import './Discovery.css'
+
+// Soft-signup nudges for the two Discovery gates.
+const SAVE_GATE: AccountGate = {
+  title: 'Save your shortlist',
+  sub: 'Create a quick profile and we’ll keep your ranked matches — and email you when new roles land.',
+}
+const APPLY_GATE: AccountGate = {
+  title: 'Track your applications',
+  sub: 'Create a quick profile to mark roles as applied and keep your progress in one place.',
+}
 
 // Reveal the shortlist a page at a time so even the focused top-50 lands calmly
 // and scannable. Start with 10, then "show next 10". The focus cap itself lives
@@ -97,7 +108,7 @@ function skillsInPosting(resume: ParsedResume | undefined, job: RankedJob): stri
 
 export function Discovery() {
   const navigate = useNavigate()
-  const { candidateName, candidateRole, jobs, broaderJobs, rawCount, loading, selectJob, hasAccount, email, resume } =
+  const { candidateName, candidateRole, jobs, broaderJobs, rawCount, loading, selectJob, hasAccount, email, requireAccount, resume } =
     useAppFlow()
   const [visible, setVisible] = useState(INITIAL_SHOWN)
   const [showBroader, setShowBroader] = useState(false)
@@ -111,7 +122,6 @@ export function Discovery() {
       return false
     }
   })
-  const [saveEmail, setSaveEmail] = useState(email)
 
   // Hydrate from the KV store when signed in. If the store isn't connected yet
   // (or the fetch fails) this no-ops and the localStorage-seeded state stands.
@@ -129,13 +139,13 @@ export function Discovery() {
   }, [email])
 
   // Persist locally (instant, offline) AND to the store (cross-device).
-  const persistApplied = (ids: string[]) => {
+  const persistApplied = (ids: string[], addr: string = email) => {
     try {
       localStorage.setItem(APPLIED_KEY, JSON.stringify(ids))
     } catch {
       /* ignore storage failures — tracking is best-effort */
     }
-    void saveUserStore(email, { applied: ids })
+    void saveUserStore(addr || email, { applied: ids })
   }
 
   // Save-my-shortlist bar (board turn 13): email capture, no signup wall. Snapshots
@@ -152,30 +162,36 @@ export function Discovery() {
       salary: j.salary,
     }))
 
-  const saveShortlist = () => {
-    const addr = saveEmail.trim()
-    if (!/.+@.+\..+/.test(addr)) return
+  // Persist the shortlist snapshot under the account email.
+  const doSaveShortlist = (addr: string) => {
     const snapshots = snapshotJobs()
     try {
       localStorage.setItem(SAVED_KEY, JSON.stringify(snapshots.map((s) => s.id)))
     } catch {
       /* best-effort */
     }
-    void saveUserStore(addr, { saved: snapshots })
+    void saveUserStore(addr || email, { saved: snapshots })
     setListSaved(true)
   }
 
-  const toggleApplied = (id: string) => {
-    // Tracking applications is an account feature — send them to sign in first.
-    if (!hasAccount) {
-      navigate('/signup', { state: { next: '/discovery' } })
-      return
-    }
+  // Save my shortlist — the MAIN soft-signup trigger. Signed in → save now;
+  // otherwise the gate opens, then the save completes on the same screen.
+  const saveShortlist = () => {
+    track('save_shortlist_attempt', { matches: jobs.length })
+    requireAccount((addr) => doSaveShortlist(addr), SAVE_GATE)
+  }
+
+  const doToggleApplied = (id: string, addr: string) => {
     const next = new Set(applied)
     if (next.has(id)) next.delete(id)
     else next.add(id)
     setApplied(next)
-    persistApplied([...next])
+    persistApplied([...next], addr)
+  }
+
+  // Marking applied is an account feature → gate it, then toggle in place.
+  const toggleApplied = (id: string) => {
+    requireAccount((addr) => doToggleApplied(id, addr), APPLY_GATE)
   }
 
   const fullFit = (job: RankedJob) => {
@@ -434,6 +450,19 @@ export function Discovery() {
           )}
         </div>
 
+        {/* Temporary-session banner — pre-credential, shortlist not yet saved. */}
+        {!hasAccount && !listSaved && jobs.length > 0 && (
+          <div className="disc-temp-banner">
+            <span className="disc-temp-copy">
+              <strong>Your shortlist is temporary.</strong> Save it with your
+              email so it&rsquo;s here when you come back.
+            </span>
+            <button className="disc-temp-btn" onClick={saveShortlist}>
+              Save my shortlist →
+            </button>
+          </div>
+        )}
+
         {/* Match list */}
         {loading && jobs.length === 0 && (
           <div className="disc-state">Finding real openings for you…</div>
@@ -521,19 +550,9 @@ export function Discovery() {
               </div>
             </div>
             {!listSaved && (
-              <div className="disc-savebar-form">
-                <input
-                  className="disc-savebar-input"
-                  type="email"
-                  placeholder="you@email.com"
-                  value={saveEmail}
-                  onChange={(e) => setSaveEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && saveShortlist()}
-                />
-                <button className="disc-savebar-btn" onClick={saveShortlist}>
-                  Save shortlist →
-                </button>
-              </div>
+              <button className="disc-savebar-btn" onClick={saveShortlist}>
+                Save my shortlist →
+              </button>
             )}
           </div>
         )}

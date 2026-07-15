@@ -1,0 +1,112 @@
+/* Soft-signup modal — Wine · Teal, calm, non-blocking. */
+.ss-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(10, 10, 10, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: tcBackdropIn 0.15s ease-out;
+}
+.ss-modal {
+  position: relative;
+  width: min(420px, 100%);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 20px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.4);
+  padding: 32px 30px 26px;
+  animation: tcModalPop 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+.ss-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(15, 15, 15, 0.15);
+  border-radius: 7px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ss-close:hover {
+  background: #0a0a0a;
+  color: #fff;
+}
+.ss-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--wine);
+  margin-bottom: 10px;
+}
+.ss-title {
+  font: 800 22px var(--font);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #0a0a0a;
+}
+.ss-sub {
+  font: 500 13.5px var(--font);
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.ss-field {
+  display: block;
+  margin-top: 16px;
+}
+.ss-flabel {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--grey);
+  margin-bottom: 6px;
+}
+.ss-input {
+  width: 100%;
+  font: 500 14.5px var(--font);
+  color: var(--ink);
+  background: #f4f2ec;
+  border: 1.5px solid var(--hairline-14);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: border-color 0.15s;
+}
+.ss-input:focus {
+  outline: none;
+  border-color: var(--wine) !important;
+}
+.ss-err {
+  margin-top: 12px;
+  font: 500 12.5px var(--font);
+  color: var(--wine);
+}
+.ss-submit {
+  width: 100%;
+  margin-top: 20px;
+  font: 700 13px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--wine);
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.ss-submit:hover {
+  filter: brightness(0.92);
+}
+.ss-fine {
+  margin-top: 12px;
+  text-align: center;
+  font: 500 11px var(--font);
+  color: var(--grey);
+}

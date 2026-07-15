@@ -454,6 +454,45 @@
   color: #fff;
 }
 
+/* Temporary-session banner — pre-credential nudge to save the shortlist. */
+.disc-temp-banner {
+  margin-top: 14px;
+  background: rgba(110, 21, 34, 0.06);
+  border: 1px solid rgba(110, 21, 34, 0.22);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.disc-temp-copy {
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+.disc-temp-copy strong {
+  color: var(--wine);
+}
+.disc-temp-btn {
+  flex-shrink: 0;
+  font: 700 12px var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--wine);
+  border: none;
+  border-radius: 100px;
+  padding: 11px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s;
+}
+.disc-temp-btn:hover {
+  filter: brightness(0.92);
+}
+
 /* Save-my-shortlist bar (board turn 13) */
 .disc-savebar {
   margin-top: 16px;

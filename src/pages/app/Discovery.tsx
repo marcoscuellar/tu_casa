@@ -239,6 +239,12 @@ export function Discovery() {
                 ))}
               </div>
             )}
+            {job.alsoPostedOn && job.alsoPostedOn.length > 0 && (
+              <div className="disc-also mono-label">
+                ↗ Also posted on {job.alsoPostedOn.length} other{' '}
+                {job.alsoPostedOn.length === 1 ? 'site' : 'sites'}
+              </div>
+            )}
           </div>
           <span className="disc-chevron" aria-hidden>
             {isOpen ? '–' : '+'}
@@ -347,6 +353,27 @@ export function Discovery() {
               <div className="disc-section">
                 <div className="disc-body-label mono-label">What the role is</div>
                 <p className="disc-desc">{snippet(job.description, 460)}</p>
+              </div>
+            )}
+
+            {job.alsoPostedOn && job.alsoPostedOn.length > 0 && (
+              <div className="disc-section">
+                <div className="disc-body-label mono-label">
+                  Also posted on — we kept the best version
+                </div>
+                <div className="disc-also-list">
+                  {job.alsoPostedOn.map((d) => (
+                    <a
+                      key={d.id}
+                      className="disc-also-link"
+                      href={d.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {d.label} ↗
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
 

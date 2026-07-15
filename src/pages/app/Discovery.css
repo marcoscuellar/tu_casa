@@ -287,6 +287,40 @@
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.85);
 }
+
+/* "Also posted on N other sites" — light grouping note + link list. */
+.disc-also {
+  margin-top: 9px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--grey);
+}
+.disc-card-top .disc-also {
+  color: rgba(255, 255, 255, 0.5);
+}
+.disc-also-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.disc-also-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  border: 1px solid var(--hairline);
+  padding: 5px 11px;
+  border-radius: 999px;
+  transition: border-color 0.15s;
+}
+.disc-also-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.disc-card-top .disc-also-link {
+  color: var(--accent-soft);
+  border-color: rgba(255, 255, 255, 0.25);
+}
 /* Meta as pill chips: company · location · industry */
 .disc-pills {
   display: flex;

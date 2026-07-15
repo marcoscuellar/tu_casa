@@ -165,9 +165,24 @@ export interface AuditResult {
   note?: string
 }
 
+/** One other listing of the same real job, collapsed into the survivor. */
+export interface DuplicatePosting {
+  id: string
+  link: string
+  sourceType: SourceType
+  /** Short where-posted label for the grouping note (e.g. "indeed.com"). */
+  label: string
+}
+
 /** A job that survived Engine 3 (verified or flagged), carrying its audit. */
 export interface AuditedJob extends DiscoveredJob {
   audit: AuditResult
+  /**
+   * Other listings of this same job (same company + title + location + closely
+   * matching description) that were collapsed into this one — drives the "also
+   * posted on N other sites" grouping. Absent when this job was posted once.
+   */
+  alsoPostedOn?: DuplicatePosting[]
 }
 
 /* ============================================================

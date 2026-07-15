@@ -19,6 +19,27 @@
   margin-top: 14px;
   max-width: 52ch;
 }
+/* "you." accent — bright teal on the dark header. */
+.disc-you {
+  color: var(--accent-soft);
+}
+/* Right-side match count. */
+.disc-header-count {
+  text-align: right;
+}
+.disc-count-num {
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 60px;
+  line-height: 1;
+  color: var(--accent-soft);
+}
+.disc-count-label {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--on-dark-50);
+  margin-top: 4px;
+}
 
 /* Save-my-list — teal accent, pops on the black header */
 .disc-save-btn {
@@ -55,36 +76,35 @@
   line-height: 1.55;
 }
 .disc-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  align-items: start;
   margin-top: 14px;
-}
-/* The #1 match is featured full-width; the rest sit in a 2-up grid. */
-.disc-card-top {
-  grid-column: 1 / -1;
 }
 
 /* Card — collapsed head + expandable body */
 .disc-card {
-  border-radius: 16px;
+  border-radius: 22px;
   overflow: hidden;
   box-shadow: 0 10px 28px -16px rgba(0, 0, 0, 0.18);
   transition: box-shadow 0.15s;
 }
-/* Top match: bright white with a 2px teal border + teal score (board turn 12) */
+/* Top match: near-black card with a bright-teal score (the signature). */
 .disc-card-top {
-  background: #fff;
-  color: var(--ink);
-  border: 2px solid var(--accent);
+  background: #0f0f0f;
+  color: #fff;
 }
 .disc-card-top .disc-score {
-  color: var(--accent);
+  color: var(--accent-soft);
 }
+/* The rest: white cards with a deep-teal score. */
 .disc-card-plain {
-  background: var(--card);
+  background: #fff;
   color: var(--ink);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.disc-card-plain .disc-score {
+  color: var(--accent);
 }
 .disc-card.is-open {
   box-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.3);
@@ -180,13 +200,61 @@
   margin-top: 9px;
 }
 .disc-head-chip {
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+/* Design tag treatment: bordered on the dark top card, cream on white cards. */
+.disc-card-top .disc-head-chip {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+.disc-card-plain .disc-head-chip {
+  background: #f4f2ec;
+  color: #6b6b6b;
+}
+/* Dark top card: make the expandable body readable on near-black. */
+.disc-card-top .disc-meta,
+.disc-card-top .disc-chevron {
+  color: rgba(255, 255, 255, 0.55);
+}
+.disc-card-top .disc-facts {
+  border-top-color: rgba(255, 255, 255, 0.14);
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+.disc-card-top .disc-fact-label,
+.disc-card-top .disc-body-label,
+.disc-card-top .disc-body-note,
+.disc-card-top .disc-desc,
+.disc-card-top .disc-measure-d,
+.disc-card-top .disc-measure-empty {
+  color: rgba(255, 255, 255, 0.62);
+}
+.disc-card-top .disc-fact-val,
+.disc-card-top .disc-measure-t {
   color: #fff;
-  background: var(--accent);
-  padding: 3px 10px;
-  border-radius: 20px;
+}
+.disc-card-top .disc-measure-good,
+.disc-card-top .disc-measure-gap {
+  color: var(--accent-soft);
+}
+/* On the dark card, the "prep" button flips to white-on-dark for contrast. */
+.disc-card-top .disc-fit-btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.disc-card-top .disc-fit-btn:hover {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff;
+}
+.disc-card-top .disc-applied-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
 }
 /* Meta as pill chips: company · location · industry */
 .disc-pills {

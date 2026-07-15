@@ -193,7 +193,7 @@ export function Discovery() {
               Step 02 / Out · Ranked shortlist
             </div>
             <h1 className="head disc-head">
-              Built for <span className="red">you.</span>
+              Built for <span className="disc-you">you.</span>
             </h1>
             <p className="disc-sub">
               {candidateName} · {candidateRole}. Live openings, strongest fit
@@ -201,6 +201,12 @@ export function Discovery() {
               requirements. Tap any role to see why it fits.
             </p>
           </div>
+          {jobs.length > 0 && (
+            <div className="disc-header-count">
+              <div className="disc-count-num">{jobs.length}</div>
+              <div className="disc-count-label mono-label">Genuine matches</div>
+            </div>
+          )}
         </div>
 
         {/* Match list */}

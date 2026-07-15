@@ -282,8 +282,8 @@ export function Landing() {
       <section className="lp-band lp-band-burgundy">
         <div className="lp-in lp-quotes">
           <div className="lp-eyebrow lp-eyebrow-onburgundy">From early users</div>
-          <div className="lp-quotes-single">
-            <figure className="lp-quote-feat lp-quote-feat-solo">
+          <div className="lp-quotes-grid">
+            <figure className="lp-quote-feat">
               <blockquote>
                 “I thought this was going to be just another data collector. This
                 is <span className="lp-bright">actual real stuff</span> — it makes
@@ -297,6 +297,37 @@ export function Landing() {
                 </span>
               </figcaption>
             </figure>
+            <div className="lp-quote-stack">
+              <figure className="lp-quote-sm">
+                <blockquote>
+                  “I’ve tried the other AI recruiter tools. This one had{' '}
+                  <span className="lp-teal-ink">results</span> — and introduced me
+                  to companies I’d never heard of.”
+                </blockquote>
+                <figcaption className="lp-quote-by">
+                  <span className="lp-quote-av lp-quote-av-teal">JV</span>
+                  <span>
+                    <span className="lp-quote-name">James V.</span>
+                    <span className="lp-quote-role">CREATIVE DIRECTOR</span>
+                  </span>
+                </figcaption>
+              </figure>
+              <figure className="lp-quote-sm">
+                <blockquote>
+                  “Résumé review, the AI guiding me through the entire process — it
+                  felt like{' '}
+                  <span className="lp-teal-ink">I had my own recruiter</span> the
+                  whole way.”
+                </blockquote>
+                <figcaption className="lp-quote-by">
+                  <span className="lp-quote-av lp-quote-av-teal">EM</span>
+                  <span>
+                    <span className="lp-quote-name">Elizabeth M.</span>
+                    <span className="lp-quote-role">IT DIRECTOR</span>
+                  </span>
+                </figcaption>
+              </figure>
+            </div>
           </div>
         </div>
       </section>

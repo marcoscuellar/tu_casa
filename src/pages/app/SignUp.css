@@ -76,8 +76,12 @@
   flex-direction: column;
   gap: 14px;
 }
+/* Teal focus on the account fields (beats the global wine focus). */
+.signup-card .field-dark:focus {
+  border-color: var(--accent-soft) !important;
+}
 .signup-err {
-  color: var(--accent-soft);
+  color: #e5837a; /* warm error tint, legible on the dark card */
   font-size: 12.5px;
   min-height: 15px;
   font-weight: 500;

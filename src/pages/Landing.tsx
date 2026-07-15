@@ -1,78 +1,59 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useClock } from '../lib/useClock'
 import { AdhdPanel } from '../components/AdhdPanel'
 import { Logo } from '../components/Logo'
 import './Landing.css'
 
-interface EngineStep {
-  key: string
-  label: string
-  desc: string
-  icon: JSX.Element
+interface Step {
+  id: string
+  n: string
+  name: string
+  body: string
 }
 
-// "One engine, search to offer" — the four-stage icon row (turn 24).
-const ENGINE: EngineStep[] = [
+// "How the AI works" — the four-step accordion (Wine · Teal handoff).
+const STEPS: Step[] = [
   {
-    key: 'find',
-    label: 'FIND',
-    desc: 'Scans ~40 job boards, then verifies each opening against the employer’s own ATS. No ghost jobs.',
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="10.5" cy="10.5" r="6.5" />
-        <path d="M21 21l-5.2-5.2" />
-      </svg>
-    ),
+    id: 'search',
+    n: '01',
+    name: 'Search',
+    body: 'Thousands of live openings, scanned in real time from a single résumé upload — no manual searching, no stale tabs.',
   },
   {
-    key: 'measure',
-    label: 'MEASURE UP',
-    desc: 'Measures your résumé against the role’s real requirements. Honest fit scores, no keyword-stuffing.',
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2.5" y="8" width="19" height="8" rx="1.5" />
-        <path d="M7 8v3M11 8v4M15 8v3M19 8v4" />
-      </svg>
-    ),
+    id: 'verify',
+    n: '02',
+    name: 'Verify',
+    body: 'Expired posts, duplicate reposts, and ghost jobs are thrown out before they ever reach your list.',
   },
   {
-    key: 'apply',
-    label: 'APPLY',
-    desc: 'Company intel tailors your résumé to what this employer actually wants.',
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="3" width="16" height="18" rx="2" />
-        <path d="M8.5 3.5h7a1 1 0 0 1 1 1V6a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" />
-        <path d="M8 12h8M8 16h5" />
-      </svg>
-    ),
+    id: 'match',
+    n: '03',
+    name: 'Match',
+    body: 'Your full experience — skills, seniority, recency — graded against each role. Best fits first, every score explained.',
   },
   {
-    key: 'interview',
-    label: 'INTERVIEW',
-    desc: 'A live cheat sheet from real company research — likely questions, ready answers, what they care about.',
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M8 12.5l2.5 2.5L16 9.5" />
-      </svg>
-    ),
+    id: 'prep',
+    n: '04',
+    name: 'Interview prep',
+    body: 'A live cheat sheet for the exact role: company research, likely questions with drafted answers, and a pre-flight checklist.',
   },
 ]
 
 export function Landing() {
+  const clock = useClock()
+  const [open, setOpen] = useState<string | null>('search')
   const [adhdOpen, setAdhdOpen] = useState(false)
   const arrowsRef = useRef<HTMLDivElement>(null)
 
-  // Bob the hero arrows apart/together as the page scrolls — a gentle wave
-  // tied to scroll position. Respects reduced-motion.
+  // Gentle scroll-bob on the hero sort arrows — the motion Marcos asked for.
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     let raf = 0
     const apply = () => {
       raf = 0
       const el = arrowsRef.current
-      if (el) el.style.setProperty('--arrow-shift', `${Math.sin(window.scrollY / 70) * 7}px`)
+      if (el) el.style.setProperty('--arrow-shift', `${Math.sin(window.scrollY / 70) * 6}px`)
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(apply)
@@ -87,12 +68,15 @@ export function Landing() {
 
   return (
     <div className="lp">
-      {/* Topbar */}
-      <header className="lp-topbar">
-        <div className="lp-topbar-in">
-          <Logo to={null} />
-          <div className="lp-topbar-right">
+      <div className="lp-wrap">
+        {/* Topbar */}
+        <header className="lp-topbar">
+          <div className="lp-topbar-left">
+            <Logo to={null} />
             <span className="lp-tag">Free for job seekers</span>
+          </div>
+          <div className="lp-topbar-right">
+            <span className="lp-clock">{clock}</span>
             <button
               className={`lp-adhd ${adhdOpen ? 'is-on' : ''}`}
               onClick={() => setAdhdOpen((v) => !v)}
@@ -100,107 +84,150 @@ export function Landing() {
               <span aria-hidden>{adhdOpen ? '●' : '○'}</span> ADHD support
             </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Hero — dark / teal split */}
-      <section className="lp-band lp-hero-band">
-        <div className="lp-in">
-          <div className="lp-hero">
-            <div className="lp-hero-ghost" aria-hidden>TUCASA</div>
-            <div className="lp-hero-dark">
-              <div className="lp-hero-eyebrow">Agentic. Composable. Built for humans.</div>
-              <h1 className="lp-hero-head">
-                REAL JOBS.
-                <br />
-                REAL FIT.
-                <br />
-                RIGHT NOW.
-              </h1>
-              <Link to="/upload" className="lp-cta lp-hero-cta">
-                Upload your résumé — free →
-              </Link>
-            </div>
-            <div className="lp-hero-teal" aria-hidden>
-              <div className="lp-hero-arrows" ref={arrowsRef}>
-                <svg width="34" height="34" viewBox="0 0 24 24" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12l7 7 7-7" />
-                </svg>
-                <svg width="34" height="34" viewBox="0 0 24 24" stroke="#0b1020" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 19V5M5 12l7-7 7 7" />
-                </svg>
-              </div>
+        {/* Hero — near-black tile, wordmark bleed, teal sort panel */}
+        <section className="lp-hero">
+          <div className="lp-hero-eyebrow">AI-powered job search</div>
+          <h1 className="lp-hero-head">
+            REAL JOBS.
+            <br />
+            REAL FIT.
+            <br />
+            RIGHT NOW.
+          </h1>
+          <div className="lp-hero-ghost" aria-hidden>
+            TuCasa
+          </div>
+          <div className="lp-hero-panel" aria-hidden>
+            <div className="lp-hero-arrows" ref={arrowsRef}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 8 4-4 4 4" />
+                <path d="M7 4v16" />
+                <path d="m21 16-4 4-4-4" />
+                <path d="M17 20V4" />
+              </svg>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Band 1 · cream — pillars */}
-      <section className="lp-band lp-band-cream">
-        <div className="lp-in lp-pillars">
-          <div className="lp-sec-head">
-            <div className="lp-eyebrow lp-eyebrow-teal">Why we exist</div>
-            <h2 className="lp-sec-title">
-              Finding a genuine job should be this{' '}
-              <span className="lp-burgundy">easy.</span>
-            </h2>
+        {/* Why we exist — white statement tile */}
+        <section className="lp-tile lp-tile-light lp-statement">
+          <div className="lp-eyebrow lp-eyebrow-wine">Why we exist</div>
+          <h2 className="lp-statement-head">
+            Finding a genuine job
+            <br />
+            should be this&nbsp;<span className="lp-wine">easy.</span>
+          </h2>
+        </section>
+
+        {/* Description + CTA row — near-black tile */}
+        <section className="lp-tile lp-tile-dark lp-desc">
+          <p className="lp-desc-text">
+            Drop your résumé.{' '}
+            <span className="lp-teal-bright">AI searches hundreds of job sites,</span>{' '}
+            ranks the ones built for you, and preps you to win the interview.
+          </p>
+          <div className="lp-desc-cta">
+            <Link to="/upload" className="lp-btn lp-btn-wine">
+              Upload your résumé — free
+            </Link>
+            <div className="lp-desc-note">Every match verified. No inflated scores.</div>
           </div>
+        </section>
 
-          {/* One engine, search to offer — icon row */}
-          <div className="lp-engine">
-            <div className="lp-eyebrow lp-eyebrow-teal">One engine, search to offer</div>
-            <div className="lp-engine-row">
-              {ENGINE.map((step, i) => (
-                <div className="lp-engine-cell" key={step.key}>
-                  {i > 0 && <span className="lp-engine-arrow" aria-hidden>→</span>}
-                  <div className="lp-engine-step">
-                    <span className="lp-engine-icon">{step.icon}</span>
-                    <span className="lp-engine-label">{step.label}</span>
-                    <span className="lp-engine-desc">{step.desc}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Three pillar cards */}
-          <div className="lp-cards">
-            <div className="lp-card lp-card-navy">
-              <div className="lp-card-title">Real jobs</div>
-              <div className="lp-card-body">
+        {/* Three pillars — white / teal / wine */}
+        <div className="lp-cards">
+          <div className="lp-card lp-card-white">
+            <svg width="26" height="26" viewBox="0 0 24 24" stroke="#0a0a0a" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="12" r="6" />
+              <circle cx="15" cy="12" r="6" />
+            </svg>
+            <div>
+              <div className="lp-card-title lp-card-title-ink">Real jobs</div>
+              <div className="lp-card-body lp-card-body-muted">
                 Live openings, pulled the moment they post. No stale listings, no
                 ghost jobs.
               </div>
             </div>
-            <div className="lp-card lp-card-teal">
-              <div className="lp-card-title">Real fit</div>
-              <div className="lp-card-body">
-                Your résumé graded against each role’s real requirements. Why you
-                fit, what’s missing.
+          </div>
+          <div className="lp-card lp-card-teal">
+            <svg width="26" height="26" viewBox="0 0 24 24" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 3v6M9 13v8M15 3v14M15 21v-2" />
+            </svg>
+            <div>
+              <div className="lp-card-title lp-card-title-white">Real fit</div>
+              <div className="lp-card-body lp-card-body-onteal">
+                Your résumé graded against each role&rsquo;s real requirements. See
+                why you fit, what&rsquo;s missing, and whether it&rsquo;s worth
+                applying.
               </div>
             </div>
-            <div className="lp-card lp-card-burgundy">
-              <div className="lp-card-title">Real support</div>
-              <div className="lp-card-body">
-                From first search to the interview — a live cheat sheet for the
-                exact role.
+          </div>
+          <div className="lp-card lp-card-wine">
+            <svg width="26" height="26" viewBox="0 0 24 24" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16v12H8l-4 4V4z" />
+            </svg>
+            <div>
+              <div className="lp-card-title lp-card-title-white">Real support</div>
+              <div className="lp-card-body lp-card-body-onwine">
+                From your first search to the interview itself — a live cheat sheet
+                built from your background and the exact role.
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Band 2 · dark — the difference + stats */}
-      <section className="lp-band lp-band-dark">
-        <div className="lp-in lp-diff">
-          <div className="lp-sec-head">
-            <div className="lp-eyebrow lp-eyebrow-bright">The difference</div>
-            <h2 className="lp-sec-title lp-on-dark">
-              We don’t match keywords.{' '}
-              <span className="lp-bright">We match you.</span>
-            </h2>
+        {/* The difference — near-black statement tile */}
+        <section className="lp-tile lp-tile-dark lp-statement">
+          <div className="lp-eyebrow lp-eyebrow-bright">The difference</div>
+          <h2 className="lp-statement-head lp-on-dark">
+            WE DON&rsquo;T MATCH
+            <br />
+            KEYWORDS. <span className="lp-teal-bright">WE MATCH YOU.</span>
+          </h2>
+        </section>
+
+        {/* How the AI works — white tile, accordion */}
+        <section className="lp-tile lp-tile-light lp-how">
+          <div className="lp-eyebrow lp-eyebrow-wine">How the AI works</div>
+          <div className="lp-how-lead">
+            Four steps, start to interview. Every one grounded in your actual
+            experience.
           </div>
-          <div className="lp-stats">
+          <div className="lp-how-grid">
+            {STEPS.map((it) => {
+              const isOpen = open === it.id
+              return (
+                <div
+                  key={it.id}
+                  className={`lp-acc ${isOpen ? 'is-open' : ''}`}
+                  onClick={() => setOpen(isOpen ? null : it.id)}
+                >
+                  <div className="lp-acc-top">
+                    <span className="lp-acc-name">{it.name}</span>
+                    <span className="lp-acc-sign">{isOpen ? '−' : '+'}</span>
+                  </div>
+                  <div className="lp-acc-n">{it.n}</div>
+                  {isOpen ? (
+                    <div className="lp-acc-body">{it.body}</div>
+                  ) : (
+                    <div className="lp-acc-spacer" />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          <div className="lp-how-foot">
+            Search and match run twice — the second pass is why you can trust the
+            first.
+          </div>
+        </section>
+
+        {/* Stats band — near-black tile, cited figures */}
+        <section className="lp-tile lp-tile-dark lp-stats">
+          <div className="lp-eyebrow lp-eyebrow-bright">The market you&rsquo;re up against</div>
+          <div className="lp-stats-grid">
             <div className="lp-stat">
               <div className="lp-stat-num">
                 1<span className="lp-stat-unit">in 7</span>
@@ -231,32 +258,32 @@ export function Landing() {
               <div className="lp-stat-src">LiveCareer HR survey · Mar 2025</div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Band 3 · cream — founder */}
-      <section className="lp-band lp-band-cream">
-        <div className="lp-in lp-founder">
+        {/* Founder — white tile */}
+        <section className="lp-tile lp-tile-light lp-founder">
           <div className="lp-founder-photo">
             <img src="/marcos.jpg" alt="Marcos Cuellar, founder of TuCasa" />
           </div>
           <div className="lp-founder-copy">
-            <div className="lp-eyebrow lp-eyebrow-teal">Why trust us</div>
+            <div className="lp-eyebrow lp-eyebrow-wine">Why trust us</div>
             <h2 className="lp-founder-head">
-              I built this for my sister. It landed her the job. Now it’s for you.
+              I built this to help my sister with her job search. It became the
+              starting point for TuCasa.
             </h2>
             <p className="lp-founder-body">
-              When my sister was job hunting, I pointed the AI engines I’d built
-              at her search — verify a job is real, check the fit, research the
-              company. It landed her the job.
+              A few years ago, I created GLVE, an agentic, composable sales engine
+              built to research companies, identify opportunities, and help teams
+              act on the right signals. When my sister started looking for a new
+              job, I adapted that same technology for her.
             </p>
             <div className="lp-founder-quote">
-              The cheat sheet I built for myself first — it predicted what they’d
-              ask and was spot on. Now it builds one for you, for the exact role.
+              It helped verify which roles were real, understand where she was a
+              strong match, research the companies behind them, and focus her time
+              on the opportunities that were actually worth pursuing.
             </div>
             <p className="lp-founder-body">
-              14 years in staffing. TuCasa is those same engines, rebuilt for job
-              seekers — free.
+              That experience became the foundation for TuCasa.
             </p>
             <div className="lp-founder-by">
               <a
@@ -275,19 +302,17 @@ export function Landing() {
               <span className="lp-founder-chip">Builds tools for ADHD folks</span>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Band 3b · burgundy — early-user quotes */}
-      <section className="lp-band lp-band-burgundy">
-        <div className="lp-in lp-quotes">
-          <div className="lp-eyebrow lp-eyebrow-onburgundy">From early users</div>
+        {/* Early-user quotes — wine tile */}
+        <section className="lp-tile lp-tile-wine lp-quotes">
+          <div className="lp-eyebrow lp-eyebrow-onwine">From early users</div>
           <div className="lp-quotes-grid">
             <figure className="lp-quote-feat">
               <blockquote>
                 “I thought this was going to be just another data collector. This
-                is <span className="lp-bright">actual real stuff</span> — it makes
-                the scariest part of the process concrete.”
+                is <span className="lp-teal-bright">actual real stuff</span> — it
+                makes the scariest part of the process concrete.”
               </blockquote>
               <figcaption className="lp-quote-by">
                 <span className="lp-quote-av">AF</span>
@@ -329,17 +354,13 @@ export function Landing() {
               </figure>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Band 4 · dark — pricing */}
-      <section className="lp-band lp-band-dark" id="pricing">
-        <div className="lp-in lp-pricing">
+        {/* Pricing — near-black tile */}
+        <section className="lp-tile lp-tile-dark lp-pricing" id="pricing">
           <div className="lp-pricing-head">
             <div className="lp-eyebrow lp-eyebrow-bright">Pricing</div>
-            <h2 className="lp-sec-title lp-on-dark lp-pricing-title">
-              Finding real jobs is free. Always.
-            </h2>
+            <h2 className="lp-pricing-title">Finding real jobs is free. Always.</h2>
             <p className="lp-pricing-sub">
               You never pay to search, verify, or see your fit. You only pay when
               the AI does personalized work for you — because that runs on a
@@ -375,7 +396,6 @@ export function Landing() {
               <ul className="lp-tier-feats">
                 <li>Unlimited AI résumé tailoring — re-done for each role</li>
                 <li>Interview cheat sheets for every interview — company intel, likely questions, ready answers</li>
-                <li>Up to 20 cheat sheets a month</li>
               </ul>
               <Link to="/signup" className="lp-tier-cta lp-tier-cta-pro">
                 Go Pro
@@ -388,42 +408,45 @@ export function Landing() {
           <div className="lp-pricing-foot">
             Built with Claude. AI-generated — always review before you send.
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Final CTA · cream */}
-      <section className="lp-band lp-band-cream">
-        <div className="lp-in lp-final">
-          <h2 className="lp-final-head">
-            Apply to less ghost jobs. To land{' '}
-            <span className="lp-teal-ink">the right one.</span>
+        {/* The trade — wine statement tile */}
+        <section className="lp-tile lp-tile-wine lp-statement">
+          <div className="lp-eyebrow lp-eyebrow-onwine-dim">The trade</div>
+          <h2 className="lp-statement-head lp-on-dark">
+            ONE RÉSUMÉ IN.
+            <br />
+            A SHORTLIST WORTH
+            <br />
+            YOUR TIME, OUT.
           </h2>
-          <Link to="/upload" className="lp-cta lp-cta-lg">
-            Upload your résumé — free →
+        </section>
+
+        {/* Final CTA — white tile */}
+        <section className="lp-tile lp-tile-light lp-final">
+          <h2 className="lp-final-head">
+            APPLY TO LESS GHOST JOBS.
+            <br />
+            TO LAND&nbsp;<span className="lp-wine">THE RIGHT ONE.</span>
+          </h2>
+          <p className="lp-final-sub">
+            Real matches, honest fit, and a cheat sheet for the interview — all
+            free.
+          </p>
+          <Link to="/upload" className="lp-btn lp-btn-teal lp-btn-lg">
+            Upload your résumé — free
           </Link>
           <div className="lp-final-note">
-            Free for job seekers · no credit card · no catch
+            Free for job seekers. No credit card. No catch.
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="lp-band lp-band-cream lp-footer-band">
-        <div className="lp-in lp-footer">
-          <Logo to="/" size={12} />
-          <div className="lp-footer-right">
-            <span>free for job seekers, always</span>
-            <a
-              className="lp-footer-credit"
-              href="https://www.linkedin.com/in/marcosmcuellar/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              by Marcos Cuellar
-            </a>
-          </div>
-        </div>
-      </footer>
+        {/* Footer */}
+        <footer className="lp-footer">
+          <span>tucasa</span>
+          <span>free for job seekers, always</span>
+        </footer>
+      </div>
 
       {adhdOpen && <AdhdPanel onClose={() => setAdhdOpen(false)} />}
     </div>

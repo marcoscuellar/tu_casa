@@ -3,20 +3,21 @@
    Canonical values from the design handoff (App Flow palette).
    ============================================================ */
 :root {
-  /* Colors — teal-led "2b" palette (reskin) */
-  --paper: #f5f2ea; /* page background — cream (no stark white) */
-  --card: #faf8f2; /* a hair lighter than the page for cards/light bands */
-  --cream: #f5f1e8; /* landing statement bands */
-  --bento: #0b1020; /* dark bento surface */
+  /* Colors — Wine · Teal palette (handoff). Wine = actions/structure/warnings;
+     teal = accents (bright #45B8C6 on dark, deep #00747D on light). */
+  --paper: #f4f1ea; /* page background — warm off-white (no stark white page) */
+  --card: #ffffff; /* white cards float on the warm paper */
+  --cream: #f5f1e8; /* soft cream inner tiles */
+  --bento: #0a0a0a; /* near-black — the deepest tiles */
   --ink: #0f0f0f; /* ink text / darkest */
-  /* Brand accent — teal-led. Teal fills + accent text on light; bright teal for
-     marks on the dark #0b1020 bento; burgundy is a SPARING secondary only. */
-  --accent: #00747d; /* teal — primary accent */
-  --accent-soft: #3fbfc9; /* bright teal — accent marks on the dark bento */
+  /* Brand accents */
+  --accent: #00747d; /* deep teal — accents on light surfaces */
+  --accent-soft: #45b8c6; /* bright teal — accents on the near-black tiles */
   --accent-teal-ink: #0e8f9b; /* deeper teal — teal accent text on light surfaces */
-  --burgundy: #640018; /* sparing secondary (plain card score, founder border) */
-  /* Legacy alias: everything authored as var(--red) now renders teal. */
-  --red: var(--accent);
+  --wine: #6e1522; /* wine — CTAs, structural borders, active states, warnings */
+  --burgundy: #6e1522; /* alias — wine is the one secondary now */
+  /* Legacy alias: everything authored as var(--red) renders wine (the action color). */
+  --red: var(--wine);
   --white: #ffffff;
   --field: #f4f2ec; /* field fill on light */
   --chip-neutral: #f0ede4; /* neutral chip fill */

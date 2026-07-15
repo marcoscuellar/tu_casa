@@ -175,9 +175,29 @@
   margin-top: 14px;
   flex-wrap: wrap;
 }
+/* Primary: wine → near-black on hover (design). */
 .fit-action-primary {
   flex: 1;
   min-width: 240px;
+  background: var(--wine);
+  color: #fff;
+  border-radius: 14px;
+  padding: 20px;
+}
+.fit-action-primary:hover {
+  background: #0f0f0f;
+  color: #fff;
+}
+/* Secondary: ghost outline → ink border on hover. */
+.fit-action-secondary {
+  background: none;
+  color: var(--ink);
+  border: 1.5px solid var(--border-light);
+  border-radius: 14px;
+  padding: 20px 26px;
+}
+.fit-action-secondary:hover {
+  border-color: var(--ink);
 }
 
 @media (max-width: 640px) {

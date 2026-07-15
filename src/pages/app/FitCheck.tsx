@@ -107,18 +107,10 @@ export function FitCheck() {
 
         {/* Actions */}
         <div className="fit-actions">
-          <button
-            className="btn btn-red-to-black fit-action-primary"
-            style={{ background: 'var(--red)', color: '#fff', borderRadius: 14, padding: 20 }}
-            onClick={prepMe}
-          >
+          <button className="btn fit-action-primary" onClick={prepMe}>
             Got the interview? Prep me →
           </button>
-          <button
-            className="btn btn-outline fit-action-secondary"
-            style={{ borderRadius: 14, padding: '20px 26px' }}
-            onClick={() => navigate('/discovery')}
-          >
+          <button className="btn fit-action-secondary" onClick={() => navigate('/discovery')}>
             Back to shortlist
           </button>
         </div>

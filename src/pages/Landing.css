@@ -467,6 +467,21 @@
   line-height: 1.12;
   color: #fff;
 }
+/* Solo feature quote — one centered dark card (until the other two land). */
+.lp-quotes-single {
+  display: flex;
+  justify-content: center;
+}
+.lp-quote-feat-solo {
+  max-width: 720px;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+}
+.lp-quote-feat-solo .lp-quote-by {
+  justify-content: center;
+}
 .lp-quote-stack {
   display: flex;
   flex-direction: column;

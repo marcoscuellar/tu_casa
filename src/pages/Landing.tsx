@@ -282,49 +282,21 @@ export function Landing() {
       <section className="lp-band lp-band-burgundy">
         <div className="lp-in lp-quotes">
           <div className="lp-eyebrow lp-eyebrow-onburgundy">From early users</div>
-          <div className="lp-quotes-grid">
-            <figure className="lp-quote-feat">
+          <div className="lp-quotes-single">
+            <figure className="lp-quote-feat lp-quote-feat-solo">
               <blockquote>
-                “The cheat sheet was right there on my screen — I could{' '}
-                <span className="lp-bright">bounce topic to topic</span> and stay
-                on track. Got the offer.”
+                “I thought this was going to be just another data collector. This
+                is <span className="lp-bright">actual real stuff</span> — it makes
+                the scariest part of the process concrete.”
               </blockquote>
               <figcaption className="lp-quote-by">
-                <span className="lp-quote-av">SL</span>
+                <span className="lp-quote-av">AF</span>
                 <span>
-                  <span className="lp-quote-name">Sofia L.</span>
-                  <span className="lp-quote-role">RECRUITER · AUSTIN</span>
+                  <span className="lp-quote-name">Anthony F.</span>
+                  <span className="lp-quote-role">RETAIL OPERATIONS MANAGER</span>
                 </span>
               </figcaption>
             </figure>
-            <div className="lp-quote-stack">
-              <figure className="lp-quote-sm">
-                <blockquote>
-                  “Had <span className="lp-teal-ink">9 real matches by lunch.</span>{' '}
-                  No ghost jobs, no rabbit holes.”
-                </blockquote>
-                <figcaption className="lp-quote-by">
-                  <span className="lp-quote-av lp-quote-av-teal">DR</span>
-                  <span>
-                    <span className="lp-quote-name">Dani R.</span>
-                    <span className="lp-quote-role">DATA ANALYST · CHICAGO</span>
-                  </span>
-                </figcaption>
-              </figure>
-              <figure className="lp-quote-sm">
-                <blockquote>
-                  “The fit score told me which jobs to skip.{' '}
-                  <span className="lp-teal-ink">That’s the part I needed.</span>”
-                </blockquote>
-                <figcaption className="lp-quote-by">
-                  <span className="lp-quote-av lp-quote-av-navy">MO</span>
-                  <span>
-                    <span className="lp-quote-name">Marcus O.</span>
-                    <span className="lp-quote-role">OPS MANAGER · REMOTE</span>
-                  </span>
-                </figcaption>
-              </figure>
-            </div>
           </div>
         </div>
       </section>

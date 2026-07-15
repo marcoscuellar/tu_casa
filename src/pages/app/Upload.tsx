@@ -78,130 +78,95 @@ export function Upload() {
 
   return (
     <AppShell>
-      <div className="upload-bento pop">
-        <div className="blk blk-black upload-block">
-        <div className="upload-header">
-          <div className="eyebrow">Step 01 / In</div>
-          <div className="upload-step mono-label">Setup · 1 of 2</div>
-        </div>
+      <div className="upload pop">
+        <div className="upload-tile">
+          <div className="upload-header">
+            <div className="upload-eyebrow mono-label">Step 01 / In</div>
+            <div className="upload-step mono-label">Setup · 1 of 2</div>
+          </div>
 
-        <div className="upload-intro">
-          <h1 className="head upload-head">
-            Drop your <span className="red">résumé.</span>
-          </h1>
-          <p className="upload-sub">
-            It&rsquo;s the only thing we&rsquo;ll ask you to bring. Your name,
-            role, and experience all come from here — you&rsquo;ll never re-type
-            them. Private to you.
-          </p>
-        </div>
+          <div className="upload-intro">
+            <h1 className="upload-head">
+              Drop your <span className="upload-teal">résumé.</span>
+            </h1>
+            <p className="upload-sub">
+              It&rsquo;s the only thing we&rsquo;ll ask you to bring. Your name,
+              role, and experience all come from here — you&rsquo;ll never re-type
+              them. Private to you.
+            </p>
+          </div>
 
-        <div className="upload-foot">
-          {!parsing ? (
-            <>
-              <input
-                ref={fileInput}
-                type="file"
-                accept=".pdf,.docx,.doc,.txt,text/plain,application/pdf"
-                hidden
-                onChange={onFile}
-              />
-              <button className="upload-dropzone" onClick={() => fileInput.current?.click()}>
-                <span className="upload-plus">+</span>
-                <span>
-                  <span className="upload-dz-title">
-                    Drop your résumé here, or click to upload
+          <div className="upload-foot">
+            {!parsing ? (
+              <>
+                <input
+                  ref={fileInput}
+                  type="file"
+                  accept=".pdf,.docx,.doc,.txt,text/plain,application/pdf"
+                  hidden
+                  onChange={onFile}
+                />
+                <button className="upload-dropzone" onClick={() => fileInput.current?.click()}>
+                  <span className="upload-plus">+</span>
+                  <span>
+                    <span className="upload-dz-title">
+                      Drop your résumé here, or click to upload
+                    </span>
+                    <span className="upload-dz-sub">
+                      PDF, DOCX, or plain text · up to 10MB
+                    </span>
                   </span>
-                  <span className="upload-dz-sub">
-                    PDF, DOCX, or plain text · up to 10MB
-                  </span>
-                </span>
-                <span className="upload-browse mono-label">Browse →</span>
-              </button>
-              <p className="upload-sample">
-                No résumé handy?{' '}
-                <a
-                  className="upload-sample-link"
-                  onClick={onSample}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && onSample()}
-                >
-                  Use a sample to look around →
-                </a>
-              </p>
-              <p className="upload-sample">
-                Don&rsquo;t have one?{' '}
-                <a
-                  className="upload-sample-link"
-                  onClick={() => navigate('/ai-resume')}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate('/ai-resume')}
-                >
-                  We got you — let AI build it →
-                </a>
-              </p>
-              {pipelineError && <p className="upload-error">{pipelineError}</p>}
-            </>
-          ) : (
-            <div className="upload-parsing">
-              <div className="upload-spinner" />
-              <div className="upload-parsing-copy">
-                <div className="upload-parsing-title">Reading your résumé…</div>
-                <p className="upload-parsing-sub">
-                  Pulling out your experience so we can find roles that actually
-                  fit. A few seconds.
+                  <span className="upload-browse mono-label">Browse →</span>
+                </button>
+                <p className="upload-sample">
+                  No résumé handy?{' '}
+                  <a
+                    className="upload-sample-link"
+                    onClick={onSample}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && onSample()}
+                  >
+                    Use a sample to look around →
+                  </a>
                 </p>
-              </div>
-              <div className="upload-checklist">
-                <div className="upload-check">
-                  <span className="upload-tick">✓</span> Contact &amp; name
+                <p className="upload-sample">
+                  Don&rsquo;t have one?{' '}
+                  <a
+                    className="upload-sample-link"
+                    onClick={() => navigate('/ai-resume')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate('/ai-resume')}
+                  >
+                    We got you — let AI build it →
+                  </a>
+                </p>
+                {pipelineError && <p className="upload-error">{pipelineError}</p>}
+              </>
+            ) : (
+              <div className="upload-parsing">
+                <div className="upload-spinner" />
+                <div className="upload-parsing-copy">
+                  <div className="upload-parsing-title">Reading your résumé…</div>
+                  <p className="upload-parsing-sub">
+                    Pulling out your experience so we can find roles that actually
+                    fit. A few seconds.
+                  </p>
                 </div>
-                <div className="upload-check">
-                  <span className="upload-tick">✓</span> Roles &amp; titles
-                </div>
-                <div className="upload-check upload-check-pending">
-                  <span className="upload-ring" /> Skills &amp; experience
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        </div>
-
-        <div className="upload-steps-box">
-          <div className="upload-steps-title mono-label">What happens next</div>
-          <ol className="upload-steps">
-            <li className="upload-step-item is-now">
-              <span className="upload-step-n mono-label">01</span>
-              <div>
-                <div className="upload-step-title">Drop your résumé</div>
-                <div className="upload-step-desc">You&rsquo;re here.</div>
-              </div>
-            </li>
-            <li className="upload-step-item">
-              <span className="upload-step-n mono-label">02</span>
-              <div>
-                <div className="upload-step-title">Confirm your info</div>
-                <div className="upload-step-desc">
-                  We show exactly what we read — you fix anything that&rsquo;s off.
-                </div>
-              </div>
-            </li>
-            <li className="upload-step-item">
-              <span className="upload-step-n mono-label">03</span>
-              <div>
-                <div className="upload-step-title">Hit search</div>
-                <div className="upload-step-desc">
-                  Your top 7 matches surface, strongest fit first — pulled from
-                  thousands of live roles. Our engine does the heavy lifting.
+                <div className="upload-checklist">
+                  <div className="upload-check">
+                    <span className="upload-tick">✓</span> Contact &amp; name
+                  </div>
+                  <div className="upload-check">
+                    <span className="upload-tick">✓</span> Roles &amp; titles
+                  </div>
+                  <div className="upload-check upload-check-pending">
+                    <span className="upload-ring" /> Skills &amp; experience
+                  </div>
                 </div>
               </div>
-            </li>
-          </ol>
-          <div className="upload-steps-foot mono-label">
-            Free for job seekers · private to you
+            )}
           </div>
         </div>
       </div>

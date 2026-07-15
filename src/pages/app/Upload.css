@@ -1,6 +1,17 @@
-.upload-block {
+/* Upload — Wine · Teal. One focused near-black tile; teal accents, the wine
+   "+" square is the only wine (action/structure). */
+
+.upload {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 28px;
+}
+.upload-tile {
   position: relative;
   overflow: hidden;
+  background: #0f0f0f;
+  color: #fff;
+  border-radius: 26px;
   padding: 56px 52px;
   min-height: 600px;
   display: flex;
@@ -11,92 +22,33 @@
   justify-content: space-between;
   align-items: baseline;
 }
+.upload-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--accent-soft);
+}
 .upload-step {
   font-size: 11px;
   letter-spacing: 0.14em;
-  color: var(--on-dark-40);
-}
-/* Bento: a bigger black box + a white "what's next" box */
-.upload-bento {
-  display: grid;
-  grid-template-columns: 1.85fr 1fr;
-  gap: 14px;
-  align-items: stretch;
-}
-.upload-block {
-  height: 100%;
+  color: rgba(255, 255, 255, 0.4);
 }
 .upload-intro {
   margin-top: 28px;
-  max-width: 20ch;
-}
-
-/* White steps box */
-.upload-steps-box {
-  background: var(--card);
-  border-radius: 20px;
-  border: 1px solid rgba(15, 15, 15, 0.08);
-  box-shadow: 0 18px 44px -16px rgba(0, 0, 0, 0.18);
-  padding: 46px 38px;
-  display: flex;
-  flex-direction: column;
-}
-.upload-steps-title {
-  color: var(--red);
-  margin-bottom: 28px;
-}
-.upload-steps {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-.upload-step-item {
-  display: flex;
-  gap: 15px;
-  align-items: flex-start;
-  opacity: 0.5;
-  transition: opacity 0.15s;
-}
-.upload-step-item.is-now {
-  opacity: 1;
-}
-.upload-step-n {
-  color: var(--red);
-  padding-top: 2px;
-  flex-shrink: 0;
-}
-.upload-step-title {
-  font-family: var(--font);
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-.upload-step-desc {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--muted);
-  margin-top: 3px;
-}
-.upload-steps-foot {
-  margin-top: auto;
-  padding-top: 28px;
-  color: var(--grey);
-}
-
-@media (max-width: 860px) {
-  .upload-bento {
-    grid-template-columns: 1fr;
-  }
+  max-width: 16ch;
 }
 .upload-head {
-  font-size: 56px;
+  font: 900 56px var(--font);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+.upload-teal {
+  color: var(--accent-soft);
 }
 .upload-sub {
   font-size: 15.5px;
   line-height: 1.6;
-  color: var(--on-dark-66);
+  color: rgba(255, 255, 255, 0.66);
   margin-top: 18px;
   max-width: 42ch;
 }
@@ -105,6 +57,7 @@
   padding-top: 36px;
 }
 
+/* Idle dropzone */
 .upload-dropzone {
   width: 100%;
   display: flex;
@@ -120,31 +73,25 @@
   color: #fff;
 }
 .upload-dropzone:hover {
-  border-color: var(--red);
-  background: rgba(240, 28, 12, 0.08);
+  border-color: var(--accent-soft);
+  background: rgba(69, 184, 198, 0.12);
 }
 .upload-plus {
   width: 56px;
   height: 56px;
   flex-shrink: 0;
   border-radius: 14px;
-  background: var(--red);
+  background: var(--wine);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font);
-  font-weight: 900;
-  font-size: 28px;
-  letter-spacing: -0.02em;
+  font: 800 28px var(--font);
   line-height: 1;
 }
 .upload-dz-title {
   display: block;
-  font-family: var(--font);
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: -0.02em;
+  font: 700 18px var(--font);
   color: #fff;
 }
 .upload-dz-sub {
@@ -157,20 +104,23 @@
   margin-left: auto;
   font-size: 10.5px;
   letter-spacing: 0.14em;
-  color: var(--on-dark-40);
+  color: rgba(255, 255, 255, 0.4);
 }
 .upload-sample {
   font-size: 12.5px;
-  color: var(--on-dark-50);
-  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 14px;
 }
 .upload-sample-link {
   cursor: pointer;
-  color: var(--red);
+  color: var(--accent-soft);
+}
+.upload-sample-link:hover {
+  color: #fff;
 }
 .upload-error {
   font-size: 13px;
-  color: var(--red);
+  color: #e5837a;
   margin-top: 14px;
   line-height: 1.5;
 }
@@ -191,7 +141,7 @@
   height: 46px;
   flex-shrink: 0;
   border: 3px solid rgba(255, 255, 255, 0.14);
-  border-top-color: var(--red);
+  border-top-color: var(--accent-soft);
   border-radius: 50%;
   animation: tcSpin 0.8s linear infinite;
 }
@@ -200,10 +150,7 @@
   min-width: 220px;
 }
 .upload-parsing-title {
-  font-family: var(--font);
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: -0.02em;
+  font: 700 18px var(--font);
   color: #fff;
 }
 .upload-parsing-sub {
@@ -229,22 +176,25 @@
   color: rgba(255, 255, 255, 0.6);
 }
 .upload-tick {
-  color: var(--red);
+  color: var(--accent-soft);
   font-weight: 700;
 }
 .upload-ring {
   width: 13px;
   height: 13px;
-  border: 2px solid var(--red);
+  border: 2px solid var(--accent-soft);
   border-radius: 50%;
   display: inline-block;
   animation: tcPulse 1s ease-in-out infinite;
 }
 
 @media (max-width: 640px) {
-  .upload-block {
+  .upload {
+    padding: 12px;
+  }
+  .upload-tile {
     padding: 40px 28px;
-    min-height: 500px;
+    min-height: 520px;
   }
   .upload-head {
     font-size: 42px;

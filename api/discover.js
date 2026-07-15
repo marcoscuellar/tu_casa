@@ -644,6 +644,7 @@ async function handler(req, res) {
       onSkip: (c, reason) => console.warn(`discover: skipped ${c.slug} \u2014 ${reason}`)
     });
     const postings = await discovery.findPostings(resume);
+    console.info(`discover: ${postings.length} raw postings returned (pre-rank)`);
     res.status(200).json({ postings });
   } catch (err) {
     console.error("discover failed:", err);

@@ -106,6 +106,8 @@ export interface AppFlowContextValue {
   adoptResume: (resume: ParsedResume) => void
   /** Confirm the (possibly edited) profile and run discovery. True on success. */
   confirmResume: (resume: ParsedResume) => Promise<boolean>
+  /** Would confirming this résumé run a NEW distinct search vs the cached one? */
+  wouldBeNewSearch: (resume: ParsedResume) => boolean
 
   /* Selection carried into fit + cheat sheet */
   selectedJob?: RankedJob
@@ -142,6 +144,26 @@ const DEFAULT_GATE: AccountGate = {
   sub: 'Save your work and unlock more features. Takes 10 seconds.',
 }
 
+/** Copy for the anti-farming gate: first shortlist free, next search signs up. */
+export const SEARCH_GATE: AccountGate = {
+  title: 'One more search? Create a quick profile',
+  sub: 'Your first shortlist is on us. Add your name + email to run another — it keeps your lists in one place. Takes 10 seconds.',
+}
+
+/**
+ * A stable fingerprint of a confirmed résumé. Same fingerprint → same shortlist,
+ * so refreshing or re-running can't farm a fresh batch of jobs each time.
+ */
+function resumeSignature(r: ParsedResume): string {
+  return JSON.stringify({
+    t: (r.titles ?? []).map((x) => x.raw.trim().toLowerCase()),
+    s: (r.skills ?? []).map((x) => x.canonical),
+    y: r.years_total,
+    i: r.industries ?? [],
+    loc: (r.location ?? '').trim().toLowerCase(),
+  })
+}
+
 export function AppFlowProvider({ children }: { children: ReactNode }) {
   // Rehydrate an unsaved working shortlist from a previous tab, if one exists.
   const [restored] = useState(loadSession)
@@ -161,6 +183,13 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   // they succeeded so the screens can navigate without racing the loading flag.
   const [draftResume, setDraftResume] = useState<ParsedResume | null>(null)
   const [pipeline, setPipeline] = useState<PipelineResult | null>(restored?.pipeline ?? null)
+  // Cache the search by résumé fingerprint so the SAME résumé always returns the
+  // SAME shortlist (deterministic) — refreshing/re-running can't farm new jobs.
+  const searchCache = useRef<{ sig: string; result: PipelineResult } | null>(
+    restored?.pipeline
+      ? { sig: resumeSignature(restored.pipeline.resume), result: restored.pipeline }
+      : null,
+  )
   const [loading, setLoading] = useState(false)
   const [pipelineError, setPipelineError] = useState<string | undefined>(undefined)
 
@@ -225,10 +254,18 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
   // discovery → audit → score → rank on it.
   const confirmResume = useCallback(async (resume: ParsedResume): Promise<boolean> => {
     setDraftResume(resume)
+    const sig = resumeSignature(resume)
+    // Deterministic: the same résumé returns the cached shortlist — no fresh pull.
+    if (searchCache.current && searchCache.current.sig === sig) {
+      setPipeline(searchCache.current.result)
+      setPipelineError(undefined)
+      return true
+    }
     setLoading(true)
     setPipelineError(undefined)
     try {
       const result = await runPipelineFromResume(PROVIDERS, resume, { asOfYear: AS_OF_YEAR })
+      searchCache.current = { sig, result }
       setPipeline(result)
       setLoading(false)
       return true
@@ -238,6 +275,15 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       return false
     }
   }, [])
+
+  // True when confirming THIS résumé would run a new, distinct search (a
+  // different fingerprint than the one already cached). Drives the anti-farming
+  // signup gate — the first search is free, a different one signs up.
+  const wouldBeNewSearch = useCallback(
+    (resume: ParsedResume): boolean =>
+      searchCache.current != null && searchCache.current.sig !== resumeSignature(resume),
+    [],
+  )
 
   const jobs = pipeline?.jobs ?? []
   const selectedJob = useMemo(
@@ -300,6 +346,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       draftResume: draftResume ?? undefined,
       adoptResume: (resume) => setDraftResume(resume),
       confirmResume,
+      wouldBeNewSearch,
 
       selectedJob,
       selectJob: (id) => setSelectedId(id),
@@ -329,7 +376,7 @@ export function AppFlowProvider({ children }: { children: ReactNode }) {
       },
       needsCredits: () => firstSheetUsed && credits <= 0,
     }),
-    [name, email, accountGate, requireAccount, submitAccountGate, cancelAccountGate, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, selectedJob, interview, departmentBrief, research, insight, credits, firstSheetUsed],
+    [name, email, accountGate, requireAccount, submitAccountGate, cancelAccountGate, candidateRole, pipeline, jobs, loading, pipelineError, clearError, submitResume, draftResume, confirmResume, wouldBeNewSearch, selectedJob, interview, departmentBrief, research, insight, credits, firstSheetUsed],
   )
 
   return <AppFlowContext.Provider value={value}>{children}</AppFlowContext.Provider>

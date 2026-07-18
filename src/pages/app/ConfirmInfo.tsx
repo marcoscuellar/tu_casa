@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
-import { useAppFlow } from '../../flow/AppFlowContext'
+import { useAppFlow, SEARCH_GATE } from '../../flow/AppFlowContext'
 import { inferFamily, inferLevel } from '../../engines/taxonomy'
 import { toCanonical } from '../../engines/synonymMap'
 import type { ParsedResume, ResumeSkill } from '../../engines/types'
@@ -20,7 +20,8 @@ const NOW_YEAR = new Date().getFullYear()
  */
 export function ConfirmInfo() {
   const navigate = useNavigate()
-  const { draftResume, confirmResume, loading, pipelineError } = useAppFlow()
+  const { draftResume, confirmResume, wouldBeNewSearch, hasAccount, requireAccount, loading, pipelineError } =
+    useAppFlow()
 
   const [title, setTitle] = useState('')
   const [location, setLocation] = useState('')
@@ -95,8 +96,18 @@ export function ConfirmInfo() {
       location: location.trim(),
       onsite_ok: onsiteOk,
     }
-    const ok = await confirmResume(confirmed)
-    if (ok) navigate('/discovery')
+    const runSearch = async () => {
+      const ok = await confirmResume(confirmed)
+      if (ok) navigate('/discovery')
+    }
+    // First shortlist is free. A different, second search asks for a quick
+    // profile — closes the "refresh for endless new jobs" loophole. The same
+    // résumé returns its cached list, so re-confirming it never gates.
+    if (!hasAccount && wouldBeNewSearch(confirmed)) {
+      requireAccount(() => void runSearch(), SEARCH_GATE)
+    } else {
+      void runSearch()
+    }
   }
 
   return (

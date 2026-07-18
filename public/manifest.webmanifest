@@ -1,0 +1,14 @@
+{
+  "name": "TuCasa — Real jobs. Real fit. Right now.",
+  "short_name": "TuCasa",
+  "description": "AI-powered job search. Real jobs, honest fit, and interview prep. Free for job seekers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#00747d",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "/icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useClock } from '../lib/useClock'
-import { AdhdPanel } from '../components/AdhdPanel'
+import { AdhdPanel } from '@marcos/adhd-support'
 import { Logo } from '../components/Logo'
 import './Landing.css'
 

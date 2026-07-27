@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { AdhdPanel } from './AdhdPanel'
+import { AdhdPanel } from '@marcos/adhd-support'
 import { Logo } from './Logo'
 import { SoftSignup } from './SoftSignup'
 import { useAppFlow, type AccountGate } from '../flow/AppFlowContext'

@@ -68,6 +68,20 @@ job crawl, live liveness re-check, résumé/company research, and the verdict
 *prose* — sits behind `providers/`. Today those are fixtures; swapping in live
 LLM/web implementations touches only that seam, never the engines or the UI.
 
+## Specs
+
+The engines are implementations of these documents — the docs are the source of
+truth, `types.ts` mirrors them field for field.
+
+| Doc | Covers |
+|---|---|
+| `resume_jd_scoring_rubric_FIXED.md` | Rubric — layers, dealbreakers, verdicts |
+| `ENGINE_4_Job_Discovery_SEEKER_MODE.md` | Finding real, live postings |
+| `ENGINE_3_Job_Audit_SEEKER_MODE.md` | Second-pass audit, dedupe, flag-not-drop |
+| `interview_research_engine.md` | Company-level research + THIN/GO gate |
+| `ENGINE_5_Interview_Prep_Cheat_Sheet.md` | The cheat sheet — intake, department scoping, the seven sections |
+| `interview_prep_cheat_sheet_SAMPLE.md` | One cheat-sheet intake run end to end |
+
 ## Live job discovery (real ATS jobs)
 
 Discovery can pull **real, live postings** from companies' public ATS boards —
